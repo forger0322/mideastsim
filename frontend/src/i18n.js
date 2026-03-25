@@ -103,7 +103,7 @@ const translations = {
     
     // 经济
     economy: {
-      title: '经济面板',
+      title: '💰 经济面板',
       gdp: 'GDP',
       trade: '贸易',
       resources: '资源',
@@ -125,12 +125,12 @@ const translations = {
     
     // 外交
     diplomacy: {
-      title: '外交面板',
+      title: '🤝 外交面板',
     },
     
     // 军事
     military: {
-      title: '军事面板',
+      title: '⚔️ 军事面板',
     },
     
     // 资源标签（头部经济数据）

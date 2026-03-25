@@ -1199,7 +1199,7 @@ function App() {
         <MemorialModal
           isOpen={showEconomicPanel}
           onClose={() => setShowEconomicPanel(false)}
-          title={`💰 ${t('economy.title')}`}
+          title={t('economy.title')}
           type="经济"
           width="min(650px, 90vw)"
         >
@@ -1212,7 +1212,7 @@ function App() {
         <MemorialModal
           isOpen={showDiplomacyPanel}
           onClose={() => setShowDiplomacyPanel(false)}
-          title={`🤝 ${t('diplomacy.title')}`}
+          title={t('diplomacy.title')}
           type="外交"
           width="min(700px, 90vw)"
         >
@@ -1225,7 +1225,7 @@ function App() {
         <MemorialModal
           isOpen={showMilitaryPanel}
           onClose={() => setShowMilitaryPanel(false)}
-          title={`⚔️ ${t('military.title')}`}
+          title={t('military.title')}
           type="军事"
           width="min(650px, 90vw)"
         >
