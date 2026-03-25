@@ -233,6 +233,17 @@ function App() {
         setShowMilitaryPanel(false);
         setShowSettingsPanel(false);
         setShowLeaderboard(false);
+        setShowFactionPanel(false);
+        break;
+      case 'faction':
+        console.log('Showing: faction panel');
+        setShowEconomicPanel(false);
+        setShowDiplomacyPanel(false);
+        setShowMilitaryPanel(false);
+        setShowSettingsPanel(false);
+        setShowLeaderboard(false);
+        setShowFactionPanel(true);
+        setCurrentPage('map'); // 不保持 active 状态
         break;
       case 'economy':
         console.log('Showing: economy panel');
@@ -241,6 +252,7 @@ function App() {
         setShowMilitaryPanel(false);
         setShowSettingsPanel(false);
         setShowLeaderboard(false);
+        setCurrentPage('map'); // 不保持 active 状态
         break;
       case 'diplomacy':
         console.log('Showing: diplomacy panel');
@@ -249,6 +261,7 @@ function App() {
         setShowMilitaryPanel(false);
         setShowSettingsPanel(false);
         setShowLeaderboard(false);
+        setCurrentPage('map'); // 不保持 active 状态
         break;
       case 'military':
         console.log('Showing: military panel');
@@ -257,6 +270,7 @@ function App() {
         setShowMilitaryPanel(true);
         setShowSettingsPanel(false);
         setShowLeaderboard(false);
+        setCurrentPage('map'); // 不保持 active 状态
         break;
       case 'leaderboard':
         console.log('Showing: leaderboard');
@@ -265,6 +279,7 @@ function App() {
         setShowMilitaryPanel(false);
         setShowSettingsPanel(false);
         setShowLeaderboard(true);
+        setCurrentPage('map'); // 不保持 active 状态
         break;
       case 'settings':
         console.log('Showing: settings panel');
@@ -273,6 +288,7 @@ function App() {
         setShowMilitaryPanel(false);
         setShowSettingsPanel(true);
         setShowLeaderboard(false);
+        setCurrentPage('map'); // 不保持 active 状态
         break;
       default:
         break;
@@ -717,81 +733,23 @@ function App() {
           <>
         {/* ========== 整合顶部栏：导航 + 状态 + 用户信息 ========== */}
         <header className="app-header">
-          {/* 左侧：Logo + 游戏标题（垂直排列）+ 导航菜单 */}
+          {/* 左侧：Logo 区域 */}
           <div className="header-left">
             <div className="logo-area">
               <div className="logo">MIDEASTSIM</div>
               <div className="game-subtitle">GEOPOLITICAL SIMULATION</div>
             </div>
-            
-            {/* 导航菜单 */}
-            <nav className="header-nav">
-              <button
-                className={`nav-item ${currentPage === 'map' ? 'active' : ''}`}
-                onClick={() => handleNavigate('map')}
-              >
-                <span className="nav-icon">🗺️</span>
-                <span className="nav-label">{lang === 'zh' ? '地图' : 'Map'}</span>
-              </button>
-              <button
-                className={`nav-item ${currentPage === 'economy' ? 'active' : ''}`}
-                onClick={() => handleNavigate('economy')}
-              >
-                <span className="nav-icon">📊</span>
-                <span className="nav-label">{lang === 'zh' ? '经济' : 'Economy'}</span>
-              </button>
-              <button
-                className={`nav-item ${currentPage === 'diplomacy' ? 'active' : ''}`}
-                onClick={() => handleNavigate('diplomacy')}
-              >
-                <span className="nav-icon">🤝</span>
-                <span className="nav-label">{lang === 'zh' ? '外交' : 'Diplomacy'}</span>
-              </button>
-              <button
-                className={`nav-item ${currentPage === 'military' ? 'active' : ''}`}
-                onClick={() => handleNavigate('military')}
-              >
-                <span className="nav-icon">⚔️</span>
-                <span className="nav-label">{lang === 'zh' ? '军事' : 'Military'}</span>
-              </button>
-              <button
-                className={`nav-item ${currentPage === 'leaderboard' ? 'active' : ''}`}
-                onClick={() => handleNavigate('leaderboard')}
-              >
-                <span className="nav-icon">🏆</span>
-                <span className="nav-label">{lang === 'zh' ? '排行榜' : 'Rank'}</span>
-              </button>
-              <button
-                className={`nav-item ${currentPage === 'settings' ? 'active' : ''}`}
-                onClick={() => handleNavigate('settings')}
-              >
-                <span className="nav-icon">⚙️</span>
-                <span className="nav-label">{lang === 'zh' ? '设置' : 'Settings'}</span>
-              </button>
-            </nav>
           </div>
 
           {/* 中央：世界统计 + 经济数据 */}
           <div className="header-center">
-            {/* 游戏标题已移到左侧 */}
-            
-            {/* 世界统计 */}
+            {/* 世界统计 - 只保留热点 */}
             {worldState && (
               <div className="world-stats">
                 <div className="stat-item clickable" onClick={() => setShowFactionPanel(true)}>
                   <span className="stat-icon">🔥</span>
                   <span className="stat-label">{lang === 'zh' ? '热点:' : 'Hotspots:'}</span>
                   <span className="stat-value">{worldState.hotspots?.length || 0}{lang === 'zh' ? '处' : ''}</span>
-                </div>
-                <div className="stat-item clickable" onClick={() => setShowFactionPanel(true)}>
-                  <span className="stat-icon">👥</span>
-                  <span className="stat-label">{lang === 'zh' ? '势力:' : 'Factions:'}</span>
-                  <span className="stat-value">4{lang === 'zh' ? '方' : ''}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-icon">🌍</span>
-                  <span className="stat-label">{lang === 'zh' ? '纪元:' : 'Era:'}</span>
-                  <span className="stat-value">AE 6{lang === 'zh' ? '年' : ''}</span>
                 </div>
               </div>
             )}
@@ -839,26 +797,82 @@ function App() {
             )}
           </div>
 
-          {/* 右侧：用户信息 + 语言切换 + 登出 */}
+          {/* 右侧：时间 + 用户信息 + 导航按钮 */}
           <div className="header-right">
-            {player && (
-              <div className="user-info">
-                <div className="user-avatar">👤</div>
-                <div className="user-details">
-                  <div className="user-name">{player.username}</div>
-                  {currentRole && (
-                    <div className="user-role">
-                      {currentRole.flag || '🏛️'} {currentRole.role_name || currentRole.name}
-                    </div>
-                  )}
+            <div className="right-column">
+              {/* 第一行：时间（左）+ 用户信息（右） */}
+              <div className="top-row">
+                {/* 时间显示 */}
+                <div className="time-display">
+                  <span className="time-icon">🕐</span>
+                  <span className="time-value">{new Date().toLocaleTimeString(lang === 'zh' ? 'zh-CN' : 'en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}, {new Date().toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                 </div>
-                <button className="logout-btn" onClick={handleLogout} title="登出">
-                  🚪
-                </button>
+                
+                {/* 用户信息 + 登出 */}
+                {player && (
+                  <div className="user-info">
+                    <div className="user-avatar">👤</div>
+                    <div className="user-details">
+                      <div className="user-name">{player.username}</div>
+                      {currentRole && (
+                        <div className="user-role">
+                          {currentRole.flag || '🏛️'} {currentRole.role_name || currentRole.name}
+                        </div>
+                      )}
+                    </div>
+                    <button className="logout-btn" onClick={handleLogout} title="登出">
+                      🚪
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
-            
-            <LanguageSwitcher />
+              
+              {/* 第二行：导航按钮 */}
+              <nav className="header-nav">
+                <button
+                  className={`nav-item ${currentPage === 'faction' ? 'active' : ''}`}
+                  onClick={() => handleNavigate('faction')}
+                >
+                  <span className="nav-icon">👥</span>
+                  <span className="nav-label">{lang === 'zh' ? '势力' : 'Faction'}</span>
+                </button>
+                <button
+                  className={`nav-item ${currentPage === 'economy' ? 'active' : ''}`}
+                  onClick={() => handleNavigate('economy')}
+                >
+                  <span className="nav-icon">📊</span>
+                  <span className="nav-label">{lang === 'zh' ? '经济' : 'Economy'}</span>
+                </button>
+                <button
+                  className={`nav-item ${currentPage === 'diplomacy' ? 'active' : ''}`}
+                  onClick={() => handleNavigate('diplomacy')}
+                >
+                  <span className="nav-icon">🤝</span>
+                  <span className="nav-label">{lang === 'zh' ? '外交' : 'Diplomacy'}</span>
+                </button>
+                <button
+                  className={`nav-item ${currentPage === 'military' ? 'active' : ''}`}
+                  onClick={() => handleNavigate('military')}
+                >
+                  <span className="nav-icon">⚔️</span>
+                  <span className="nav-label">{lang === 'zh' ? '军事' : 'Military'}</span>
+                </button>
+                <button
+                  className={`nav-item ${currentPage === 'leaderboard' ? 'active' : ''}`}
+                  onClick={() => handleNavigate('leaderboard')}
+                >
+                  <span className="nav-icon">🏆</span>
+                  <span className="nav-label">{lang === 'zh' ? '排行榜' : 'Rank'}</span>
+                </button>
+                <button
+                  className={`nav-item ${currentPage === 'settings' ? 'active' : ''}`}
+                  onClick={() => handleNavigate('settings')}
+                >
+                  <span className="nav-icon">⚙️</span>
+                  <span className="nav-label">{lang === 'zh' ? '设置' : 'Settings'}</span>
+                </button>
+              </nav>
+            </div>
           </div>
         </header>
 
