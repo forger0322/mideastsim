@@ -77,30 +77,6 @@ const translations = {
       alreadyAllies: '已经是盟友',
     },
     
-    // 外交
-    diplomacy: {
-      relations: '外交关系',
-      alliance: '同盟',
-      war: '战争',
-      neutral: '中立',
-      friendly: '友好',
-      hostile: '敌对',
-      support: '支持',
-      criticize: '批评',
-    },
-    
-    // 军事
-    military: {
-      wars: '进行中的战争',
-      noWars: '暂无战争',
-      aggressor: '进攻方',
-      defender: '防守方',
-      startTime: '开始时间',
-      casualties: '伤亡',
-      routine: '例行',
-      large: '大规模',
-    },
-    
     // 经济
     economy: {
       title: '💰 经济面板',
@@ -126,11 +102,27 @@ const translations = {
     // 外交
     diplomacy: {
       title: '🤝 外交面板',
+      relations: '外交关系',
+      alliance: '同盟',
+      war: '战争',
+      neutral: '中立',
+      friendly: '友好',
+      hostile: '敌对',
+      support: '支持',
+      criticize: '批评',
     },
     
     // 军事
     military: {
       title: '⚔️ 军事面板',
+      wars: '进行中的战争',
+      noWars: '暂无战争',
+      aggressor: '进攻方',
+      defender: '防守方',
+      startTime: '开始时间',
+      casualties: '伤亡',
+      routine: '例行',
+      large: '大规模',
     },
     
     // 资源标签（头部经济数据）
@@ -372,33 +364,9 @@ const translations = {
       alreadyAllies: 'Already allies',
     },
     
-    // Diplomacy
-    diplomacy: {
-      relations: 'Diplomatic Relations',
-      alliance: 'Alliance',
-      war: 'War',
-      neutral: 'Neutral',
-      friendly: 'Friendly',
-      hostile: 'Hostile',
-      support: 'Support',
-      criticize: 'Criticize',
-    },
-    
-    // Military
-    military: {
-      wars: 'Active Wars',
-      noWars: 'No active wars',
-      aggressor: 'Aggressor',
-      defender: 'Defender',
-      startTime: 'Start Time',
-      casualties: 'Casualties',
-      routine: 'Routine',
-      large: 'Large Scale',
-    },
-    
     // Economy
     economy: {
-      title: 'Economic Panel',
+      title: '💰 Economic Panel',
       gdp: 'GDP',
       trade: 'Trade',
       resources: 'Resources',
@@ -420,12 +388,28 @@ const translations = {
     
     // Diplomacy
     diplomacy: {
-      title: 'Diplomacy Panel',
+      title: '🤝 Diplomacy Panel',
+      relations: 'Diplomatic Relations',
+      alliance: 'Alliance',
+      war: 'War',
+      neutral: 'Neutral',
+      friendly: 'Friendly',
+      hostile: 'Hostile',
+      support: 'Support',
+      criticize: 'Criticize',
     },
     
     // Military
     military: {
-      title: 'Military Panel',
+      title: '⚔️ Military Panel',
+      wars: 'Active Wars',
+      noWars: 'No active wars',
+      aggressor: 'Aggressor',
+      defender: 'Defender',
+      startTime: 'Start Time',
+      casualties: 'Casualties',
+      routine: 'Routine',
+      large: 'Large Scale',
     },
     
     // Resource labels (header economic data)

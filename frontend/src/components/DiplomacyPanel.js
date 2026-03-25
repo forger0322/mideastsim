@@ -62,11 +62,6 @@ const DiplomacyPanel = ({ relations, onClose }) => {
 
   return (
     <div className="diplomacy-panel">
-      <div className="panel-header">
-        <h3>🤝 {t('diplomacy.relations')}</h3>
-        <button className="close-btn" onClick={onClose}>×</button>
-      </div>
-
       <div className="panel-content">
         <div className="relations-list">
           {displayRelations.map((rel, index) => {

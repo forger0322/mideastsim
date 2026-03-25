@@ -103,11 +103,6 @@ const EconomicPanel = ({ worldState, onClose }) => {
 
   return (
     <div className="economic-panel">
-      <div className="panel-header">
-        <h3>📊 {t('economy.title')}</h3>
-        <button className="close-btn" onClick={onClose}>×</button>
-      </div>
-
       <div className="panel-content">
         {/* 股票市场 */}
         <div className="section">

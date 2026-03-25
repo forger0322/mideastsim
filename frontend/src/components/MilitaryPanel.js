@@ -53,11 +53,6 @@ const MilitaryPanel = ({ wars, onClose }) => {
 
   return (
     <div className="military-panel">
-      <div className="panel-header">
-        <h3>⚔️ {t('military.wars')}</h3>
-        <button className="close-btn" onClick={onClose}>×</button>
-      </div>
-
       <div className="panel-content">
         {displayWars.length === 0 ? (
           <div className="no-wars">
