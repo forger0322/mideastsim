@@ -1,0 +1,239 @@
+/* frontend/src/components/EconomicPanel.css */
+
+.economic-panel {
+  background: rgba(10, 12, 16, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #F0E6D2;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.close-btn {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 6px;
+  color: #F0E6D2;
+  font-size: 24px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.panel-content {
+  padding: 20px;
+}
+
+.section {
+  margin-bottom: 24px;
+}
+
+.section h4 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #A0A0A0;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Stock Grid */
+.stock-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.stock-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.stock-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.stock-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.stock-name {
+  font-size: 13px;
+  color: #000000;
+  margin-bottom: 6px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.stock-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000000;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 4px;
+}
+
+.stock-change {
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.stock-change.up {
+  color: #4CAF50;
+}
+
+.stock-change.down {
+  color: #f44336;
+}
+
+/* Commodity Grid */
+.commodity-grid,
+.crypto-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.commodity-card,
+.crypto-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.commodity-card:hover,
+.crypto-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.commodity-icon,
+.crypto-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.commodity-name,
+.crypto-name {
+  font-size: 13px;
+  color: #000000;
+  margin-bottom: 6px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.commodity-value,
+.crypto-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000000;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 4px;
+}
+
+.commodity-change,
+.crypto-change {
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.commodity-change.up,
+.crypto-change.up {
+  color: #4CAF50;
+}
+
+.commodity-change.down,
+.crypto-change.down {
+  color: #f44336;
+}
+
+/* Sanctions List */
+.sanctions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sanction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.sanction-status {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+  border: 1px solid rgba(244, 67, 54, 0.4);
+}
+
+.sanction-status.active {
+  background: rgba(244, 67, 54, 0.3);
+  border-color: rgba(244, 67, 54, 0.6);
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .stock-grid,
+  .commodity-grid,
+  .crypto-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .economic-panel {
+    margin: 0;
+    border-radius: 0;
+    border: none;
+  }
+  
+  .stock-grid,
+  .commodity-grid,
+  .crypto-grid {
+    grid-template-columns: 1fr;
+  }
+}

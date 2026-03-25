@@ -1,0 +1,216 @@
+/* frontend/src/components/MilitaryPanel.css */
+
+.military-panel {
+  background: rgba(10, 12, 16, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 800px;
+  margin: 0 auto;
+  backdrop-filter: blur(10px);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #F0E6D2;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.close-btn {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 6px;
+  color: #F0E6D2;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.panel-content {
+  padding: 20px;
+}
+
+/* No Wars */
+.no-wars {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.no-wars-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.no-wars-text {
+  font-size: 16px;
+  color: #A0A0A0;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Wars List */
+.wars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.war-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.war-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.war-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: rgba(139, 26, 26, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.war-sides {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.war-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.country-flag {
+  font-size: 32px;
+}
+
+.country-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #F0E6D2;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.side-label {
+  font-size: 10px;
+  color: #A0A0A0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.vs {
+  font-size: 18px;
+  font-weight: 900;
+  color: #f44336;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.war-status {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+  border: 1px solid rgba(76, 175, 80, 0.4);
+}
+
+.war-status.active {
+  background: rgba(76, 175, 80, 0.3);
+  border-color: rgba(76, 175, 80, 0.6);
+}
+
+.war-info {
+  padding: 16px 20px;
+}
+
+.war-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.war-item:last-child {
+  border-bottom: none;
+}
+
+.war-label {
+  font-size: 13px;
+  color: #A0A0A0;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.war-value {
+  font-size: 13px;
+  color: #F0E6D2;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .war-sides {
+    gap: 12px;
+  }
+  
+  .country-flag {
+    font-size: 28px;
+  }
+  
+  .country-name {
+    font-size: 12px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .military-panel {
+    margin: 0;
+    border-radius: 0;
+    border: none;
+  }
+  
+  .war-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .war-sides {
+    gap: 16px;
+  }
+  
+  .war-item {
+    flex-direction: column;
+    gap: 6px;
+  }
+}

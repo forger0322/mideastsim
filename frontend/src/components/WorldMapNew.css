@@ -1,0 +1,673 @@
+/* WorldMapNew.css - D3 真实地图样式 */
+
+.world-map-new-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 620px;
+  border: 8px solid #8b5a2b;
+  border-radius: 40px;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.6), 0 20px 40px rgba(0,0,0,0.7);
+  overflow: hidden;
+  background: transparent;
+}
+
+/* 地图加载动画 */
+.map-loading {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.map-loading-content { text-align: center; }
+
+.compass-loader {
+  width: 100px; height: 100px;
+  position: relative;
+  margin: 0 auto 30px;
+}
+
+.compass-outer {
+  width: 100%; height: 100%;
+  border: 4px solid #D4AF37;
+  border-radius: 50%;
+  position: absolute;
+  animation: compassSpin 3s linear infinite;
+}
+
+.compass-outer::before, .compass-outer::after {
+  content: '✦';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #D4AF37;
+  font-size: 20px;
+}
+
+.compass-outer::before { top: -10px; }
+.compass-outer::after { bottom: -10px; }
+
+.compass-inner {
+  width: 60px; height: 60px;
+  background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+
+.compass-directions {
+  position: absolute;
+  width: 140px; height: 140px;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.compass-directions::before, .compass-directions::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #D4AF37;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.compass-directions::before { content: 'N'; top: -10px; }
+.compass-directions::after { content: 'S'; bottom: -10px; }
+
+.loading-text {
+  color: #F0E6D2;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.loading-subtext {
+  color: #B8860B;
+  font-size: 14px;
+  font-family: 'KaiTi', 'STKaiti', serif;
+  letter-spacing: 2px;
+  animation: fadeInOut 2s ease-in-out infinite;
+}
+
+@keyframes compassSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* SVG 地图 */
+.world-map-new {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  cursor: default;
+}
+
+/* 国家路径 */
+.country {
+  transition: all 0.15s ease;
+  cursor: pointer !important;
+  pointer-events: all !important;
+}
+
+.country:hover {
+  fill-opacity: 0.9 !important;
+  filter: drop-shadow(0 0 8px #D4AF37);
+}
+
+/* 国家标签 */
+.country-label {
+  font-family: 'KaiTi', 'STKaiti', serif;
+  font-weight: bold;
+  fill: #F0E6D2;
+  pointer-events: none;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9), -1px -1px 2px rgba(0, 0, 0, 0.9), 1px -1px 2px rgba(0, 0, 0, 0.9), -1px 1px 2px rgba(0, 0, 0, 0.9);
+  text-rendering: optimizeLegibility;
+  opacity: 0.95;
+  letter-spacing: 0.5px;
+}
+
+/* 中东主要冲突国家标签加大加粗 */
+.country-label[data-name="伊朗"],
+.country-label[data-name="伊拉克"],
+.country-label[data-name="叙利亚"],
+.country-label[data-name="以色列"],
+.country-label[data-name="沙特"],
+.country-label[data-name="埃及"],
+.country-label[data-name="土耳其"],
+.country-label[data-name="黎巴嫩"],
+.country-label[data-name="也门"],
+.country-label[data-name="巴勒斯坦"],
+.country-label[data-name="约旦"],
+.country-label[data-name="科威特"],
+.country-label[data-name="卡塔尔"],
+.country-label[data-name="阿联酋"],
+.country-label[data-name="巴林"],
+.country-label[data-name="阿曼"] {
+  font-size: 10px;
+  fill: #fff;
+  font-weight: 900;
+}
+
+/* HTML 领导人标记层 */
+.leader-markers-html {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* 让容器不拦截鼠标事件 */
+  z-index: 10; /* 确保在 SVG 上方 */
+}
+
+/* 领导人标记（HTML div） */
+.leader-marker-html {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  pointer-events: auto; /* 标记本身可以点击 */
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.leader-marker-html:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+  border-color: #FFD700 !important;
+  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.6);
+  z-index: 100;
+}
+
+/* 图例 */
+.map-legend-new {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(245, 230, 211, 0.95);
+  border: 2px solid #8b5a2b;
+  border-radius: 10px;
+  padding: 15px;
+  font-family: 'KaiTi', 'STKaiti', serif;
+  z-index: 10;
+  min-width: 150px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.legend-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #2C2416;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #8b5a2b;
+}
+
+.legend-item-new {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  font-size: 12px;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  border: 1px solid #4A331C;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
+
+.legend-text {
+  color: #2C2416;
+  white-space: nowrap;
+}
+
+/* 领导人悬停提示 */
+.leader-tooltip {
+  position: absolute;
+  background: rgba(30, 30, 30, 0.98);
+  border: 2px solid #D4AF37;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-width: 180px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  animation: fadeIn 0.2s ease;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.leader-tooltip-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #D4AF37;
+  flex-shrink: 0;
+}
+
+.leader-tooltip-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.leader-tooltip-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.leader-tooltip-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  font-family: 'KaiTi', 'STKaiti', serif;
+}
+
+.leader-tooltip-country {
+  font-size: 12px;
+  color: #D4AF37;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.country-flag { font-size: 16px; }
+
+/* ========== 模态框面板 - 地图中央 ========== */
+.country-detail-panel-modal,
+.leader-detail-panel-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000 !important;
+  animation: fadeInModal 0.2s ease;
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.country-detail-panel-content,
+.leader-detail-panel-content {
+  background: linear-gradient(135deg, rgba(139, 90, 43, 0.95), rgba(100, 70, 30, 0.95));
+  border: 3px solid #3d2410;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  padding: 0;
+  position: relative;
+  animation: slideInModal 0.3s ease;
+  max-width: 90%;
+}
+
+.country-detail-panel-content {
+  width: 320px;
+}
+
+.leader-detail-panel-content {
+  width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+@keyframes slideInModal {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.close-panel-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  font-size: 24px;
+  color: #ffffff;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.close-panel-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+}
+
+/* 面板头部 */
+.country-detail-header,
+.leader-detail-header {
+  padding: 20px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 16px 16px 0 0;
+}
+
+.leader-detail-header {
+  gap: 15px;
+}
+
+.country-name,
+.leader-name {
+  font-size: 20px;
+  font-weight: 900;
+  color: #ffffff;
+  font-family: 'KaiTi', 'STKaiti', serif;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.country-flag { font-size: 28px; }
+
+.faction-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+}
+
+.faction-badge.resistance { background: #8B1A1A; }
+.faction-badge.us-israel { background: #1E4F8A; }
+.faction-badge.moderate { background: #B8860B; }
+.faction-badge.brotherhood { background: #2D5A27; }
+.faction-badge.other { background: #7b7b7b; }
+
+/* 领导人头像 */
+.leader-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #D4AF37;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+  background: #fff;
+}
+
+.leader-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.leader-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+.leader-country {
+  font-size: 14px;
+  color: #f0e6d2;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.leader-faction {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  width: fit-content;
+}
+
+/* 详情网格 */
+.country-detail-grid,
+.leader-detail-grid {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.detail-label {
+  font-size: 11px;
+  color: #d4af37;
+  font-weight: 700;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.detail-value {
+  font-size: 14px;
+  color: #ffffff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.faction-color { color: #FFD700; }
+
+.faction-color-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 领导人简介 */
+.leader-bio {
+  padding: 15px 20px 20px;
+  background: rgba(0, 0, 0, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0 0 16px 16px;
+}
+
+.leader-bio h4 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #d4af37;
+  font-weight: 700;
+}
+
+.leader-bio p {
+  margin: 0;
+  font-size: 13px;
+  color: #f0e6d2;
+  line-height: 1.6;
+}
+
+/* 响应式 */
+@media (max-width: 1200px) {
+  .world-map-new-container {
+    border-width: 6px;
+    border-radius: 30px;
+  }
+
+  .map-legend-new {
+    top: 10px;
+    right: 10px;
+    bottom: auto;
+    left: auto;
+    padding: 10px;
+    min-width: 120px;
+  }
+
+  .country-detail-panel-content {
+    width: 280px;
+  }
+
+  .leader-detail-panel-content {
+    width: 340px;
+  }
+}
+
+/* 非冲突国家简化面板 */
+.country-detail-panel-simple {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 40px !important;
+}
+
+.non-active-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.country-name-large {
+  font-size: 28px;
+  font-weight: 700;
+  color: #f0e6d2;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.country-name-large .country-flag {
+  font-size: 36px;
+}
+
+.non-active-message {
+  margin-top: 30px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #6bcb77;
+  text-align: center;
+  padding: 15px 30px;
+  background: rgba(107, 203, 119, 0.1);
+  border-radius: 12px;
+  border: 2px solid rgba(107, 203, 119, 0.3);
+}
+
+/* 非冲突国家简化面板 */
+.country-detail-panel-simple {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 40px !important;
+}
+
+.non-active-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.country-name-large {
+  font-size: 28px;
+  font-weight: 700;
+  color: #f0e6d2;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.country-name-large .country-flag {
+  font-size: 36px;
+}
+
+.faction-badge.other {
+  background: #6b7280;
+  color: #fff;
+}
+
+.non-active-message {
+  margin-top: 30px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #6bcb77;
+  text-align: center;
+  padding: 15px 30px;
+  background: rgba(107, 203, 119, 0.1);
+  border-radius: 12px;
+  border: 2px solid rgba(107, 203, 119, 0.3);
+}
+
+@media (max-width: 1200px) {
+  .leader-avatar {
+    width: 70px;
+    height: 70px;
+  }
+
+  .country-name,
+  .leader-name {
+    font-size: 18px;
+  }
+}

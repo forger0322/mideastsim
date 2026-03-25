@@ -1,0 +1,54 @@
+# Node modules
+node_modules/
+
+# Database files
+*.db
+*.db-wal
+*.db-shm
+
+# Logs
+*.log
+
+# Binary executables
+backend/mideastsim
+backend/mideastsim-backend
+backend/mideastsim-back
+backend/server
+mideastsim-backend
+mideastsim-back
+
+# Environment files
+.env
+.env.local
+
+# Build artifacts
+frontend/build/
+
+# Cache
+frontend/node_modules/.cache/
+
+# Agent sessions
+agent_sessions.json
+
+# Backup files
+*.bak
+*.bak2
+*.backup
+*.patch
+
+# Test files
+test-*.sh
+test-*.js
+test-*.html
+backend/*_test.go
+backend/_tests/
+
+# Monitor scripts
+monitor.sh
+
+# Images (duplicates)
+img/
+
+# Documentation (keep only README)
+*.md
+!README.md

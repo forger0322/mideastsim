@@ -1,0 +1,214 @@
+/* CountryDetailPanel.css - 国家详情面板样式 */
+
+.country-detail-panel {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 320px;
+  background: rgba(245, 230, 211, 0.98);
+  border: 3px solid #8b5a2b;
+  border-radius: 20px;
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.5),
+    inset 0 0 20px rgba(139, 90, 43, 0.1);
+  padding: 0;
+  z-index: 1000;
+  font-family: 'KaiTi', 'STKaiti', serif;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.country-detail-panel.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* 关闭按钮 */
+.close-panel {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  font-size: 24px;
+  font-weight: bold;
+  color: #8b5a2b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.close-panel:hover {
+  background: rgba(139, 90, 43, 0.2);
+  color: #2a1e0a;
+}
+
+/* 头部 */
+.country-detail-header {
+  background: linear-gradient(135deg, #8b5a2b 0%, #6b4423 100%);
+  padding: 20px 25px;
+  border-bottom: 2px solid #d4af37;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.country-name {
+  font-size: 22px;
+  font-weight: bold;
+  color: #f5e6d3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.country-flag {
+  font-size: 28px;
+}
+
+/* 势力徽章 */
+.faction-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.faction-badge.resistance {
+  background: #8B1A1A;
+  color: #fff;
+}
+
+.faction-badge.us-israel {
+  background: #1E4F8A;
+  color: #fff;
+}
+
+.faction-badge.moderate {
+  background: #B8860B;
+  color: #fff;
+}
+
+.faction-badge.brotherhood {
+  background: #2D5A27;
+  color: #fff;
+}
+
+.faction-badge.other {
+  background: #6B6B6B;
+  color: #fff;
+}
+
+/* 详情网格 */
+.country-detail-grid {
+  padding: 20px 25px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.detail-label {
+  font-size: 12px;
+  color: #6b4423;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.detail-value {
+  font-size: 15px;
+  color: #2a1e0a;
+  font-weight: 600;
+}
+
+.detail-value.faction-color {
+  font-weight: bold;
+}
+
+/* 行动按钮区 */
+.country-actions {
+  padding: 20px 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(139, 90, 43, 0.1);
+}
+
+.game-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #b87c4b 0%, #8b5a2b 100%);
+  border: 2px solid #6b4423;
+  border-radius: 25px;
+  font-family: 'KaiTi', 'STKaiti', serif;
+  font-size: 15px;
+  font-weight: bold;
+  color: #f5e6d3;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.game-button:hover {
+  background: linear-gradient(135deg, #d4af37 0%, #b87c4b 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+.game-button:active {
+  transform: translateY(0);
+}
+
+.game-button-icon {
+  font-size: 18px;
+}
+
+/* 响应式 */
+@media (max-width: 1200px) {
+  .country-detail-panel {
+    top: 10px;
+    right: 10px;
+    width: 280px;
+  }
+
+  .country-detail-header {
+    padding: 15px 20px;
+  }
+
+  .country-name {
+    font-size: 18px;
+  }
+
+  .country-detail-grid {
+    padding: 15px 20px;
+    grid-template-columns: 1fr;
+  }
+
+  .country-actions {
+    padding: 15px 20px;
+  }
+}

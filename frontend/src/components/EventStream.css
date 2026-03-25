@@ -1,0 +1,606 @@
+.event-stream-container {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 战争详情样式 */
+.war-details {
+  margin-top: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(255, 69, 0, 0.15) 0%, rgba(139, 26, 26, 0.2) 100%);
+  border: 2px solid rgba(255, 69, 0, 0.4);
+  border-radius: 8px;
+  animation: warPulse 3s infinite;
+}
+
+@keyframes warPulse {
+  0%, 100% {
+    border-color: rgba(255, 69, 0, 0.4);
+    box-shadow: 0 0 10px rgba(255, 69, 0, 0.2);
+  }
+  50% {
+    border-color: rgba(255, 69, 0, 0.6);
+    box-shadow: 0 0 20px rgba(255, 69, 0, 0.3);
+  }
+}
+
+.war-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 69, 0, 0.3);
+}
+
+.war-icon {
+  font-size: 2rem;
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+
+.war-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #FF4500;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.war-badge {
+  margin-left: auto;
+  background: linear-gradient(45deg, #FF4500, #FF6B35);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  animation: blink 1.5s infinite;
+}
+
+.war-combatants {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 20px 0;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+.combatant {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.combatant-flag {
+  font-size: 2.5rem;
+}
+
+.combatant-name {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #F0E6D2;
+}
+
+.combatant-role {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.vs-divider {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #FF4500;
+  padding: 0 20px;
+}
+
+.war-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+}
+
+.info-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.info-label {
+  font-weight: bold;
+  color: #60A5FA;
+  min-width: 100px;
+}
+
+.info-value {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.war-description {
+  margin: 16px 0;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-left: 3px solid #FF4500;
+  border-radius: 4px;
+}
+
+.war-description p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+}
+
+.war-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.war-action-btn {
+  flex: 1;
+  padding: 10px 16px;
+  background: rgba(255, 69, 0, 0.2);
+  border: 1px solid rgba(255, 69, 0, 0.4);
+  border-radius: 6px;
+  color: #F0E6D2;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.war-action-btn:hover {
+  background: rgba(255, 69, 0, 0.3);
+  border-color: rgba(255, 69, 0, 0.6);
+  transform: translateY(-2px);
+}
+
+/* PM 分析徽章 */
+.pm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(75, 0, 130, 0.3));
+  border: 1px solid rgba(138, 43, 226, 0.4);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  margin-left: 8px;
+  animation: pmPulse 2s infinite;
+}
+
+@keyframes pmPulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(138, 43, 226, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+  }
+}
+
+.pm-indicator {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.pm-indicator.up {
+  color: #10B981;
+}
+
+.pm-indicator.down {
+  color: #EF4444;
+}
+
+/* PM 分析区域样式 */
+.pm-analysis {
+  margin-top: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(138, 43, 226, 0.15), rgba(75, 0, 130, 0.2));
+  border: 2px solid rgba(138, 43, 226, 0.3);
+  border-radius: 8px;
+}
+
+.pm-analysis h4 {
+  margin: 0 0 12px 0;
+  color: #8A2BE2;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.impact-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.impact-item:last-child {
+  border-bottom: none;
+}
+
+.impact-icon {
+  font-size: 1.2rem;
+  width: 24px;
+  text-align: center;
+}
+
+.impact-label {
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.8);
+  min-width: 60px;
+}
+
+.impact-value {
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.impact-value.positive {
+  color: #10B981;
+}
+
+.impact-value.negative {
+  color: #EF4444;
+}
+
+.impact-reason {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  flex: 1;
+}
+
+.impact-price {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  margin-left: 8px;
+  font-family: 'Courier New', monospace;
+}
+
+.impact-value.neutral {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.impact-item.no-impact {
+  opacity: 0.6;
+}
+
+.pm-analysis-section {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pm-analysis-section:last-child {
+  border-bottom: none;
+}
+
+.pm-analysis-section h5 {
+  color: #F0B90B;
+  font-size: 0.95rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.analysis-summary {
+  margin-top: 12px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  border-left: 3px solid #8A2BE2;
+}
+
+.analysis-summary p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+}
+
+.pm-analysis-placeholder {
+  margin-top: 12px;
+  padding: 12px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+}
+
+.event-stream-container h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #F0B90B;
+  font-size: 1.1rem;
+}
+
+.events-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* 事件列表 - 古代兵书/战报风格 */
+.event-item {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.event-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(139, 90, 43, 0.03), transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.event-item:hover::before {
+  opacity: 1;
+}
+
+.event-item:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: translateX(4px);
+  border-color: rgba(139, 90, 43, 0.3);
+}
+
+.event-item.expanded {
+  background: linear-gradient(135deg, rgba(240, 185, 11, 0.15), rgba(139, 90, 43, 0.1));
+  border: 2px solid rgba(240, 185, 11, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 20px rgba(240, 185, 11, 0.2);
+  transform: scale(1.02);
+}
+
+.event-military {
+  background: linear-gradient(135deg, rgba(255, 69, 0, 0.08), rgba(139, 26, 26, 0.05));
+  border-left: 4px solid #ff4d4d;
+}
+
+.event-diplomacy {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(184, 134, 11, 0.05));
+  border-left: 4px solid #ffd700;
+}
+
+.event-economic {
+  background: linear-gradient(135deg, rgba(50, 205, 50, 0.08), rgba(34, 139, 34, 0.05));
+  border-left: 4px solid #32cd32;
+}
+
+.event-other {
+  background: linear-gradient(135deg, rgba(240, 185, 11, 0.08), rgba(139, 90, 43, 0.05));
+  border-left: 4px solid #F0B90B;
+}
+
+.event-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.event-icon {
+  font-size: 1.4rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.event-time {
+  opacity: 0.7;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: rgba(240, 230, 210, 0.7);
+}
+
+.event-location {
+  font-weight: 700;
+  color: #F0E6D2;
+  font-size: 0.95rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.event-expand-icon {
+  margin-left: auto;
+  opacity: 0.6;
+  font-size: 0.8rem;
+  transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  color: rgba(240, 230, 210, 0.8);
+}
+
+.event-item.expanded .event-expand-icon {
+  transform: rotate(180deg) scale(1.2);
+  opacity: 1;
+}
+
+.event-summary {
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.6;
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.event-details {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.event-description {
+  margin-bottom: 1rem;
+}
+
+.event-description strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #F0B90B;
+  font-size: 0.9rem;
+}
+
+.event-description p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  font-size: 0.85rem;
+}
+
+/* PM Agent 分析样式 */
+.pm-analysis {
+  background: rgba(66, 153, 225, 0.1);
+  border: 1px solid rgba(66, 153, 225, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 0.75rem;
+}
+
+.pm-analysis h4 {
+  margin: 0 0 0.75rem 0;
+  color: #60A5FA;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.impact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.85rem;
+}
+
+.impact-item:last-child {
+  border-bottom: none;
+}
+
+.impact-icon {
+  font-size: 1rem;
+}
+
+.impact-label {
+  color: rgba(255, 255, 255, 0.7);
+  min-width: 50px;
+}
+
+.impact-value {
+  font-weight: bold;
+  font-family: 'JetBrains Mono', monospace;
+  min-width: 80px;
+}
+
+.impact-value.positive {
+  color: #48BB78;
+}
+
+.impact-value.negative {
+  color: #F56565;
+}
+
+.impact-reason {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  flex: 1;
+}
+
+.analysis-summary {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(66, 153, 225, 0.2);
+}
+
+.analysis-summary strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #FCD34D;
+  font-size: 0.85rem;
+}
+
+.analysis-summary p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.6;
+  font-size: 0.85rem;
+}
+
+.pm-analysis-placeholder {
+  text-align: center;
+  padding: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.no-events {
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  padding: 1rem;
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .event-header {
+    flex-wrap: wrap;
+  }
+  
+  .event-location {
+    order: -1;
+    width: 100%;
+    margin-bottom: 0.25rem;
+  }
+  
+  .impact-item {
+    flex-wrap: wrap;
+  }
+  
+  .impact-reason {
+    width: 100%;
+    margin-top: 0.25rem;
+  }
+}

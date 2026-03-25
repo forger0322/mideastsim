@@ -1,0 +1,181 @@
+/* frontend/src/components/DiplomacyPanel.css */
+
+.diplomacy-panel {
+  background: rgba(10, 12, 16, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 900px;
+  margin: 0 auto;
+  backdrop-filter: blur(10px);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #F0E6D2;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.close-btn {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 6px;
+  color: #F0E6D2;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.panel-content {
+  padding: 20px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+/* Relations List */
+.relations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.relation-item {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 0.5fr 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.relation-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.relation-countries {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #000000;
+}
+
+.country-flag {
+  font-size: 20px;
+}
+
+.country-name {
+  font-weight: 600;
+  color: #000000;
+}
+
+.vs {
+  color: #A0A0A0;
+  font-size: 12px;
+}
+
+.relation-value {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.value-number {
+  font-size: 16px;
+  font-weight: 700;
+  color: #000000;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.relation-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.relation-trend {
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.trend-up {
+  color: #4CAF50;
+}
+
+.trend-down {
+  color: #f44336;
+}
+
+.trend-stable {
+  color: #A0A0A0;
+}
+
+.relation-level {
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .relation-item {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .relation-countries {
+    justify-content: center;
+  }
+  
+  .relation-value,
+  .relation-trend,
+  .relation-level {
+    justify-content: center;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .diplomacy-panel {
+    margin: 0;
+    border-radius: 0;
+    border: none;
+  }
+  
+  .panel-content {
+    max-height: none;
+  }
+  
+  .relation-item {
+    padding: 12px 14px;
+  }
+}
