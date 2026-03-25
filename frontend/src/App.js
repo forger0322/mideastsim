@@ -871,36 +871,6 @@ function App() {
               </select>
             </div>
             
-            <button className="action-token strategy" onMouseDown={(e) => { 
-              e.preventDefault(); 
-              const startTime = performance.now();
-              console.log(`🔴 [${startTime.toFixed(1)}ms] 鼠标按下`);
-              setShowFactionPanel(true);
-              setTimeout(() => {
-                const afterState = performance.now();
-                console.log(`🟡 [${afterState.toFixed(1)}ms] setState 完成，耗时：${(afterState - startTime).toFixed(2)}ms`);
-              }, 0);
-              requestAnimationFrame(() => {
-                const rafTime = performance.now();
-                console.log(`🟢 [${rafTime.toFixed(1)}ms] requestAnimationFrame，总耗时：${(rafTime - startTime).toFixed(2)}ms`);
-              });
-            }}>
-              <span className="token-icon">⚙️</span>
-              <span className="token-text">{lang === 'zh' ? '策略' : 'Strategy'}</span>
-            </button>
-            
-            <button className="action-token" onMouseDown={(e) => { 
-              e.preventDefault(); 
-              const startTime = performance.now();
-              setShowLeaderboard(true);
-              requestAnimationFrame(() => {
-                const endTime = performance.now();
-                console.log(`⏱️ 排行榜面板响应时间：${(endTime - startTime).toFixed(2)}ms`);
-              });
-            }}>
-              <span className="token-icon">🏆</span>
-              <span className="token-text">{lang === 'zh' ? '排行榜' : 'Rank'}</span>
-            </button>
           </div>
         </aside>
         
