@@ -980,7 +980,8 @@ function App() {
           onClose={() => setShowEventPanel(false)}
           title="📜 完整事件流"
           type="外交"
-          width="800px"
+          width="1000px"
+          disableAnimation={true}
         >
           <EventStream 
             events={events} 

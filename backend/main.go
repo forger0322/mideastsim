@@ -17,9 +17,10 @@ import (
 
 // Global variables
 var (
-	logger *log.Logger
-	db     *Database
-	hub    *WebSocketHub
+	logger     *log.Logger
+	db         *Database
+	hub        *WebSocketHub
+	ruleEngine *RuleEngine
 )
 
 // WebSocketMessage WebSocket 消息
@@ -76,7 +77,19 @@ func main() {
 	go hub.run()
 
 	// 初始化规则引擎
-	ruleEngine := NewRuleEngine(db)
+	ruleEngine = NewRuleEngine(db)
+
+	// 🆕 初始化 Telegram Bot（PM Agent 通知）
+	initTelegram()
+
+	// 🆕 设置 Telegram Webhook（获取 Chat ID）
+	webhookURL := getEnv("TELEGRAM_WEBHOOK_URL", "")
+	if webhookURL != "" && telegramBot != nil {
+		if err := setTelegramWebhook(webhookURL); err != nil {
+			logger.Printf("[Telegram] ⚠️ Webhook 设置失败：%v", err)
+			logger.Printf("[Telegram] 💡 使用 /api/telegram/getUpdates 手动获取 Chat ID")
+		}
+	}
 
 	// 🆕 初始化 Agent 记忆系统
 	if err := db.CreateAgentMemoryTable(); err != nil {
@@ -129,12 +142,19 @@ func main() {
 	// PM Agent 经济影响分析 API
 	http.HandleFunc("/api/agent/pm/analyze", JWTMiddleware(authService, handlePMAnalyze))
 	
+	// 🆕 PM Agent 回调 API（PM Agent 分析完成后调用此接口返回结果）
+	http.HandleFunc("/api/agent/pm/callback", handlePMCallback)
+	
 	// 🆕 Agent 记忆 API
 	http.HandleFunc("/api/agent/memory", JWTMiddleware(authService, handleAgentMemory))
 	http.HandleFunc("/api/agent/memory/list", JWTMiddleware(authService, handleAgentMemoryList))
 	
 	// 🆕 离线 AI 状态 API
 	http.HandleFunc("/api/ai/offline/status", handleAIOfflineStatus)
+	
+	// 📲 Telegram Webhook API
+	http.HandleFunc("/api/telegram/webhook", handleTelegramWebhook)
+	http.HandleFunc("/api/telegram/getUpdates", handleTelegramGetUpdates)
 	
 	// 🎬 历史回放 API
 	http.HandleFunc("/api/history/events", handleGetHistory)
@@ -278,8 +298,9 @@ func generateRandomEvent(db *Database) {
 	
 	title := eventTitles[location]["en"]
 	titleZh := eventTitles[location]["zh"]
-	description := fmt.Sprintf("%s: %s event reported", location, eventType)
-	descriptionZh := fmt.Sprintf("%s：%s事件报道", locationNames[location]["zh"], eventTypeDesc[eventType]["zh"])
+	// 更自然的事件描述
+	description := fmt.Sprintf("A %s event has been reported in %s, reflecting ongoing regional developments.", eventType, location)
+	descriptionZh := fmt.Sprintf("%s发生%s事件，反映地区局势持续发展。", locationNames[location]["zh"], eventTypeDesc[eventType]["zh"])
 	
 	event := &Event{
 		ID:            fmt.Sprintf("evt_%d", time.Now().Unix()),
@@ -293,6 +314,31 @@ func generateRandomEvent(db *Database) {
 		DescriptionZh: descriptionZh,
 	}
 	
+	// 为事件生成 PM 经济影响分析（通过 PM Agent）
+	go func() {
+		req := PMAnalyzeRequest{
+			EventID:     event.ID,
+			EventType:   event.Type,
+			Location:    event.Location,
+			Title:       event.Title,
+			Description: event.Description,
+		}
+		
+		// 调用 PM Agent 进行分析
+		analysis := analyzeEventViaPMAgent(req)
+		if analysis != nil {
+			calculatePriceChanges(analysis)
+			
+			// 将 PM 分析存入事件 Data 字段
+			eventData := make(map[string]interface{})
+			eventData["pm_analysis"] = analysis
+			db.UpdateEventData(event.ID, eventData)
+			
+			logger.Printf("✅ [PM Agent] 事件 %s 分析完成", event.ID)
+		}
+	}()
+	
+	// 先创建事件（不带 PM 分析，分析完成后异步更新）
 	db.CreateEvent(event)
 }
 
@@ -935,15 +981,79 @@ func handleAgentCommand(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 简单决策逻辑（后续可扩展为调用 AI Agent）
+	// Agent 决策逻辑
 	decision := makeDecision(role.ID, req.Action, req.Target, myData, targetData)
 
-	// 返回决策结果
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(decision)
+	logger.Printf("🤖 [Agent 决策] %s → %s (%s): %v", role.ID, req.Action, req.Target, decision.Execute)
 
-	// 如果决定执行，返回执行标志，由前端调用行动 API
-	// 后端不直接执行，保持决策和执行分离
+	// 如果决定执行，直接调用规则引擎执行行动
+	if decision.Execute {
+		var result *ActionResult
+		var err error
+
+		// 根据行动类型直接调用规则引擎方法
+		switch req.Action {
+		case "declare_war":
+			result, err = ruleEngine.DeclareWar(role.ID, req.Target)
+		case "sanction":
+			result, err = ruleEngine.Sanction(role.ID, req.Target)
+		case "coup":
+			result, err = ruleEngine.Coup(role.ID, req.Target)
+		case "form_alliance":
+			result, err = ruleEngine.FormAlliance(role.ID, req.Target)
+		case "diplomatic_statement":
+			statementType := req.Params["statement_type"]
+			if statementType == "" {
+				statementType = "neutral"
+			}
+			result, err = ruleEngine.DiplomaticStatement(role.ID, req.Target, statementType, req.Content)
+		default:
+			logger.Printf("[ERROR] 未知行动类型：%s", req.Action)
+			http.Error(w, fmt.Sprintf("Unknown action type: %s", req.Action), http.StatusBadRequest)
+			return
+		}
+
+		if err != nil {
+			logger.Printf("[ERROR] 行动执行失败：%v", err)
+			http.Error(w, fmt.Sprintf("Action execution failed: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		// 应用属性变化
+		if len(result.Changes) > 0 {
+			for _, change := range result.Changes {
+				if err := db.UpdateRoleAttribute(change.TargetID, change.Attribute, change.NewValue); err != nil {
+					logger.Printf("[ERROR] 更新属性失败：%v", err)
+				}
+			}
+		}
+
+		// 存储事件
+		if result.NewEvent != nil {
+			if err := db.InsertEvent(*result.NewEvent); err != nil {
+				logger.Printf("[ERROR] 存储事件失败：%v", err)
+			}
+		}
+
+		// 返回决策 + 执行结果
+		response := map[string]interface{}{
+			"decision":      decision,
+			"action_result": result,
+			"executed":      true,
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	// 决定不执行，返回决策结果
+	response := map[string]interface{}{
+		"decision": decision,
+		"executed": false,
+		"reason":   decision.Reason,
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }
 
 // PMAnalyzeRequest PM Agent 分析请求
@@ -985,6 +1095,8 @@ type PMAnalyzeResponse struct {
 type PriceChange struct {
 	Baseline      float64 `json:"baseline"`
 	PercentChange float64 `json:"percent_change"` // PM Agent 分析的具体影响百分比
+	MinChange     float64 `json:"min_change"`     // 最小变化值
+	MaxChange     float64 `json:"max_change"`     // 最大变化值
 	NewPrice      float64 `json:"new_price"`      // 新价格
 	Currency      string  `json:"currency"`
 }
@@ -999,6 +1111,56 @@ type ImpactAnalysis struct {
 }
 
 // handlePMAnalyze PM Agent 分析事件经济影响
+// PMCallbackRequest PM Agent 回调请求
+type PMCallbackRequest struct {
+	EventID   string          `json:"event_id"`
+	EventType string          `json:"event_type"`
+	Analysis  *PMAnalyzeResponse `json:"analysis"`
+}
+
+// handlePMCallback PM Agent 分析完成后的回调接口
+func handlePMCallback(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req PMCallbackRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		logger.Printf("[PM Callback] 请求解析失败：%v", err)
+		http.Error(w, fmt.Sprintf("Invalid request: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	logger.Printf("[PM Callback] 收到事件 %s 的分析结果", req.EventID)
+
+	// 计算具体价格变化
+	calculatePriceChanges(req.Analysis)
+	
+	// 更新经济数据
+	updateEconomicData(req.Analysis)
+
+	// 更新事件数据
+	if req.EventID != "" && req.Analysis != nil {
+		// 直接将分析结果作为 JSON 对象存储（不是字符串）
+		eventData := make(map[string]interface{})
+		eventData["pm_analysis"] = req.Analysis
+		err := db.UpdateEventData(req.EventID, eventData)
+		if err != nil {
+			logger.Printf("[PM Callback] 更新事件数据失败：%v", err)
+			http.Error(w, fmt.Sprintf("Update failed: %v", err), http.StatusInternalServerError)
+			return
+		}
+		logger.Printf("[PM Callback] ✅ 事件 %s 数据已更新", req.EventID)
+		
+		// 📲 发送 Telegram 通知
+		sendPMAnalysis(req.EventID, req.EventType, "", req.Analysis)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+}
+
 func handlePMAnalyze(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -1133,6 +1295,79 @@ func getCurrentEconomicData() map[string]float64 {
 }
 
 // analyzeEventImpact 分析事件对经济的影响
+// analyzeEventViaPMAgent 通过 OpenClaw Gateway 调用 PM Agent 分析事件
+func analyzeEventViaPMAgent(req PMAnalyzeRequest) *PMAnalyzeResponse {
+	logger.Printf("[PM Agent] 发送分析请求：%s (%s)", req.EventID, req.EventType)
+	
+	// 构建发送给 PM Agent 的消息
+	message := fmt.Sprintf(`📊 事件分析请求
+
+**事件 ID**: %s
+**类型**: %s
+**地点**: %s
+**标题**: %s
+**描述**: %s
+
+---
+
+请分析该事件对全球经济的影响。
+
+## 分析要求
+
+1. 使用 KNOWLEDGE.md 中的量化公式计算
+2. 覆盖以下指标：
+   - 原油 (WTI) 价格变化
+   - 黄金价格变化
+   - BTC、ETH 加密货币变化
+   - 标普 500、恒生指数、富时 100 股市变化
+
+3. **分析完成后，必须调用后端 API 返回结果**：
+
+POST http://localhost:8080/api/agent/pm/callback
+Content-Type: application/json
+
+请求体格式：
+{
+  "event_id": "%s",
+  "event_type": "%s",
+  "analysis": {
+    "oil": {"direction": "up/down", "min_change": 1, "max_change": 3, "reason": "...", "value": 2},
+    "gold": {...},
+    "btc": {...},
+    "eth": {...},
+    "spx": {...},
+    "hsi": {...},
+    "ftse": {...},
+    "summary": "..."
+  }
+}
+
+## 输出格式参考
+
+{
+  "oil": {"direction": "up", "min_change": 8, "max_change": 15, "value": 11.5, "reason": "霍尔木兹海峡紧张"},
+  "gold": {"direction": "up", "min_change": 3, "max_change": 5, "value": 4, "reason": "避险情绪"},
+  "summary": "🚨 中东局势推高油价和避险资产"
+}
+
+**现在请开始分析。**`, 
+		req.EventID, req.EventType, req.Location, req.Title, req.Description,
+		req.EventID, req.EventType)
+	
+	// 发送消息给 PM Agent
+	err := sendToAgent("pm", message)
+	if err != nil {
+		logger.Printf("⚠️ [PM Agent] 发送失败：%v", err)
+		// 降级使用本地分析
+		return analyzeEventImpact(req)
+	}
+	
+	// PM Agent 会异步分析并回调 API 更新事件数据
+	// 这里返回 nil，等待回调
+	logger.Printf("[PM Agent] ✅ 请求已发送，等待回调...")
+	return nil
+}
+
 func analyzeEventImpact(req PMAnalyzeRequest) *PMAnalyzeResponse {
 	response := &PMAnalyzeResponse{}
 
@@ -1308,9 +1543,18 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 			percentChange = -percentChange
 		}
 		priceChange := baseline * percentChange / 100
+		// 计算最小和最大变化值
+		minChange := baseline * analysis.Oil.Min / 100
+		maxChange := baseline * analysis.Oil.Max / 100
+		if analysis.Oil.Direction == "down" {
+			minChange = -minChange
+			maxChange = -maxChange
+		}
 		analysis.OilPriceChange = &PriceChange{
 			Baseline:      baseline,
 			PercentChange: percentChange,
+			MinChange:     math.Round(minChange*100) / 100,
+			MaxChange:     math.Round(maxChange*100) / 100,
 			NewPrice:      math.Round((baseline+priceChange)*100) / 100,
 			Currency:      "$",
 		}
@@ -1324,9 +1568,17 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 			percentChange = -percentChange
 		}
 		priceChange := baseline * percentChange / 100
+		minChange := baseline * analysis.Gold.Min / 100
+		maxChange := baseline * analysis.Gold.Max / 100
+		if analysis.Gold.Direction == "down" {
+			minChange = -minChange
+			maxChange = -maxChange
+		}
 		analysis.GoldPriceChange = &PriceChange{
 			Baseline:      baseline,
 			PercentChange: percentChange,
+			MinChange:     math.Round(minChange*100) / 100,
+			MaxChange:     math.Round(maxChange*100) / 100,
 			NewPrice:      math.Round((baseline+priceChange)*100) / 100,
 			Currency:      "$",
 		}
@@ -1340,9 +1592,17 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 			percentChange = -percentChange
 		}
 		priceChange := baseline * percentChange / 100
+		minChange := baseline * analysis.Silver.Min / 100
+		maxChange := baseline * analysis.Silver.Max / 100
+		if analysis.Silver.Direction == "down" {
+			minChange = -minChange
+			maxChange = -maxChange
+		}
 		analysis.SilverPriceChange = &PriceChange{
 			Baseline:      baseline,
 			PercentChange: percentChange,
+			MinChange:     math.Round(minChange*100) / 100,
+			MaxChange:     math.Round(maxChange*100) / 100,
 			NewPrice:      math.Round((baseline+priceChange)*100) / 100,
 			Currency:      "$",
 		}
@@ -1356,9 +1616,17 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 			percentChange = -percentChange
 		}
 		priceChange := baseline * percentChange / 100
+		minChange := baseline * analysis.BTC.Min / 100
+		maxChange := baseline * analysis.BTC.Max / 100
+		if analysis.BTC.Direction == "down" {
+			minChange = -minChange
+			maxChange = -maxChange
+		}
 		analysis.BTCPriceChange = &PriceChange{
 			Baseline:      baseline,
 			PercentChange: percentChange,
+			MinChange:     math.Round(minChange*100) / 100,
+			MaxChange:     math.Round(maxChange*100) / 100,
 			NewPrice:      math.Round((baseline+priceChange)*100) / 100,
 			Currency:      "$",
 		}
@@ -1372,9 +1640,17 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 			percentChange = -percentChange
 		}
 		priceChange := baseline * percentChange / 100
+		minChange := baseline * analysis.ETH.Min / 100
+		maxChange := baseline * analysis.ETH.Max / 100
+		if analysis.ETH.Direction == "down" {
+			minChange = -minChange
+			maxChange = -maxChange
+		}
 		analysis.ETHPriceChange = &PriceChange{
 			Baseline:      baseline,
 			PercentChange: percentChange,
+			MinChange:     math.Round(minChange*100) / 100,
+			MaxChange:     math.Round(maxChange*100) / 100,
 			NewPrice:      math.Round((baseline+priceChange)*100) / 100,
 			Currency:      "$",
 		}
@@ -1388,9 +1664,17 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 			percentChange = -percentChange
 		}
 		priceChange := baseline * percentChange / 100
+		minChange := baseline * analysis.SPX.Min / 100
+		maxChange := baseline * analysis.SPX.Max / 100
+		if analysis.SPX.Direction == "down" {
+			minChange = -minChange
+			maxChange = -maxChange
+		}
 		analysis.SPXPriceChange = &PriceChange{
 			Baseline:      baseline,
 			PercentChange: percentChange,
+			MinChange:     math.Round(minChange*100) / 100,
+			MaxChange:     math.Round(maxChange*100) / 100,
 			NewPrice:      math.Round((baseline+priceChange)*100) / 100,
 			Currency:      "pts",
 		}
@@ -1404,9 +1688,17 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 			percentChange = -percentChange
 		}
 		priceChange := baseline * percentChange / 100
+		minChange := baseline * analysis.HSI.Min / 100
+		maxChange := baseline * analysis.HSI.Max / 100
+		if analysis.HSI.Direction == "down" {
+			minChange = -minChange
+			maxChange = -maxChange
+		}
 		analysis.HSIPriceChange = &PriceChange{
 			Baseline:      baseline,
 			PercentChange: percentChange,
+			MinChange:     math.Round(minChange*100) / 100,
+			MaxChange:     math.Round(maxChange*100) / 100,
 			NewPrice:      math.Round((baseline+priceChange)*100) / 100,
 			Currency:      "pts",
 		}
@@ -1420,9 +1712,17 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 			percentChange = -percentChange
 		}
 		priceChange := baseline * percentChange / 100
+		minChange := baseline * analysis.FTSE.Min / 100
+		maxChange := baseline * analysis.FTSE.Max / 100
+		if analysis.FTSE.Direction == "down" {
+			minChange = -minChange
+			maxChange = -maxChange
+		}
 		analysis.FTSEPriceChange = &PriceChange{
 			Baseline:      baseline,
 			PercentChange: percentChange,
+			MinChange:     math.Round(minChange*100) / 100,
+			MaxChange:     math.Round(maxChange*100) / 100,
 			NewPrice:      math.Round((baseline+priceChange)*100) / 100,
 			Currency:      "pts",
 		}

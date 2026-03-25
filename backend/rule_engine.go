@@ -133,6 +133,9 @@ func (re *RuleEngine) DeclareWar(attackerID, defenderID string) (*ActionResult, 
 			TargetID:    defenderID,
 			TargetName:  defender.Name,
 		}
+
+		// 📲 发送 Telegram 战争通知
+		go sendWarNotification(attacker.Name, defender.Name, "军事冲突爆发")
 	} else {
 		// 失败：攻击方损失
 		attackerLoss := int(float64(attacker.Attributes.Army) * 0.1)

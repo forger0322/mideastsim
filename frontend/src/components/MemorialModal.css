@@ -156,9 +156,23 @@
 .memorial-body {
   font-family: 'KaiTi', 'STKaiti', serif;
   color: #2C2416;
-  max-height: 50vh;
+  max-height: 65vh;
   overflow-y: auto;
   padding-right: 10px;
+}
+
+/* 事件面板特殊样式 - 移除高度限制，让 EventStream 自己控制 */
+.memorial-body .event-stream-container {
+  max-height: none;
+  height: auto;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* 事件面板专用样式 */
+.memorial-body .event-stream-container h3 {
+  color: #F0B90B;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
 }
 
 /* 适配内部面板组件 */
@@ -167,7 +181,8 @@
 .memorial-body .diplomacy-panel,
 .memorial-body .military-panel,
 .memorial-body .settings-panel,
-.memorial-body .leaderboard {
+.memorial-body .leaderboard,
+.memorial-body .event-stream-container {
   background: transparent;
   box-shadow: none;
 }

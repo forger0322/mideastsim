@@ -72,7 +72,9 @@ function EventStream({ events, onEventSelect, availableRoles = [] }) {
       const event = events.find(e => e.id === eventId);
       console.log('📊 找到事件:', event);
       if (event && onEventSelect) {
-        console.log('📊 调用 onEventSelect, PM 分析:', event.pm_analysis);
+        // PM 分析在 event.data?.pm_analysis 中
+        const pmAnalysis = event.data?.pm_analysis;
+        console.log('📊 调用 onEventSelect, PM 分析:', pmAnalysis);
         onEventSelect(event);
       }
     }
@@ -105,12 +107,12 @@ function EventStream({ events, onEventSelect, availableRoles = [] }) {
                 <span className="event-location">{event.location}</span>
                 
                 {/* PM 分析徽章 */}
-                {event.pm_analysis && (
+                {event.data?.pm_analysis && (
                   <span className="pm-badge" title="PM Agent 已分析经济影响">
                     🤖
-                    {event.pm_analysis.oil && (
-                      <span className={`pm-indicator ${event.pm_analysis.oil.direction}`}>
-                        {event.pm_analysis.oil.direction === 'up' ? '↑' : '↓'}
+                    {event.data?.pm_analysis.oil && (
+                      <span className={`pm-indicator ${event.data?.pm_analysis.oil.direction}`}>
+                        {event.data?.pm_analysis.oil.direction === 'up' ? '↑' : '↓'}
                       </span>
                     )}
                   </span>
@@ -185,25 +187,25 @@ function EventStream({ events, onEventSelect, availableRoles = [] }) {
                       </div>
                       
                       {/* PM Agent 分析 */}
-                      {event.pm_analysis && (
+                      {event.data?.pm_analysis && (
                     <div className="pm-analysis">
                       <h4>🤖 PM Agent 分析</h4>
                       
                       <div className="pm-analysis-section">
                         <h5>🛢️ 大宗商品</h5>
-                        {event.pm_analysis.oil ? (
+                        {event.data?.pm_analysis.oil ? (
                           <div className="impact-item">
                             <span className="impact-icon">🛢️</span>
                             <span className="impact-label">原油:</span>
-                            <span className={`impact-value ${event.pm_analysis.oil.direction === 'up' ? 'positive' : 'negative'}`}>
-                              {event.pm_analysis.oil.direction === 'up' ? '↑' : '↓'} {event.pm_analysis.oil.min}-{event.pm_analysis.oil.max}%
+                            <span className={`impact-value ${event.data?.pm_analysis.oil.direction === 'up' ? 'positive' : 'negative'}`}>
+                              {event.data?.pm_analysis.oil.direction === 'up' ? '↑' : '↓'} {event.data?.pm_analysis.oil.min}-{event.data?.pm_analysis.oil.max}%
                             </span>
-                            {event.pm_analysis.oil_price_change && (
+                            {event.data?.pm_analysis.oil_price_change && (
                               <span className="impact-price">
-                                ${event.pm_analysis.oil_price_change.baseline} → ${event.pm_analysis.oil_price_change.baseline + event.pm_analysis.oil_price_change.min_change}-${(event.pm_analysis.oil_price_change.baseline + event.pm_analysis.oil_price_change.max_change).toFixed(2)}
+                                ${event.data?.pm_analysis.oil_price_change.baseline} → ${event.data?.pm_analysis.oil_price_change.baseline + event.data?.pm_analysis.oil_price_change.min_change}-${(event.data?.pm_analysis.oil_price_change.baseline + event.data?.pm_analysis.oil_price_change.max_change).toFixed(2)}
                               </span>
                             )}
-                            <span className="impact-reason">{event.pm_analysis.oil.reason}</span>
+                            <span className="impact-reason">{event.data?.pm_analysis.oil.reason}</span>
                           </div>
                         ) : (
                           <div className="impact-item no-impact">
@@ -214,19 +216,19 @@ function EventStream({ events, onEventSelect, availableRoles = [] }) {
                           </div>
                         )}
                         
-                        {event.pm_analysis.gold ? (
+                        {event.data?.pm_analysis.gold ? (
                           <div className="impact-item">
                             <span className="impact-icon">🏆</span>
                             <span className="impact-label">黄金:</span>
-                            <span className={`impact-value ${event.pm_analysis.gold.direction === 'up' ? 'positive' : 'negative'}`}>
-                              {event.pm_analysis.gold.direction === 'up' ? '↑' : '↓'} {event.pm_analysis.gold.min}-{event.pm_analysis.gold.max}%
+                            <span className={`impact-value ${event.data?.pm_analysis.gold.direction === 'up' ? 'positive' : 'negative'}`}>
+                              {event.data?.pm_analysis.gold.direction === 'up' ? '↑' : '↓'} {event.data?.pm_analysis.gold.min}-{event.data?.pm_analysis.gold.max}%
                             </span>
-                            {event.pm_analysis.gold_price_change && (
+                            {event.data?.pm_analysis.gold_price_change && (
                               <span className="impact-price">
-                                ${event.pm_analysis.gold_price_change.baseline.toLocaleString()} → ${(event.pm_analysis.gold_price_change.baseline + event.pm_analysis.gold_price_change.min_change).toLocaleString()}-${(event.pm_analysis.gold_price_change.baseline + event.pm_analysis.gold_price_change.max_change).toLocaleString()}
+                                ${event.data?.pm_analysis.gold_price_change.baseline.toLocaleString()} → ${(event.data?.pm_analysis.gold_price_change.baseline + event.data?.pm_analysis.gold_price_change.min_change).toLocaleString()}-${(event.data?.pm_analysis.gold_price_change.baseline + event.data?.pm_analysis.gold_price_change.max_change).toLocaleString()}
                               </span>
                             )}
-                            <span className="impact-reason">{event.pm_analysis.gold.reason}</span>
+                            <span className="impact-reason">{event.data?.pm_analysis.gold.reason}</span>
                           </div>
                         ) : (
                           <div className="impact-item no-impact">
@@ -237,19 +239,19 @@ function EventStream({ events, onEventSelect, availableRoles = [] }) {
                           </div>
                         )}
                         
-                        {event.pm_analysis.silver ? (
+                        {event.data?.pm_analysis.silver ? (
                           <div className="impact-item">
                             <span className="impact-icon">🥈</span>
                             <span className="impact-label">白银:</span>
-                            <span className={`impact-value ${event.pm_analysis.silver.direction === 'up' ? 'positive' : 'negative'}`}>
-                              {event.pm_analysis.silver.direction === 'up' ? '↑' : '↓'} {event.pm_analysis.silver.min}-{event.pm_analysis.silver.max}%
+                            <span className={`impact-value ${event.data?.pm_analysis.silver.direction === 'up' ? 'positive' : 'negative'}`}>
+                              {event.data?.pm_analysis.silver.direction === 'up' ? '↑' : '↓'} {event.data?.pm_analysis.silver.min}-{event.data?.pm_analysis.silver.max}%
                             </span>
-                            {event.pm_analysis.silver_price_change && (
+                            {event.data?.pm_analysis.silver_price_change && (
                               <span className="impact-price">
-                                ${event.pm_analysis.silver_price_change.baseline} → ${(event.pm_analysis.silver_price_change.baseline + event.pm_analysis.silver_price_change.min_change).toFixed(2)}-${(event.pm_analysis.silver_price_change.baseline + event.pm_analysis.silver_price_change.max_change).toFixed(2)}
+                                ${event.data?.pm_analysis.silver_price_change.baseline} → ${(event.data?.pm_analysis.silver_price_change.baseline + event.data?.pm_analysis.silver_price_change.min_change).toFixed(2)}-${(event.data?.pm_analysis.silver_price_change.baseline + event.data?.pm_analysis.silver_price_change.max_change).toFixed(2)}
                               </span>
                             )}
-                            <span className="impact-reason">{event.pm_analysis.silver.reason}</span>
+                            <span className="impact-reason">{event.data?.pm_analysis.silver.reason}</span>
                           </div>
                         ) : (
                           <div className="impact-item no-impact">
@@ -263,19 +265,19 @@ function EventStream({ events, onEventSelect, availableRoles = [] }) {
                       
                       <div className="pm-analysis-section">
                         <h5>₿ 加密货币</h5>
-                        {event.pm_analysis.btc ? (
+                        {event.data?.pm_analysis.btc ? (
                           <div className="impact-item">
                             <span className="impact-icon">₿</span>
                             <span className="impact-label">BTC:</span>
-                            <span className={`impact-value ${event.pm_analysis.btc.direction === 'up' ? 'positive' : 'negative'}`}>
-                              {event.pm_analysis.btc.direction === 'up' ? '↑' : '↓'} {event.pm_analysis.btc.min}-{event.pm_analysis.btc.max}%
+                            <span className={`impact-value ${event.data?.pm_analysis.btc.direction === 'up' ? 'positive' : 'negative'}`}>
+                              {event.data?.pm_analysis.btc.direction === 'up' ? '↑' : '↓'} {event.data?.pm_analysis.btc.min}-{event.data?.pm_analysis.btc.max}%
                             </span>
-                            {event.pm_analysis.btc_price_change && (
+                            {event.data?.pm_analysis.btc_price_change && (
                               <span className="impact-price">
-                                ${event.pm_analysis.btc_price_change.baseline.toLocaleString()} → ${(event.pm_analysis.btc_price_change.baseline + event.pm_analysis.btc_price_change.min_change).toLocaleString()}-${(event.pm_analysis.btc_price_change.baseline + event.pm_analysis.btc_price_change.max_change).toLocaleString()}
+                                ${event.data?.pm_analysis.btc_price_change.baseline.toLocaleString()} → ${(event.data?.pm_analysis.btc_price_change.baseline + event.data?.pm_analysis.btc_price_change.min_change).toLocaleString()}-${(event.data?.pm_analysis.btc_price_change.baseline + event.data?.pm_analysis.btc_price_change.max_change).toLocaleString()}
                               </span>
                             )}
-                            <span className="impact-reason">{event.pm_analysis.btc.reason}</span>
+                            <span className="impact-reason">{event.data?.pm_analysis.btc.reason}</span>
                           </div>
                         ) : (
                           <div className="impact-item no-impact">
@@ -286,19 +288,19 @@ function EventStream({ events, onEventSelect, availableRoles = [] }) {
                           </div>
                         )}
                         
-                        {event.pm_analysis.eth ? (
+                        {event.data?.pm_analysis.eth ? (
                           <div className="impact-item">
                             <span className="impact-icon">♦</span>
                             <span className="impact-label">ETH:</span>
-                            <span className={`impact-value ${event.pm_analysis.eth.direction === 'up' ? 'positive' : 'negative'}`}>
-                              {event.pm_analysis.eth.direction === 'up' ? '↑' : '↓'} {event.pm_analysis.eth.min}-{event.pm_analysis.eth.max}%
+                            <span className={`impact-value ${event.data?.pm_analysis.eth.direction === 'up' ? 'positive' : 'negative'}`}>
+                              {event.data?.pm_analysis.eth.direction === 'up' ? '↑' : '↓'} {event.data?.pm_analysis.eth.min}-{event.data?.pm_analysis.eth.max}%
                             </span>
-                            {event.pm_analysis.eth_price_change && (
+                            {event.data?.pm_analysis.eth_price_change && (
                               <span className="impact-price">
-                                ${event.pm_analysis.eth_price_change.baseline} → ${(event.pm_analysis.eth_price_change.baseline + event.pm_analysis.eth_price_change.min_change).toFixed(2)}-${(event.pm_analysis.eth_price_change.baseline + event.pm_analysis.eth_price_change.max_change).toFixed(2)}
+                                ${event.data?.pm_analysis.eth_price_change.baseline} → ${(event.data?.pm_analysis.eth_price_change.baseline + event.data?.pm_analysis.eth_price_change.min_change).toFixed(2)}-${(event.data?.pm_analysis.eth_price_change.baseline + event.data?.pm_analysis.eth_price_change.max_change).toFixed(2)}
                               </span>
                             )}
-                            <span className="impact-reason">{event.pm_analysis.eth.reason}</span>
+                            <span className="impact-reason">{event.data?.pm_analysis.eth.reason}</span>
                           </div>
                         ) : (
                           <div className="impact-item no-impact">
@@ -312,19 +314,19 @@ function EventStream({ events, onEventSelect, availableRoles = [] }) {
                       
                       <div className="pm-analysis-section">
                         <h5>📊 全球股市</h5>
-                        {event.pm_analysis.spx ? (
+                        {event.data?.pm_analysis.spx ? (
                           <div className="impact-item">
                             <span className="impact-icon">🇺🇸</span>
                             <span className="impact-label">标普 500:</span>
-                            <span className={`impact-value ${event.pm_analysis.spx.direction === 'up' ? 'positive' : 'negative'}`}>
-                              {event.pm_analysis.spx.direction === 'up' ? '↑' : '↓'} {event.pm_analysis.spx.min}-{event.pm_analysis.spx.max}%
+                            <span className={`impact-value ${event.data?.pm_analysis.spx.direction === 'up' ? 'positive' : 'negative'}`}>
+                              {event.data?.pm_analysis.spx.direction === 'up' ? '↑' : '↓'} {event.data?.pm_analysis.spx.min}-{event.data?.pm_analysis.spx.max}%
                             </span>
-                            {event.pm_analysis.spx_price_change && (
+                            {event.data?.pm_analysis.spx_price_change && (
                               <span className="impact-price">
-                                {event.pm_analysis.spx_price_change.baseline.toLocaleString()} → {(event.pm_analysis.spx_price_change.baseline + event.pm_analysis.spx_price_change.min_change).toFixed(2)}-${(event.pm_analysis.spx_price_change.baseline + event.pm_analysis.spx_price_change.max_change).toFixed(2)} 点
+                                {event.data?.pm_analysis.spx_price_change.baseline.toLocaleString()} → {(event.data?.pm_analysis.spx_price_change.baseline + event.data?.pm_analysis.spx_price_change.min_change).toFixed(2)}-${(event.data?.pm_analysis.spx_price_change.baseline + event.data?.pm_analysis.spx_price_change.max_change).toFixed(2)} 点
                               </span>
                             )}
-                            <span className="impact-reason">{event.pm_analysis.spx.reason}</span>
+                            <span className="impact-reason">{event.data?.pm_analysis.spx.reason}</span>
                           </div>
                         ) : (
                           <div className="impact-item no-impact">
@@ -335,19 +337,19 @@ function EventStream({ events, onEventSelect, availableRoles = [] }) {
                           </div>
                         )}
                         
-                        {event.pm_analysis.hsi ? (
+                        {event.data?.pm_analysis.hsi ? (
                           <div className="impact-item">
                             <span className="impact-icon">🇭🇰</span>
                             <span className="impact-label">恒生指数:</span>
-                            <span className={`impact-value ${event.pm_analysis.hsi.direction === 'up' ? 'positive' : 'negative'}`}>
-                              {event.pm_analysis.hsi.direction === 'up' ? '↑' : '↓'} {event.pm_analysis.hsi.min}-{event.pm_analysis.hsi.max}%
+                            <span className={`impact-value ${event.data?.pm_analysis.hsi.direction === 'up' ? 'positive' : 'negative'}`}>
+                              {event.data?.pm_analysis.hsi.direction === 'up' ? '↑' : '↓'} {event.data?.pm_analysis.hsi.min}-{event.data?.pm_analysis.hsi.max}%
                             </span>
-                            {event.pm_analysis.hsi_price_change && (
+                            {event.data?.pm_analysis.hsi_price_change && (
                               <span className="impact-price">
-                                {event.pm_analysis.hsi_price_change.baseline.toLocaleString()} → {(event.pm_analysis.hsi_price_change.baseline + event.pm_analysis.hsi_price_change.min_change).toFixed(2)}-${(event.pm_analysis.hsi_price_change.baseline + event.pm_analysis.hsi_price_change.max_change).toFixed(2)} 点
+                                {event.data?.pm_analysis.hsi_price_change.baseline.toLocaleString()} → {(event.data?.pm_analysis.hsi_price_change.baseline + event.data?.pm_analysis.hsi_price_change.min_change).toFixed(2)}-${(event.data?.pm_analysis.hsi_price_change.baseline + event.data?.pm_analysis.hsi_price_change.max_change).toFixed(2)} 点
                               </span>
                             )}
-                            <span className="impact-reason">{event.pm_analysis.hsi.reason}</span>
+                            <span className="impact-reason">{event.data?.pm_analysis.hsi.reason}</span>
                           </div>
                         ) : (
                           <div className="impact-item no-impact">
@@ -358,19 +360,19 @@ function EventStream({ events, onEventSelect, availableRoles = [] }) {
                           </div>
                         )}
                         
-                        {event.pm_analysis.ftse ? (
+                        {event.data?.pm_analysis.ftse ? (
                           <div className="impact-item">
                             <span className="impact-icon">🇬🇧</span>
                             <span className="impact-label">富时 100:</span>
-                            <span className={`impact-value ${event.pm_analysis.ftse.direction === 'up' ? 'positive' : 'negative'}`}>
-                              {event.pm_analysis.ftse.direction === 'up' ? '↑' : '↓'} {event.pm_analysis.ftse.min}-{event.pm_analysis.ftse.max}%
+                            <span className={`impact-value ${event.data?.pm_analysis.ftse.direction === 'up' ? 'positive' : 'negative'}`}>
+                              {event.data?.pm_analysis.ftse.direction === 'up' ? '↑' : '↓'} {event.data?.pm_analysis.ftse.min}-{event.data?.pm_analysis.ftse.max}%
                             </span>
-                            {event.pm_analysis.ftse_price_change && (
+                            {event.data?.pm_analysis.ftse_price_change && (
                               <span className="impact-price">
-                                {event.pm_analysis.ftse_price_change.baseline.toLocaleString()} → {(event.pm_analysis.ftse_price_change.baseline + event.pm_analysis.ftse_price_change.min_change).toFixed(2)}-${(event.pm_analysis.ftse_price_change.baseline + event.pm_analysis.ftse_price_change.max_change).toFixed(2)} 点
+                                {event.data?.pm_analysis.ftse_price_change.baseline.toLocaleString()} → {(event.data?.pm_analysis.ftse_price_change.baseline + event.data?.pm_analysis.ftse_price_change.min_change).toFixed(2)}-${(event.data?.pm_analysis.ftse_price_change.baseline + event.data?.pm_analysis.ftse_price_change.max_change).toFixed(2)} 点
                               </span>
                             )}
-                            <span className="impact-reason">{event.pm_analysis.ftse.reason}</span>
+                            <span className="impact-reason">{event.data?.pm_analysis.ftse.reason}</span>
                           </div>
                         ) : (
                           <div className="impact-item no-impact">
@@ -382,10 +384,10 @@ function EventStream({ events, onEventSelect, availableRoles = [] }) {
                         )}
                       </div>
                       
-                      {event.pm_analysis.summary && (
+                      {event.data?.pm_analysis.summary && (
                         <div className="analysis-summary">
                           <strong>💡 总结:</strong>
-                          <p>{event.pm_analysis.summary}</p>
+                          <p>{event.data?.pm_analysis.summary}</p>
                         </div>
                       )}
                     </div>
@@ -394,7 +396,7 @@ function EventStream({ events, onEventSelect, availableRoles = [] }) {
                   )}
                   
                   {/* 如果没有 PM 分析，显示占位符 */}
-                  {!event.pm_analysis && (
+                  {!event.data?.pm_analysis && (
                     <div className="pm-analysis-placeholder">
                       <p>⏳ PM Agent 正在分析事件影响...</p>
                     </div>

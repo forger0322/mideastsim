@@ -451,6 +451,42 @@ func (d *Database) CreateEvent(event *Event) error {
 	return err
 }
 
+// UpdateEventData 更新事件的 data 字段（用于 PM Agent 异步更新分析结果）
+func (d *Database) UpdateEventData(eventID string, data map[string]interface{}) error {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
+	// 先获取现有的 data
+	var existingDataStr sql.NullString
+	err := d.db.QueryRow(`SELECT data FROM events WHERE id = ?`, eventID).Scan(&existingDataStr)
+	if err != nil {
+		return err
+	}
+
+	// 解析现有 data
+	existingData := make(map[string]interface{})
+	if existingDataStr.Valid && existingDataStr.String != "" {
+		if err := json.Unmarshal([]byte(existingDataStr.String), &existingData); err != nil {
+			// 如果现有 data 不是有效 JSON，从头开始
+			existingData = make(map[string]interface{})
+		}
+	}
+
+	// 合并新数据
+	for k, v := range data {
+		existingData[k] = v
+	}
+
+	// 序列化并更新
+	dataJSON, err := json.Marshal(existingData)
+	if err != nil {
+		return err
+	}
+
+	_, err = d.db.Exec(`UPDATE events SET data = ? WHERE id = ?`, string(dataJSON), eventID)
+	return err
+}
+
 // GetRecentEvents 获取最近事件
 func (d *Database) GetRecentEvents(limit int) ([]Event, error) {
 	d.mu.RLock()
