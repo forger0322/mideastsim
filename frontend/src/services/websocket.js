@@ -6,9 +6,11 @@ class WorldWebSocket {
     this.publicListeners = [];
     this.privateListeners = [];
     this.actionListeners = [];
-    // 直连后端 8080 端口（3 月 20 日测试成功的配置）
+    // 使用环境变量配置（支持本地和远程部署）
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    this.url = `${protocol}//${window.location.hostname}:8080/ws`;
+    const wsHost = process.env.REACT_APP_WS_HOST || window.location.hostname;
+    const wsPort = process.env.REACT_APP_WS_PORT || '8080';
+    this.url = `${protocol}//${wsHost}:${wsPort}/ws`;
     this.reconnectTimer = null;
   }
 

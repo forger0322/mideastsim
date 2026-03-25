@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useTransition, useMemo } from 'react';
 import WorldMapNew from './components/WorldMapNew';
-import NavBar from './components/NavBar';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import EconomicPanel from './components/EconomicPanel';
 import DiplomacyPanel from './components/DiplomacyPanel';
@@ -716,92 +715,152 @@ function App() {
         {/* ========== 主游戏界面（仅当已认证且完成角色选择后显示） ========== */}
         {!showAuth && !showRoleSelector && (
           <>
-        {/* ========== 导航栏（带语言切换） ========== */}
-        <NavBar currentPage={currentPage} onNavigate={handleNavigate} onLogout={handleLogout} player={player} currentRole={currentRole} />
-
-      {/* ========== 顶部信息栏 ========== */}
-      <header className="app-header">
-        <div className="header-left">
-          <div className="logo">MIDEASTSIM</div>
-          
-          {/* 世界统计 */}
-          {worldState && (
-            <div className="world-stats">
-              <div className="stat-item clickable" onClick={() => setShowFactionPanel(true)}>
-                <span className="stat-icon">🔥</span>
-                <span className="stat-label">{lang === 'zh' ? '热点:' : 'Hotspots:'}</span>
-                <span className="stat-value">{worldState.hotspots?.length || 0}{lang === 'zh' ? '处' : ''}</span>
-              </div>
-              <div className="stat-item clickable" onClick={() => setShowFactionPanel(true)}>
-                <span className="stat-icon">👥</span>
-                <span className="stat-label">{lang === 'zh' ? '势力:' : 'Factions:'}</span>
-                <span className="stat-value">4{lang === 'zh' ? '方' : ''}</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-icon">🌍</span>
-                <span className="stat-label">{lang === 'zh' ? '纪元:' : 'Era:'}</span>
-                <span className="stat-value">AE 6{lang === 'zh' ? '年' : ''}</span>
-              </div>
+        {/* ========== 整合顶部栏：导航 + 状态 + 用户信息 ========== */}
+        <header className="app-header">
+          {/* 左侧：Logo + 游戏标题（垂直排列）+ 导航菜单 */}
+          <div className="header-left">
+            <div className="logo-area">
+              <div className="logo">MIDEASTSIM</div>
+              <div className="game-subtitle">GEOPOLITICAL SIMULATION</div>
             </div>
-          )}
-        </div>
-
-        {/* 游戏标题 */}
-        <div className="header-center">
-          <div className="game-title">{t('title')}</div>
-          <div className="game-subtitle">GEOPOLITICAL SIMULATION</div>
-        </div>
-
-        <div className="header-right">
-          {/* 资源条 - 可点击打开经济面板 */}
-          {worldState && worldState.economic && (
-            <div className="resource-bar clickable" onClick={() => setShowEconomicPanel(true)}>
-              <div className="resource-item">
-                <span className="resource-label">{t('resources.oil')}</span>
-                <span className="resource-value">
-                  ${worldState.economic.commodities?.Oil?.value?.replace('$', '') || '85.3'}
-                </span>
-                <span className={`resource-change ${
-                  (worldState.economic.commodities?.Oil?.change || 0) > 0 ? 'up' : 'down'
-                }`}>
-                  {(worldState.economic.commodities?.Oil?.change || 0) > 0 ? '↑' : '↓'}
-                  {Math.abs(worldState.economic.commodities?.Oil?.change || 0)}%
-                </span>
-              </div>
-              <div className="resource-item">
-                <span className="resource-label">{t('resources.gold')}</span>
-                <span className="resource-value">
-                  ${worldState.economic.commodities?.Gold?.value?.replace('$', '') || '2150'}
-                </span>
-                <span className={`resource-change ${
-                  (worldState.economic.commodities?.Gold?.change || 0) > 0 ? 'up' : 'down'
-                }`}>
-                  {(worldState.economic.commodities?.Gold?.change || 0) > 0 ? '↑' : '↓'}
-                  {Math.abs(worldState.economic.commodities?.Gold?.change || 0)}%
-                </span>
-              </div>
-              <div className="resource-item">
-                <span className="resource-label">{t('resources.btc')}</span>
-                <span className="resource-value">
-                  ${worldState.economic.crypto?.BTC?.value?.replace('$', '') || '68200'}
-                </span>
-                <span className={`resource-change ${
-                  (worldState.economic.crypto?.BTC?.change || 0) > 0 ? 'up' : 'down'
-                }`}>
-                  {(worldState.economic.crypto?.BTC?.change || 0) > 0 ? '↑' : '↓'}
-                  {Math.abs(worldState.economic.crypto?.BTC?.change || 0)}%
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* 时间显示 - 美国东部时间 */}
-          <div className="time-display">
-            <div className="time-label">{lang === 'zh' ? '美国时间' : 'US Time'}</div>
-            <div className="time-value">{formatTime(currentTime)}</div>
+            
+            {/* 导航菜单 */}
+            <nav className="header-nav">
+              <button
+                className={`nav-item ${currentPage === 'map' ? 'active' : ''}`}
+                onClick={() => handleNavigate('map')}
+              >
+                <span className="nav-icon">🗺️</span>
+                <span className="nav-label">{lang === 'zh' ? '地图' : 'Map'}</span>
+              </button>
+              <button
+                className={`nav-item ${currentPage === 'economy' ? 'active' : ''}`}
+                onClick={() => handleNavigate('economy')}
+              >
+                <span className="nav-icon">📊</span>
+                <span className="nav-label">{lang === 'zh' ? '经济' : 'Economy'}</span>
+              </button>
+              <button
+                className={`nav-item ${currentPage === 'diplomacy' ? 'active' : ''}`}
+                onClick={() => handleNavigate('diplomacy')}
+              >
+                <span className="nav-icon">🤝</span>
+                <span className="nav-label">{lang === 'zh' ? '外交' : 'Diplomacy'}</span>
+              </button>
+              <button
+                className={`nav-item ${currentPage === 'military' ? 'active' : ''}`}
+                onClick={() => handleNavigate('military')}
+              >
+                <span className="nav-icon">⚔️</span>
+                <span className="nav-label">{lang === 'zh' ? '军事' : 'Military'}</span>
+              </button>
+              <button
+                className={`nav-item ${currentPage === 'leaderboard' ? 'active' : ''}`}
+                onClick={() => handleNavigate('leaderboard')}
+              >
+                <span className="nav-icon">🏆</span>
+                <span className="nav-label">{lang === 'zh' ? '排行榜' : 'Rank'}</span>
+              </button>
+              <button
+                className={`nav-item ${currentPage === 'settings' ? 'active' : ''}`}
+                onClick={() => handleNavigate('settings')}
+              >
+                <span className="nav-icon">⚙️</span>
+                <span className="nav-label">{lang === 'zh' ? '设置' : 'Settings'}</span>
+              </button>
+            </nav>
           </div>
-        </div>
-      </header>
+
+          {/* 中央：世界统计 + 经济数据 */}
+          <div className="header-center">
+            {/* 游戏标题已移到左侧 */}
+            
+            {/* 世界统计 */}
+            {worldState && (
+              <div className="world-stats">
+                <div className="stat-item clickable" onClick={() => setShowFactionPanel(true)}>
+                  <span className="stat-icon">🔥</span>
+                  <span className="stat-label">{lang === 'zh' ? '热点:' : 'Hotspots:'}</span>
+                  <span className="stat-value">{worldState.hotspots?.length || 0}{lang === 'zh' ? '处' : ''}</span>
+                </div>
+                <div className="stat-item clickable" onClick={() => setShowFactionPanel(true)}>
+                  <span className="stat-icon">👥</span>
+                  <span className="stat-label">{lang === 'zh' ? '势力:' : 'Factions:'}</span>
+                  <span className="stat-value">4{lang === 'zh' ? '方' : ''}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-icon">🌍</span>
+                  <span className="stat-label">{lang === 'zh' ? '纪元:' : 'Era:'}</span>
+                  <span className="stat-value">AE 6{lang === 'zh' ? '年' : ''}</span>
+                </div>
+              </div>
+            )}
+
+            {/* 资源条 - 可点击打开经济面板 */}
+            {worldState && worldState.economic && (
+              <div className="resource-bar clickable" onClick={() => setShowEconomicPanel(true)}>
+                <div className="resource-item">
+                  <span className="resource-label">{t('resources.oil')}</span>
+                  <span className="resource-value">
+                    ${worldState.economic.commodities?.Oil?.value?.replace('$', '') || '85.3'}
+                  </span>
+                  <span className={`resource-change ${
+                    (worldState.economic.commodities?.Oil?.change || 0) > 0 ? 'up' : 'down'
+                  }`}>
+                    {(worldState.economic.commodities?.Oil?.change || 0) > 0 ? '↑' : '↓'}
+                    {Math.abs(worldState.economic.commodities?.Oil?.change || 0)}%
+                  </span>
+                </div>
+                <div className="resource-item">
+                  <span className="resource-label">{t('resources.gold')}</span>
+                  <span className="resource-value">
+                    ${worldState.economic.commodities?.Gold?.value?.replace('$', '') || '2150'}
+                  </span>
+                  <span className={`resource-change ${
+                    (worldState.economic.commodities?.Gold?.change || 0) > 0 ? 'up' : 'down'
+                  }`}>
+                    {(worldState.economic.commodities?.Gold?.change || 0) > 0 ? '↑' : '↓'}
+                    {Math.abs(worldState.economic.commodities?.Gold?.change || 0)}%
+                  </span>
+                </div>
+                <div className="resource-item">
+                  <span className="resource-label">{t('resources.btc')}</span>
+                  <span className="resource-value">
+                    ${worldState.economic.crypto?.BTC?.value?.replace('$', '') || '68200'}
+                  </span>
+                  <span className={`resource-change ${
+                    (worldState.economic.crypto?.BTC?.change || 0) > 0 ? 'up' : 'down'
+                  }`}>
+                    {(worldState.economic.crypto?.BTC?.change || 0) > 0 ? '↑' : '↓'}
+                    {Math.abs(worldState.economic.crypto?.BTC?.change || 0)}%
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 右侧：用户信息 + 语言切换 + 登出 */}
+          <div className="header-right">
+            {player && (
+              <div className="user-info">
+                <div className="user-avatar">👤</div>
+                <div className="user-details">
+                  <div className="user-name">{player.username}</div>
+                  {currentRole && (
+                    <div className="user-role">
+                      {currentRole.flag || '🏛️'} {currentRole.role_name || currentRole.name}
+                    </div>
+                  )}
+                </div>
+                <button className="logout-btn" onClick={handleLogout} title="登出">
+                  🚪
+                </button>
+              </div>
+            )}
+            
+            <LanguageSwitcher />
+          </div>
+        </header>
 
       {/* ========== 时间线 ========== */}
       <div className="timeline-container">
