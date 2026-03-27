@@ -630,32 +630,115 @@
 /* 国家实力显示 */
 .country-power-display {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 16px;
+  align-items: stretch;
+  gap: 0;
+  padding: 8px 12px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+/* 旗帜容器（跨两排） */
+.country-flag-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  margin-right: 8px;
+}
+
 .country-flag {
-  font-size: 1.4rem;
+  font-size: 2.2rem;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  line-height: 1;
+}
+
+/* 右侧统计区域 */
+.country-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* 第一排：8 项属性 */
+.stats-row-1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.stats-row-1::-webkit-scrollbar {
+  height: 3px;
+}
+
+.stats-row-1::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+}
+
+.stats-row-1::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+/* 单项属性（小图标 + 数值） */
+.stat-mini {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  cursor: help;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.stat-mini:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.stat-mini-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.stat-mini-value {
+  color: var(--text-light);
+  font-weight: 600;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  min-width: 28px;
+  text-align: right;
+}
+
+/* 第二排：国家名称、国力总分、势力徽章 */
+.stats-row-2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 2px;
 }
 
 .country-name {
   color: var(--text-light);
-  font-weight: 600;
-  font-size: 0.95rem;
-  min-width: 60px;
+  font-weight: 700;
+  font-size: 1rem;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
 }
 
 .power-value {
   color: #fbbf24;
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   white-space: nowrap;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
@@ -663,11 +746,17 @@
 .faction-badge-small {
   padding: 2px 8px;
   border-radius: 4px;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 600;
   color: #fff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   white-space: nowrap;
+}
+
+.loading-text {
+  color: rgba(240, 230, 210, 0.5);
+  font-size: 0.8rem;
+  font-style: italic;
 }
 
 /* 游戏标题 */

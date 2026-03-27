@@ -795,23 +795,78 @@ function App() {
             <div className="country-power-display">
               {userCountryPower ? (
                 <>
-                  <span className="country-flag">{userCountryPower.flag}</span>
-                  <span className="country-name">{userCountryPower.name}</span>
-                  <span className="power-value">💪 {userCountryPower.totalPower.toLocaleString()}</span>
-                  <span className="faction-badge-small" style={{ 
-                    background: userCountryPower.faction === '抵抗轴心' ? '#8B1A1A' : 
-                               userCountryPower.faction === '美以联盟' ? '#1E4F8A' : 
-                               userCountryPower.faction === '温和联盟' ? '#B8860B' : 
-                               userCountryPower.faction === '亲穆兄会' ? '#2D5A27' : '#7B7B7B'
-                  }}>
-                    {userCountryPower.faction || '-'}
-                  </span>
+                  {/* 左侧：国家旗帜（跨两排） */}
+                  <div className="country-flag-wrapper">
+                    <span className="country-flag">{userCountryPower.flag}</span>
+                  </div>
+                  
+                  {/* 右侧：两排布局 */}
+                  <div className="country-stats">
+                    {/* 第一排：8 项属性 */}
+                    <div className="stats-row stats-row-1">
+                      <div className="stat-mini" title="军力">
+                        <span className="stat-mini-icon">🪖</span>
+                        <span className="stat-mini-value">{userCountryPower.attributes.army || 0}</span>
+                      </div>
+                      <div className="stat-mini" title="海军">
+                        <span className="stat-mini-icon">⚓</span>
+                        <span className="stat-mini-value">{userCountryPower.attributes.navy || 0}</span>
+                      </div>
+                      <div className="stat-mini" title="空军">
+                        <span className="stat-mini-icon">✈️</span>
+                        <span className="stat-mini-value">{userCountryPower.attributes.airForce || 0}</span>
+                      </div>
+                      <div className="stat-mini" title="核武">
+                        <span className="stat-mini-icon">☢️</span>
+                        <span className="stat-mini-value">{userCountryPower.attributes.nuclear || 0}</span>
+                      </div>
+                      <div className="stat-mini" title="经济">
+                        <span className="stat-mini-icon">💰</span>
+                        <span className="stat-mini-value">{userCountryPower.attributes.economy || 0}</span>
+                      </div>
+                      <div className="stat-mini" title="稳定">
+                        <span className="stat-mini-icon">🏛️</span>
+                        <span className="stat-mini-value">{userCountryPower.attributes.stability || 0}</span>
+                      </div>
+                      <div className="stat-mini" title="外交">
+                        <span className="stat-mini-icon">🤝</span>
+                        <span className="stat-mini-value">{userCountryPower.attributes.diplomacy || 0}</span>
+                      </div>
+                      <div className="stat-mini" title="情报">
+                        <span className="stat-mini-icon">👁️</span>
+                        <span className="stat-mini-value">{userCountryPower.attributes.intel || 0}</span>
+                      </div>
+                    </div>
+                    
+                    {/* 第二排：国家名称、国力总分、势力徽章 */}
+                    <div className="stats-row stats-row-2">
+                      <span className="country-name">{userCountryPower.name}</span>
+                      <span className="power-value">💪 {userCountryPower.totalPower.toLocaleString()}</span>
+                      <span className="faction-badge-small" style={{ 
+                        background: userCountryPower.faction === '抵抗轴心' ? '#8B1A1A' : 
+                                   userCountryPower.faction === '美以联盟' ? '#1E4F8A' : 
+                                   userCountryPower.faction === '温和联盟' ? '#B8860B' : 
+                                   userCountryPower.faction === '亲穆兄会' ? '#2D5A27' : '#7B7B7B'
+                      }}>
+                        {userCountryPower.faction || '-'}
+                      </span>
+                    </div>
+                  </div>
                 </>
               ) : (
                 <>
-                  <span className="country-flag">🇮🇷</span>
-                  <span className="country-name">伊朗</span>
-                  <span className="power-value">💪 加载中...</span>
+                  {/* 加载中状态 */}
+                  <div className="country-flag-wrapper">
+                    <span className="country-flag">🇮🇷</span>
+                  </div>
+                  <div className="country-stats">
+                    <div className="stats-row stats-row-1">
+                      <span className="loading-text">数据加载中...</span>
+                    </div>
+                    <div className="stats-row stats-row-2">
+                      <span className="country-name">伊朗</span>
+                    </div>
+                  </div>
                 </>
               )}
             </div>
