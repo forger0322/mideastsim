@@ -197,9 +197,9 @@ func main() {
 	// 启动后台任务
 	go simulationLoop(db)
 
-	// 🆕 启动离线 AI 定时任务 (每 30 秒执行一次 AI 决策)
+	// 🆕 启动离线 AI 定时任务 (每 5 分钟执行一次 AI 决策)
 	go func() {
-		ticker := time.NewTicker(30 * time.Second)
+		ticker := time.NewTicker(5 * time.Minute)
 		defer ticker.Stop()
 		for range ticker.C {
 			offlineAI.ExecuteAIActions(ruleEngine)
