@@ -257,12 +257,15 @@ function App() {
   useEffect(() => {
     const fetchUserCountryPower = async () => {
       try {
+        // 调试：显示 currentRole 的完整结构
+        console.log('[HeaderCenter] currentRole 完整结构:', JSON.stringify(currentRole, null, 2));
+        
         // 确定要查询的国家 ID（游客默认为伊朗 IRN）
-        const countryId = currentRole?.role_id || 'IRN';
+        // 兼容多种字段名：role_id, roleId, id
+        const countryId = currentRole?.role_id?.String || currentRole?.role_id || currentRole?.roleId || currentRole?.id || 'IRN';
         
         // 调试日志：显示当前角色
-        console.log('[HeaderCenter] currentRole:', currentRole);
-        console.log('[HeaderCenter] countryId:', countryId);
+        console.log('[HeaderCenter] 解析后的 countryId:', countryId);
         console.log('[HeaderCenter] 是否游客模式:', !currentRole);
         
         const response = await fetch(`/api/roles`);
