@@ -15,7 +15,7 @@ sleep 1
 # 编译
 echo "🔨 编译后端..."
 cd /home/node/.openclaw/workspace/mideastsim/backend
-go build -o mideastsim-backend main.go database.go auth.go player.go rule_engine.go forward.go forward_action.go middleware.go agent_memory.go agent_memory_handlers.go offline_ai.go history_playback.go
+go build -o mideastsim-backend main.go database.go auth.go player.go rule_engine.go forward.go forward_action.go middleware.go agent_memory.go agent_memory_handlers.go offline_ai.go history_playback.go telegram.go debug_handler.go
 
 if [ $? -eq 0 ]; then
     echo "✅ 编译成功"

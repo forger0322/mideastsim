@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -1321,51 +1322,119 @@ func analyzeEventViaPMAgent(req PMAnalyzeRequest) *PMAnalyzeResponse {
    - BTC、ETH 加密货币变化
    - 标普 500、恒生指数、富时 100 股市变化
 
-3. **分析完成后，必须调用后端 API 返回结果**：
+3. **直接在回复中返回 JSON 格式的分析结果**（不要调用 API）：
 
-POST http://localhost:8080/api/agent/pm/callback
-Content-Type: application/json
-
-请求体格式：
-{
-  "event_id": "%s",
-  "event_type": "%s",
-  "analysis": {
-    "oil": {"direction": "up/down", "min_change": 1, "max_change": 3, "reason": "...", "value": 2},
-    "gold": {...},
-    "btc": {...},
-    "eth": {...},
-    "spx": {...},
-    "hsi": {...},
-    "ftse": {...},
-    "summary": "..."
-  }
-}
-
-## 输出格式参考
-
+JSON 格式：
 {
   "oil": {"direction": "up", "min_change": 8, "max_change": 15, "value": 11.5, "reason": "霍尔木兹海峡紧张"},
   "gold": {"direction": "up", "min_change": 3, "max_change": 5, "value": 4, "reason": "避险情绪"},
+  "btc": {"direction": "down", "min_change": 2, "max_change": 5, "value": -3.5, "reason": "风险资产抛售"},
+  "eth": {"direction": "down", "min_change": 2, "max_change": 5, "value": -3, "reason": "跟随 BTC"},
+  "spx": {"direction": "down", "min_change": 1, "max_change": 3, "value": -2, "reason": "地缘政治风险"},
+  "hsi": {"direction": "down", "min_change": 2, "max_change": 4, "value": -3, "reason": "亚洲市场恐慌"},
+  "ftse": {"direction": "down", "min_change": 1, "max_change": 3, "value": -2, "reason": "油价上涨拖累"},
   "summary": "🚨 中东局势推高油价和避险资产"
 }
 
-**现在请开始分析。**`, 
-		req.EventID, req.EventType, req.Location, req.Title, req.Description,
-		req.EventID, req.EventType)
+**现在请开始分析，直接返回 JSON 格式结果。**`, 
+		req.EventID, req.EventType, req.Location, req.Title, req.Description)
 	
-	// 发送消息给 PM Agent
-	err := sendToAgent("pm", message)
+	// 发送消息给 PM Agent 并等待回复（90 秒超时）
+	reply, err := sendToAgentAndWait("pm", message, 90*time.Second)
 	if err != nil {
-		logger.Printf("⚠️ [PM Agent] 发送失败：%v", err)
+		logger.Printf("⚠️ [PM Agent] 发送/接收失败：%v", err)
 		// 降级使用本地分析
 		return analyzeEventImpact(req)
 	}
 	
-	// PM Agent 会异步分析并回调 API 更新事件数据
-	// 这里返回 nil，等待回调
-	logger.Printf("[PM Agent] ✅ 请求已发送，等待回调...")
-	return nil
+	logger.Printf("[PM Agent] ✅ 收到回复，长度：%d 字符", len(reply))
+	
+	// 解析 PM Agent 的回复，提取 JSON 分析结果
+	analysis := parsePMAnalysisReply(reply)
+	if analysis == nil {
+		logger.Printf("⚠️ [PM Agent] 解析回复失败，使用本地分析")
+		return analyzeEventImpact(req)
+	}
+	
+	logger.Printf("[PM Agent] ✅ 解析成功：%s", analysis.Summary)
+	return analysis
+}
+
+// parsePMAnalysisReply 解析 PM Agent 的回复，提取 JSON 分析结果
+func parsePMAnalysisReply(reply string) *PMAnalyzeResponse {
+	// 尝试从回复中提取 JSON 代码块
+	jsonStart := strings.Index(reply, "```json")
+	jsonEnd := strings.Index(reply, "```")
+	
+	var jsonStr string
+	if jsonStart >= 0 && jsonEnd > jsonStart {
+		jsonStr = reply[jsonStart+7:jsonEnd] // 跳过 ```json
+	} else {
+		// 尝试直接解析整个回复
+		jsonStr = reply
+	}
+	
+	// 清理 JSON 字符串
+	jsonStr = strings.TrimSpace(jsonStr)
+	
+	// 定义临时结构体用于解析
+	type TempAnalysis struct {
+		Oil    *ImpactAnalysis `json:"oil,omitempty"`
+		Gold   *ImpactAnalysis `json:"gold,omitempty"`
+		Silver *ImpactAnalysis `json:"silver,omitempty"`
+		BTC    *ImpactAnalysis `json:"btc,omitempty"`
+		ETH    *ImpactAnalysis `json:"eth,omitempty"`
+		SPX    *ImpactAnalysis `json:"spx,omitempty"`
+		HSI    *ImpactAnalysis `json:"hsi,omitempty"`
+		FTSE   *ImpactAnalysis `json:"ftse,omitempty"`
+		Summary string         `json:"summary,omitempty"`
+	}
+	
+	var tempAnalysis TempAnalysis
+	if err := json.Unmarshal([]byte(jsonStr), &tempAnalysis); err != nil {
+		logger.Printf("❌ [PM Agent] 解析 JSON 失败：%v", err)
+		logger.Printf("JSON 字符串：%s", jsonStr[:min(200, len(jsonStr))])
+		return nil
+	}
+	
+	// 转换为 PMAnalyzeResponse
+	response := &PMAnalyzeResponse{
+		Summary: tempAnalysis.Summary,
+	}
+	
+	if tempAnalysis.Oil != nil {
+		response.Oil = tempAnalysis.Oil
+	}
+	if tempAnalysis.Gold != nil {
+		response.Gold = tempAnalysis.Gold
+	}
+	if tempAnalysis.Silver != nil {
+		response.Silver = tempAnalysis.Silver
+	}
+	if tempAnalysis.BTC != nil {
+		response.BTC = tempAnalysis.BTC
+	}
+	if tempAnalysis.ETH != nil {
+		response.ETH = tempAnalysis.ETH
+	}
+	if tempAnalysis.SPX != nil {
+		response.SPX = tempAnalysis.SPX
+	}
+	if tempAnalysis.HSI != nil {
+		response.HSI = tempAnalysis.HSI
+	}
+	if tempAnalysis.FTSE != nil {
+		response.FTSE = tempAnalysis.FTSE
+	}
+	
+	return response
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 func analyzeEventImpact(req PMAnalyzeRequest) *PMAnalyzeResponse {

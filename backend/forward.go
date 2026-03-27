@@ -190,8 +190,8 @@ func getSessionKey(agentID string) string {
 	return fmt.Sprintf("agent:%s:main", agentID)
 }
 
-// sendToAgent 发送消息到 OpenClaw Agent 会话
-func sendToAgent(agentID, message string) error {
+// sendToAgentAndWait 发送消息到 OpenClaw Agent 会话并等待回复
+func sendToAgentAndWait(agentID, message string, timeout time.Duration) (string, error) {
 	// 使用 OpenClaw Gateway HTTP API
 	gatewayURL := "http://127.0.0.1:18789/v1/responses"
 	authToken := "57d61723513764e2fd1cd21495de1ab8a1caf2ffb4b85150"
@@ -205,35 +205,65 @@ func sendToAgent(agentID, message string) error {
 	jsonData, err := json.Marshal(requestBody)
 	if err != nil {
 		logger.Printf("❌ [OpenClaw] 序列化失败给 %s: %v", agentID, err)
-		return err
+		return "", err
 	}
 	
 	req, err := http.NewRequest("POST", gatewayURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		logger.Printf("❌ [OpenClaw] 创建请求失败给 %s: %v", agentID, err)
-		return err
+		return "", err
 	}
 	
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", authToken))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-openclaw-session-key", sessionKey)
 	
-	client := &http.Client{Timeout: 30 * time.Second}
+	client := &http.Client{Timeout: timeout}
 	resp, err := client.Do(req)
 	if err != nil {
 		logger.Printf("❌ [OpenClaw] 发送失败给 %s: %v", agentID, err)
-		return err
+		return "", err
 	}
 	defer resp.Body.Close()
 	
-	body, _ := io.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		logger.Printf("❌ [OpenClaw] 读取响应失败：%v", err)
+		return "", err
+	}
+	
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		logger.Printf("✅ [OpenClaw] 发送成功给 %s (状态：%d)", agentID, resp.StatusCode)
-		return nil
+		
+		// 解析响应，提取回复内容
+		var response map[string]interface{}
+		if err := json.Unmarshal(body, &response); err != nil {
+			logger.Printf("❌ [OpenClaw] 解析响应失败：%v", err)
+			return string(body), nil
+		}
+		
+		// 尝试从响应中提取回复内容
+		if output, ok := response["output"].(string); ok {
+			return output, nil
+		}
+		if content, ok := response["content"].(string); ok {
+			return content, nil
+		}
+		if text, ok := response["text"].(string); ok {
+			return text, nil
+		}
+		
+		return string(body), nil
 	}
 	
 	logger.Printf("❌ [OpenClaw] 发送失败给 %s: 状态 %d, 响应：%s", agentID, resp.StatusCode, string(body))
-	return fmt.Errorf("HTTP %d", resp.StatusCode)
+	return "", fmt.Errorf("HTTP %d", resp.StatusCode)
+}
+
+// sendToAgent 发送消息到 OpenClaw Agent 会话（不等待回复）
+func sendToAgent(agentID, message string) error {
+	_, err := sendToAgentAndWait(agentID, message, 30*time.Second)
+	return err
 }
 
 func loadOpenClawConfig() (*OpenClawAPIConfig, error) {
