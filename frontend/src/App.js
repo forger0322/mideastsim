@@ -1058,19 +1058,14 @@ function App() {
             {/* 资源条 - 可点击打开经济面板 */}
             {worldState && worldState.economic && (
               <div className="resource-bar clickable" onClick={(e) => { 
-                console.log('=== 资源条点击 ===', { 
-                  target: e.target.className, 
-                  currentTime: new Date().toISOString(),
-                  before: { showEconomicPanel, showFactionPanel }
-                }); 
                 e.stopPropagation(); 
+                // 确保关闭其他面板
+                setShowFactionPanel(false);
+                setShowDiplomacyPanel(false);
+                setShowMilitaryPanel(false);
+                setShowSettingsPanel(false);
+                setShowLeaderboard(false);
                 setShowEconomicPanel(true);
-                setTimeout(() => {
-                  console.log('=== 点击后状态 ===', { 
-                    showEconomicPanel: true, 
-                    showFactionPanel 
-                  });
-                }, 100);
               }}>
                 <div className="resource-item">
                   <span className="resource-label">{t('resources.oil')}</span>
