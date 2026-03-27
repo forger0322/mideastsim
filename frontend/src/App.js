@@ -27,32 +27,58 @@ const LEADERS = [
   { id: 'salman', name: '萨勒曼国王', nameEn: 'King Salman', location: '沙特', locationEn: 'Saudi Arabia', status: 'Active', avatar: '🇸🇦', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Salman_bin_Abdulaziz_Al_Saud_2019.jpg/220px-Salman_bin_Abdulaziz_Al_Saud_2019.jpg', lat: 23.8859, lng: 45.0792 },
   { id: 'sisi', name: '阿卜杜勒 - 法塔赫·塞西', nameEn: 'Abdel Fattah el-Sisi', location: '埃及', locationEn: 'Egypt', status: 'Active', avatar: '🇪🇬', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Abdel_Fattah_el-Sisi_2015.jpg/220px-Abdel_Fattah_el-Sisi_2015.jpg', lat: 26.8206, lng: 30.8025 },
   { id: 'erdogan', name: '雷杰普·塔伊普·埃尔多安', nameEn: 'Recep Tayyip Erdogan', location: '土耳其', locationEn: 'Turkey', status: 'Active', avatar: '🇹🇷', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Recep_Tayyip_Erdogan_%282023%29_%28cropped%29.jpg/220px-Recep_Tayyip_Erdogan_%282023%29_%28cropped%29.jpg', lat: 38.9637, lng: 35.2433 },
+  { id: 'abdullah', name: '阿卜杜拉二世', nameEn: 'Abdullah II', location: '约旦', locationEn: 'Jordan', status: 'Active', avatar: '🇯🇴', image: 'https://ui-avatars.com/api/?name=Abdullah+II&size=220&background=1E4F8A&color=fff', lat: 31.9454, lng: 35.9284 },
+  { id: 'aoun', name: '约瑟夫·奥恩', nameEn: 'Joseph Aoun', location: '黎巴嫩', locationEn: 'Lebanon', status: 'Active', avatar: '🇱🇧', image: 'https://ui-avatars.com/api/?name=Joseph+Aoun&size=220&background=8B1A1A&color=fff', lat: 33.8547, lng: 35.8623 },
+  { id: 'abbas', name: '马哈茂德·阿巴斯', nameEn: 'Mahmoud Abbas', location: '巴勒斯坦', locationEn: 'Palestine', status: 'Active', avatar: '🇵🇸', image: 'https://ui-avatars.com/api/?name=Mahmoud+Abbas&size=220&background=8B1A1A&color=fff', lat: 31.9522, lng: 35.2332 },
+  { id: 'alimi', name: '拉沙德·阿里米', nameEn: 'Rashad al-Alimi', location: '也门', locationEn: 'Yemen', status: 'Active', avatar: '🇾🇪', image: 'https://ui-avatars.com/api/?name=Rashad+al-Alimi&size=220&background=B8860B&color=fff', lat: 15.3694, lng: 44.191 },
+  { id: 'haitham', name: '海赛姆·本·塔里克', nameEn: 'Haitham bin Tariq', location: '阿曼', locationEn: 'Oman', status: 'Active', avatar: '🇴🇲', image: 'https://ui-avatars.com/api/?name=Haitham+bin+Tariq&size=220&background=B8860B&color=fff', lat: 21.4735, lng: 55.9754 },
+  { id: 'mishal', name: '米沙勒·艾哈迈德', nameEn: 'Mishal Al-Ahmad', location: '科威特', locationEn: 'Kuwait', status: 'Active', avatar: '🇰🇼', image: 'https://ui-avatars.com/api/?name=Mishal+Al-Ahmad&size=220&background=B8860B&color=fff', lat: 29.3117, lng: 47.4818 },
+  { id: 'tamim', name: '塔米姆·本·哈马德', nameEn: 'Tamim bin Hamad', location: '卡塔尔', locationEn: 'Qatar', status: 'Active', avatar: '🇶🇦', image: 'https://ui-avatars.com/api/?name=Tamim+bin+Hamad&size=220&background=B8860B&color=fff', lat: 25.3548, lng: 51.1839 },
+  { id: 'mohamed', name: '穆罕默德·本·扎耶德', nameEn: 'Mohamed bin Zayed', location: '阿联酋', locationEn: 'UAE', status: 'Active', avatar: '🇦🇪', image: 'https://ui-avatars.com/api/?name=Mohamed+bin+Zayed&size=220&background=B8860B&color=fff', lat: 23.4241, lng: 53.8478 },
+  { id: 'hamad', name: '哈马德·本·伊萨', nameEn: 'Hamad bin Isa', location: '巴林', locationEn: 'Bahrain', status: 'Active', avatar: '🇧🇭', image: 'https://ui-avatars.com/api/?name=Hamad+bin+Isa&size=220&background=B8860B&color=fff', lat: 26.0667, lng: 50.5577 },
+  { id: 'akhundzada', name: '海巴图拉·阿洪扎达', nameEn: 'Hibatullah Akhundzada', location: '阿富汗', locationEn: 'Afghanistan', status: 'Active', avatar: '🇦🇫', image: 'https://ui-avatars.com/api/?name=Hibatullah+Akhundzada&size=220&background=7B7B7B&color=fff', lat: 33.9391, lng: 67.71 },
+  { id: 'pashinyan', name: '尼科尔·帕希尼扬', nameEn: 'Nikol Pashinyan', location: '亚美尼亚', locationEn: 'Armenia', status: 'Active', avatar: '🇦🇲', image: 'https://ui-avatars.com/api/?name=Nikol+Pashinyan&size=220&background=7B7B7B&color=fff', lat: 40.0691, lng: 45.0382 },
+  { id: 'aliyev', name: '伊利哈姆·阿利耶夫', nameEn: 'Ilham Aliyev', location: '阿塞拜疆', locationEn: 'Azerbaijan', status: 'Active', avatar: '🇦🇿', image: 'https://ui-avatars.com/api/?name=Ilham+Aliyev&size=220&background=7B7B7B&color=fff', lat: 40.1431, lng: 47.5769 },
+  { id: 'zourabichvili', name: '萨洛梅·祖拉比什维利', nameEn: 'Salome Zourabichvili', location: '格鲁吉亚', locationEn: 'Georgia', status: 'Active', avatar: '🇬🇪', image: 'https://ui-avatars.com/api/?name=Salome+Zourabichvili&size=220&background=7B7B7B&color=fff', lat: 42.3154, lng: 43.3569 },
 ];
 
-// 国家到领导人的映射（根据国家 ID）
-const COUNTRY_LEADER_MAP = {
-  'IRN': { name: '阿里·哈梅内伊', nameEn: 'Ali Khamenei', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Ali_Khamenei_in_Mashhad_%282016%29_02_%28cropped%29.jpg/220px-Ali_Khamenei_in_Mashhad_%282016%29_02_%28cropped%29.jpg' },
-  'IRQ': { name: '穆杰塔巴·萨德尔', nameEn: 'Mujtaba Sadr', image: 'https://ui-avatars.com/api/?name=Mujtaba+Sadr&size=220&background=8B1A1A&color=fff' },
-  'SYR': { name: '巴沙尔·阿萨德', nameEn: 'Bashar al-Assad', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Bashar_al-Assad_in_Moscow%2C_18_May_2023_%28cropped%29.jpg/220px-Bashar_al-Assad_in_Moscow%2C_18_May_2023_%28cropped%29.jpg' },
-  'ISR': { name: '本雅明·内塔尼亚胡', nameEn: 'Benjamin Netanyahu', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Netanyahu_2017_%28cropped%29.jpg/220px-Netanyahu_2017_%28cropped%29.jpg' },
-  'USA': { name: '唐纳德·特朗普', nameEn: 'Donald Trump', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Donald_Trump_official_portrait.jpg/220px-Donald_Trump_official_portrait.jpg' },
-  'SAU': { name: '萨勒曼国王', nameEn: 'King Salman', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Salman_bin_Abdulaziz_Al_Saud_2019.jpg/220px-Salman_bin_Abdulaziz_Al_Saud_2019.jpg' },
-  'EGY': { name: '阿卜杜勒 - 法塔赫·塞西', nameEn: 'Abdel Fattah el-Sisi', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Abdel_Fattah_el-Sisi_2015.jpg/220px-Abdel_Fattah_el-Sisi_2015.jpg' },
-  'TUR': { name: '雷杰普·塔伊普·埃尔多安', nameEn: 'Recep Tayyip Erdogan', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Recep_Tayyip_Erdogan_%282023%29_%28cropped%29.jpg/220px-Recep_Tayyip_Erdogan_%282023%29_%28cropped%29.jpg' },
-  'JOR': { name: '阿卜杜拉二世', nameEn: 'Abdullah II', image: 'https://ui-avatars.com/api/?name=Abdullah+II&size=220&background=1E4F8A&color=fff' },
-  'LBN': { name: '约瑟夫·奥恩', nameEn: 'Joseph Aoun', image: 'https://ui-avatars.com/api/?name=Joseph+Aoun&size=220&background=8B1A1A&color=fff' },
-  'PSE': { name: '马哈茂德·阿巴斯', nameEn: 'Mahmoud Abbas', image: 'https://ui-avatars.com/api/?name=Mahmoud+Abbas&size=220&background=8B1A1A&color=fff' },
-  'YEM': { name: '拉沙德·阿里米', nameEn: 'Rashad al-Alimi', image: 'https://ui-avatars.com/api/?name=Rashad+al-Alimi&size=220&background=B8860B&color=fff' },
-  'OMN': { name: '海赛姆·本·塔里克', nameEn: 'Haitham bin Tariq', image: 'https://ui-avatars.com/api/?name=Haitham+bin+Tariq&size=220&background=B8860B&color=fff' },
-  'KWT': { name: '米沙勒·艾哈迈德', nameEn: 'Mishal Al-Ahmad', image: 'https://ui-avatars.com/api/?name=Mishal+Al-Ahmad&size=220&background=B8860B&color=fff' },
-  'QAT': { name: '塔米姆·本·哈马德', nameEn: 'Tamim bin Hamad', image: 'https://ui-avatars.com/api/?name=Tamim+bin+Hamad&size=220&background=B8860B&color=fff' },
-  'ARE': { name: '穆罕默德·本·扎耶德', nameEn: 'Mohamed bin Zayed', image: 'https://ui-avatars.com/api/?name=Mohamed+bin+Zayed&size=220&background=B8860B&color=fff' },
-  'BHR': { name: '哈马德·本·伊萨', nameEn: 'Hamad bin Isa', image: 'https://ui-avatars.com/api/?name=Hamad+bin+Isa&size=220&background=B8860B&color=fff' },
-  'AFG': { name: '海巴图拉·阿洪扎达', nameEn: 'Hibatullah Akhundzada', image: 'https://ui-avatars.com/api/?name=Hibatullah+Akhundzada&size=220&background=7B7B7B&color=fff' },
-  'ARM': { name: '尼科尔·帕希尼扬', nameEn: 'Nikol Pashinyan', image: 'https://ui-avatars.com/api/?name=Nikol+Pashinyan&size=220&background=7B7B7B&color=fff' },
-  'AZE': { name: '伊利哈姆·阿利耶夫', nameEn: 'Ilham Aliyev', image: 'https://ui-avatars.com/api/?name=Ilham+Aliyev&size=220&background=7B7B7B&color=fff' },
-  'GEO': { name: '萨洛梅·祖拉比什维利', nameEn: 'Salome Zourabichvili', image: 'https://ui-avatars.com/api/?name=Salome+Zourabichvili&size=220&background=7B7B7B&color=fff' },
+// 国家 ID 到领导人 ID 的映射
+const COUNTRY_TO_LEADER_ID = {
+  'IRN': 'khamenei',
+  'IRQ': 'mujtaba',
+  'SYR': 'assad',
+  'ISR': 'netanyahu',
+  'USA': 'trump',
+  'SAU': 'salman',
+  'EGY': 'sisi',
+  'TUR': 'erdogan',
+  'JOR': 'abdullah',
+  'LBN': 'aoun',
+  'PSE': 'abbas',
+  'YEM': 'alimi',
+  'OMN': 'haitham',
+  'KWT': 'mishal',
+  'QAT': 'tamim',
+  'ARE': 'mohamed',
+  'BHR': 'hamad',
+  'AFG': 'akhundzada',
+  'ARM': 'pashinyan',
+  'AZE': 'aliyev',
+  'GEO': 'zourabichvili',
 };
+
+// 从 LEADERS 数组生成 COUNTRY_LEADER_MAP（统一数据源）
+const COUNTRY_LEADER_MAP = {};
+Object.entries(COUNTRY_TO_LEADER_ID).forEach(([countryId, leaderId]) => {
+  const leader = LEADERS.find(l => l.id === leaderId);
+  if (leader) {
+    COUNTRY_LEADER_MAP[countryId] = {
+      name: leader.name,
+      nameEn: leader.nameEn,
+      image: leader.image,
+    };
+  }
+});
 
 // 国力属性描述（用于 tooltip）
 const POWER_ATTR_DESCRIPTIONS = {
