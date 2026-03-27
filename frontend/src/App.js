@@ -102,16 +102,36 @@ const POWER_ATTR_DESCRIPTIONS = {
 // 简单的 Tooltip 组件（即时显示，无延迟）
 const Tooltip = ({ text, children }) => {
   const [show, setShow] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const ref = useRef(null);
+  
+  const handleMouseEnter = () => {
+    if (ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      setPosition({
+        top: rect.top - 8,
+        left: rect.left + rect.width / 2
+      });
+    }
+    setShow(true);
+  };
   
   return (
     <div 
+      ref={ref}
       className="stat-mini-with-tooltip"
-      onMouseEnter={() => setShow(true)}
+      onMouseEnter={handleMouseEnter}
       onMouseLeave={() => setShow(false)}
     >
       {children}
       {show && text && (
-        <div className="custom-tooltip">{text}</div>
+        <div className="custom-tooltip" style={{ 
+          top: position.top, 
+          left: position.left,
+          transform: 'translateX(-50%) translateY(-4px)'
+        }}>
+          {text}
+        </div>
       )}
     </div>
   );

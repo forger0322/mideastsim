@@ -738,18 +738,16 @@
 
 /* 自定义 tooltip - 即时显示 */
 .custom-tooltip {
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-4px);
+  position: fixed;
+  left: 0;
+  top: 0;
   background: #1a1a2e;
   color: #f0e6d2;
   padding: 6px 12px;
   border-radius: 4px;
   font-size: 0.75rem;
   white-space: nowrap;
-  z-index: 1000;
-  margin-bottom: 8px;
+  z-index: 9999;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
   border: 1px solid rgba(212, 175, 55, 0.3);
   font-family: 'JetBrains Mono', monospace;
