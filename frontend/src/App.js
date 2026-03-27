@@ -419,7 +419,7 @@ function App() {
 
   // 导航处理
   const handleNavigate = (pageId) => {
-    console.log('App handleNavigate:', pageId);
+    console.log('=== handleNavigate ===', { pageId, before: { showEconomicPanel, showFactionPanel } });
     setCurrentPage(pageId);
     
     // 根据页面显示对应面板
@@ -1057,7 +1057,21 @@ function App() {
 
             {/* 资源条 - 可点击打开经济面板 */}
             {worldState && worldState.economic && (
-              <div className="resource-bar clickable" onClick={(e) => { e.stopPropagation(); setShowEconomicPanel(true); }}>
+              <div className="resource-bar clickable" onClick={(e) => { 
+                console.log('=== 资源条点击 ===', { 
+                  target: e.target.className, 
+                  currentTime: new Date().toISOString(),
+                  before: { showEconomicPanel, showFactionPanel }
+                }); 
+                e.stopPropagation(); 
+                setShowEconomicPanel(true);
+                setTimeout(() => {
+                  console.log('=== 点击后状态 ===', { 
+                    showEconomicPanel: true, 
+                    showFactionPanel 
+                  });
+                }, 100);
+              }}>
                 <div className="resource-item">
                   <span className="resource-label">{t('resources.oil')}</span>
                   <span className="resource-value">
