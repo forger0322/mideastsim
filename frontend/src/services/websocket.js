@@ -15,25 +15,20 @@ class WorldWebSocket {
   }
 
   connect(agentId = 'unknown') {
-    // 清空旧监听器，防止 StrictMode 重复注册
-    this.publicListeners = [];
-    this.privateListeners = [];
-    this.actionListeners = [];
-    
     const url = agentId !== 'unknown' ? `${this.url}?agentId=${agentId}` : this.url;
     console.log('🔌 [WebSocket] 尝试连接:', url);
     console.log('🔌 [WebSocket] agentId:', agentId);
     console.log('🔌 [WebSocket] 环境变量:', { wsHost: process.env.REACT_APP_WS_HOST, wsPort: process.env.REACT_APP_WS_PORT });
     this.ws = new WebSocket(url);
-    
+
     this.ws.onopen = () => {
       console.log('✅ [WebSocket] 连接成功！');
     };
-    
+
     this.ws.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
-        
+
         if (msg.type === 'public') {
           this.publicListeners.forEach(cb => cb(msg));
         } else if (msg.type === 'private') {
@@ -50,18 +45,24 @@ class WorldWebSocket {
         console.error('❌ [WebSocket] 解析消息失败:', err);
       }
     };
-    
-    this.ws.onclose = () => {
+
+    const handleClose = (event) => {
+      console.log('🔌 [WebSocket] 连接关闭:', event.code, event.reason);
+      if (this.reconnectTimer) {
+        clearTimeout(this.reconnectTimer);
+      }
       this.reconnectTimer = setTimeout(() => this.connect(agentId), 5000);
     };
-    
+
+    this.ws.onclose = handleClose;
+
     this.ws.onerror = (error) => {
       console.error('❌ [WebSocket] 错误:', error);
       console.error('❌ [WebSocket] readyState:', this.ws?.readyState);
-    };
-    
-    this.ws.onclose = (event) => {
-      console.log('🔌 [WebSocket] 连接关闭:', event.code, event.reason);
+      // 发生错误时强制重连
+      if (this.ws) {
+        this.ws.close();
+      }
     };
   }
 

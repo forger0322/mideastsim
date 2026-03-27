@@ -43,6 +43,9 @@ func main() {
 	logger = log.New(os.Stdout, "[MideastSim] ", log.LstdFlags|log.Lshortfile)
 	logger.Println("🚀 启动 MideastSim 后端...")
 
+	// 🆕 初始化随机种子
+	rand.Seed(time.Now().UnixNano())
+
 	// 初始化数据库
 	dbPath := getEnv("DATABASE_PATH", "./mideastsim.db")
 	var err error
@@ -56,7 +59,7 @@ func main() {
 	if err := db.InitSchema(); err != nil {
 		logger.Printf("⚠️ 数据库表结构初始化警告：%v", err)
 	}
-	
+
 	// 数据库迁移：添加中文字段
 	if err := db.MigrateAddChineseFields(); err != nil {
 		logger.Printf("⚠️ 数据库迁移警告：%v", err)
@@ -118,72 +121,72 @@ func main() {
 	http.HandleFunc("/api/auth/register", playerService.Register)
 	http.HandleFunc("/api/auth/login", playerService.Login)
 	http.HandleFunc("/api/auth/me", JWTMiddleware(authService, playerService.GetPlayerInfo))
-	
+
 	http.HandleFunc("/api/roles/available", JWTMiddleware(authService, playerService.GetAvailableRoles))
 	http.HandleFunc("/api/roles/claim", JWTMiddleware(authService, playerService.ClaimRole))
 	http.HandleFunc("/api/roles/release", JWTMiddleware(authService, playerService.ReleaseRole))
-	
+
 	// Admin API - 重置所有角色绑定（开发用）
 	http.HandleFunc("/api/admin/reset-roles", handleResetRoles)
-	
+
 	// 国家信息查询
 	http.HandleFunc("/api/roles/info", handleRoleInfo)
 	http.HandleFunc("/api/roles", handleAllRoles)
-	
+
 	// 领导人信息
 	http.HandleFunc("/api/leaders", handleAllLeaders)
 	http.HandleFunc("/api/leaders/info", handleLeaderInfo)
-	
+
 	// 行动 API（需要已选择国家）
 	http.HandleFunc("/api/actions/execute", JWTMiddleware(authService, ruleEngine.HandleAction))
-	
+
 	// Agent 指令 API（玩家发送指令给 Agent，Agent 自主决策）
 	http.HandleFunc("/api/agent/command", JWTMiddleware(authService, handleAgentCommand))
-	
+
 	// PM Agent 经济影响分析 API
 	http.HandleFunc("/api/agent/pm/analyze", JWTMiddleware(authService, handlePMAnalyze))
-	
+
 	// 🆕 PM Agent 回调 API（PM Agent 分析完成后调用此接口返回结果）
 	http.HandleFunc("/api/agent/pm/callback", handlePMCallback)
-	
+
 	// 🆕 Agent 记忆 API
 	http.HandleFunc("/api/agent/memory", JWTMiddleware(authService, handleAgentMemory))
 	http.HandleFunc("/api/agent/memory/list", JWTMiddleware(authService, handleAgentMemoryList))
-	
+
 	// 🆕 离线 AI 状态 API
 	http.HandleFunc("/api/ai/offline/status", handleAIOfflineStatus)
-	
+
 	// 📲 Telegram Webhook API
 	http.HandleFunc("/api/telegram/webhook", handleTelegramWebhook)
 	http.HandleFunc("/api/telegram/getUpdates", handleTelegramGetUpdates)
-	
+
 	// 🎬 历史回放 API
 	http.HandleFunc("/api/history/events", handleGetHistory)
 	http.HandleFunc("/api/history/event", handleGetEventDetail)
 	http.HandleFunc("/api/history/snapshot", handlePlaybackSnapshot)
 	http.HandleFunc("/api/history/timeline", handleGetTimeline)
-	
+
 	// 世界频道声明 API（Agent 发送公开声明）
 	http.HandleFunc("/api/world/actions/declare", handleDeclareStatement)
-	
+
 	http.HandleFunc("/api/world/state", handleWorldState)
 	http.HandleFunc("/api/world/events", handleEvents)
 	http.HandleFunc("/api/world/relations", handleRelations)
 	http.HandleFunc("/api/world/wars", handleWars)
-	
+
 	// 静态文件服务（领导人照片）
 	imgPath := "/home/node/.openclaw/workspace/mideastsim/img"
 	fs := http.FileServer(http.Dir(imgPath))
 	http.Handle("/img/", http.StripPrefix("/img/", fs))
-	
+
 	http.HandleFunc("/ws", handleWebSocket)
-	
+
 	// 健康检查
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status": "ok",
-			"time":   time.Now().Format(time.RFC3339),
+			"status":         "ok",
+			"time":           time.Now().Format(time.RFC3339),
 			"online_players": sessionStore.Count(),
 		})
 	})
@@ -193,7 +196,7 @@ func main() {
 
 	// 启动后台任务
 	go simulationLoop(db)
-	
+
 	// 🆕 启动离线 AI 定时任务 (每 30 秒执行一次 AI 决策)
 	go func() {
 		ticker := time.NewTicker(30 * time.Second)
@@ -202,7 +205,7 @@ func main() {
 			offlineAI.ExecuteAIActions(ruleEngine)
 		}
 	}()
-	
+
 	// 🆕 启动记忆清理定时任务 (每小时清理过期记忆)
 	go func() {
 		ticker := time.NewTicker(1 * time.Hour)
@@ -240,10 +243,10 @@ func simulationLoop(db *Database) {
 	for range ticker.C {
 		// 生成随机事件
 		generateRandomEvent(db)
-		
+
 		// 更新关系
 		updateRelations(db)
-		
+
 		// 广播世界状态更新
 		broadcastWorldState()
 	}
@@ -253,10 +256,11 @@ func simulationLoop(db *Database) {
 func generateRandomEvent(db *Database) {
 	eventTypes := []string{"diplomacy", "military", "economic"}
 	locations := []string{"Tehran", "Jerusalem", "Riyadh", "Damascus", "Baghdad"}
-	
-	eventType := eventTypes[time.Now().Unix()%int64(len(eventTypes))]
-	location := locations[time.Now().Unix()%int64(len(locations))]
-	
+
+	// 🆕 使用真正的随机性，而不是确定性算法
+	eventType := eventTypes[rand.Intn(len(eventTypes))]
+	location := locations[rand.Intn(len(locations))]
+
 	// 中英文事件标题
 	eventTitles := map[string]map[string]string{
 		"Tehran": {
@@ -280,29 +284,44 @@ func generateRandomEvent(db *Database) {
 			"en": "Baghdad Diplomatic Talks",
 		},
 	}
-	
+
 	// 中英文地点
 	locationNames := map[string]map[string]string{
-		"Tehran": {"zh": "德黑兰", "en": "Tehran"},
+		"Tehran":    {"zh": "德黑兰", "en": "Tehran"},
 		"Jerusalem": {"zh": "耶路撒冷", "en": "Jerusalem"},
-		"Riyadh": {"zh": "利雅得", "en": "Riyadh"},
-		"Damascus": {"zh": "大马士革", "en": "Damascus"},
-		"Baghdad": {"zh": "巴格达", "en": "Baghdad"},
+		"Riyadh":    {"zh": "利雅得", "en": "Riyadh"},
+		"Damascus":  {"zh": "大马士革", "en": "Damascus"},
+		"Baghdad":   {"zh": "巴格达", "en": "Baghdad"},
 	}
-	
+
 	// 中英文事件类型描述
 	eventTypeDesc := map[string]map[string]string{
 		"diplomacy": {"zh": "外交", "en": "diplomacy"},
-		"military": {"zh": "军事", "en": "military"},
-		"economic": {"zh": "经济", "en": "economic"},
+		"military":  {"zh": "军事", "en": "military"},
+		"economic":  {"zh": "经济", "en": "economic"},
 	}
-	
+
 	title := eventTitles[location]["en"]
 	titleZh := eventTitles[location]["zh"]
 	// 更自然的事件描述
 	description := fmt.Sprintf("A %s event has been reported in %s, reflecting ongoing regional developments.", eventType, location)
 	descriptionZh := fmt.Sprintf("%s发生%s事件，反映地区局势持续发展。", locationNames[location]["zh"], eventTypeDesc[eventType]["zh"])
-	
+
+	// 🆕 去重检查：检查最近 5 分钟内是否已生成相同标题的事件
+	recentEvents, err := db.GetRecentEvents(20)
+	if err == nil {
+		fiveMinutesAgo := time.Now().Add(-5 * time.Minute)
+		for _, recentEvent := range recentEvents {
+			if recentEvent.Timestamp.After(fiveMinutesAgo) &&
+				recentEvent.Title == title {
+				// 重复事件，跳过生成
+				logger.Printf("⚠️ 跳过重复事件：%s (生成于 %v 前)",
+					title, time.Since(recentEvent.Timestamp).Round(time.Second))
+				return
+			}
+		}
+	}
+
 	event := &Event{
 		ID:            fmt.Sprintf("evt_%d", time.Now().Unix()),
 		Timestamp:     time.Now(),
@@ -314,7 +333,7 @@ func generateRandomEvent(db *Database) {
 		Description:   description,
 		DescriptionZh: descriptionZh,
 	}
-	
+
 	// 为事件生成 PM 经济影响分析（通过 PM Agent）
 	go func() {
 		req := PMAnalyzeRequest{
@@ -324,21 +343,21 @@ func generateRandomEvent(db *Database) {
 			Title:       event.Title,
 			Description: event.Description,
 		}
-		
+
 		// 调用 PM Agent 进行分析
 		analysis := analyzeEventViaPMAgent(req)
 		if analysis != nil {
 			calculatePriceChanges(analysis)
-			
+
 			// 将 PM 分析存入事件 Data 字段
 			eventData := make(map[string]interface{})
 			eventData["pm_analysis"] = analysis
 			db.UpdateEventData(event.ID, eventData)
-			
+
 			logger.Printf("✅ [PM Agent] 事件 %s 分析完成", event.ID)
 		}
 	}()
-	
+
 	// 先创建事件（不带 PM 分析，分析完成后异步更新）
 	db.CreateEvent(event)
 }
@@ -356,7 +375,7 @@ func updateRelations(db *Database) {
 		if newValue < -100 {
 			newValue = -100
 		}
-		
+
 		trend := newValue - rel.Value
 		db.UpdateRelation(rel.ActorID, rel.TargetID, newValue, trend)
 	}
@@ -366,7 +385,7 @@ func updateRelations(db *Database) {
 func broadcastWorldState() {
 	state := getWorldState()
 	data, _ := json.Marshal(state)
-	
+
 	hub.broadcast <- data
 }
 
@@ -381,7 +400,7 @@ func getWorldState() map[string]interface{} {
 	if err != nil {
 		log.Printf("⚠️ 获取领导人失败：%v", err)
 	}
-	
+
 	// 构建 role_id 到领导人的映射
 	leaderMap := make(map[string]map[string]interface{})
 	for _, l := range leaders {
@@ -398,7 +417,7 @@ func getWorldState() map[string]interface{} {
 			}
 		}
 	}
-	
+
 	// 创建角色 ID 到 role_id 的映射（三字码 -> 英文全称）
 	roleCodeMap := map[string]string{
 		"EGY": "egypt", "IRN": "iran", "ISR": "israel", "SAU": "saudi_arabia",
@@ -407,7 +426,7 @@ func getWorldState() map[string]interface{} {
 		"OMN": "oman", "YEM": "yemen", "LBN": "lebanon", "PSE": "palestine",
 		"USA": "usa", "RUS": "russia", "CHN": "china",
 	}
-	
+
 	// 为每个角色添加领导人信息
 	for _, role := range roles {
 		if roleID, ok := roleCodeMap[role.ID]; ok {
@@ -416,10 +435,10 @@ func getWorldState() map[string]interface{} {
 			}
 		}
 	}
-	
+
 	// 获取当前经济数据
 	economicData := getCurrentEconomicData()
-	
+
 	return map[string]interface{}{
 		"timestamp": time.Now().Format(time.RFC3339),
 		"roles":     roles,
@@ -458,7 +477,7 @@ func handleEvents(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"查询失败"}`, http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"events": events,
@@ -472,7 +491,7 @@ func handleRelations(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"查询失败"}`, http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"relations": relations,
@@ -486,7 +505,7 @@ func handleWars(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"查询失败"}`, http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"wars":  wars,
@@ -496,25 +515,25 @@ func handleWars(w http.ResponseWriter, r *http.Request) {
 
 // DeclareStatementRequest 声明请求
 type DeclareStatementRequest struct {
-	Content     string `json:"content"`
-	ContentZh   string `json:"content_zh"`  // 中文内容（可选）
-	Type        string `json:"type"`        // diplomacy, military, economic
-	Location    string `json:"location"`    // 可选，默认自动
-	LocationZh  string `json:"location_zh"` // 中文地点（可选）
-	AgentID     string `json:"agent_id"`    // Agent 标识
-	RoleID      string `json:"role_id"`     // 国家/角色 ID（如 USA, IRN）
+	Content    string `json:"content"`
+	ContentZh  string `json:"content_zh"`  // 中文内容（可选）
+	Type       string `json:"type"`        // diplomacy, military, economic
+	Location   string `json:"location"`    // 可选，默认自动
+	LocationZh string `json:"location_zh"` // 中文地点（可选）
+	AgentID    string `json:"agent_id"`    // Agent 标识
+	RoleID     string `json:"role_id"`     // 国家/角色 ID（如 USA, IRN）
 }
 
 // 中英文地点映射
 var locationNames = map[string]map[string]string{
 	"Washington": {"zh": "华盛顿", "en": "Washington"},
-	"Tehran": {"zh": "德黑兰", "en": "Tehran"},
-	"Jerusalem": {"zh": "耶路撒冷", "en": "Jerusalem"},
-	"Riyadh": {"zh": "利雅得", "en": "Riyadh"},
-	"Damascus": {"zh": "大马士革", "en": "Damascus"},
-	"Baghdad": {"zh": "巴格达", "en": "Baghdad"},
-	"Beijing": {"zh": "北京", "en": "Beijing"},
-	"Moscow": {"zh": "莫斯科", "en": "Moscow"},
+	"Tehran":     {"zh": "德黑兰", "en": "Tehran"},
+	"Jerusalem":  {"zh": "耶路撒冷", "en": "Jerusalem"},
+	"Riyadh":     {"zh": "利雅得", "en": "Riyadh"},
+	"Damascus":   {"zh": "大马士革", "en": "Damascus"},
+	"Baghdad":    {"zh": "巴格达", "en": "Baghdad"},
+	"Beijing":    {"zh": "北京", "en": "Beijing"},
+	"Moscow":     {"zh": "莫斯科", "en": "Moscow"},
 }
 
 // handleDeclareStatement 处理公开声明
@@ -523,29 +542,29 @@ func handleDeclareStatement(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"Method not allowed"}`, http.StatusMethodNotAllowed)
 		return
 	}
-	
+
 	var req DeclareStatementRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, `{"error":"Invalid request body"}`, http.StatusBadRequest)
 		return
 	}
-	
+
 	if req.Content == "" {
 		http.Error(w, `{"error":"Content is required"}`, http.StatusBadRequest)
 		return
 	}
-	
+
 	// 默认类型
 	if req.Type == "" {
 		req.Type = "diplomacy"
 	}
-	
+
 	// 默认地点
 	if req.Location == "" {
 		locations := []string{"Washington", "Tehran", "Jerusalem", "Riyadh", "Damascus"}
 		req.Location = locations[time.Now().Unix()%int64(len(locations))]
 	}
-	
+
 	// 中文地点
 	locationZh := req.LocationZh
 	if locationZh == "" {
@@ -555,13 +574,13 @@ func handleDeclareStatement(w http.ResponseWriter, r *http.Request) {
 			locationZh = req.Location
 		}
 	}
-	
+
 	// 中文内容（如果没有提供，使用英文内容）
 	contentZh := req.ContentZh
 	if contentZh == "" {
 		contentZh = req.Content
 	}
-	
+
 	// 创建事件
 	event := &Event{
 		ID:            fmt.Sprintf("evt_%d", time.Now().UnixNano()),
@@ -574,13 +593,13 @@ func handleDeclareStatement(w http.ResponseWriter, r *http.Request) {
 		Description:   req.Content,
 		DescriptionZh: contentZh,
 	}
-	
+
 	if err := db.CreateEvent(event); err != nil {
 		logger.Printf("❌ 创建事件失败：%v", err)
 		http.Error(w, `{"error":"Failed to create event"}`, http.StatusInternalServerError)
 		return
 	}
-	
+
 	// 构建 WebSocket 消息
 	wsMsg := WebSocketMessage{
 		Type:      "public_statement",
@@ -595,18 +614,18 @@ func handleDeclareStatement(w http.ResponseWriter, r *http.Request) {
 			"location": req.Location,
 		},
 	}
-	
+
 	// 广播消息
 	if msgBytes, err := json.Marshal(wsMsg); err == nil {
 		hub.broadcast <- msgBytes
 		logger.Printf("📢 [声明] %s (%s): %s", req.AgentID, req.RoleID, req.Content)
-		
+
 		// 转发给 Agent（去重检查在 ForwardMessage 中）
 		go ForwardMessage(wsMsg)
 	}
-	
+
 	logger.Printf("✅ [声明] 事件已创建：%s", event.ID)
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success":   true,
@@ -623,7 +642,7 @@ func handleAllRoles(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"获取国家列表失败"}`, http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"roles": roles,
@@ -637,13 +656,13 @@ func handleRoleInfo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"需要提供国家 ID"}`, http.StatusBadRequest)
 		return
 	}
-	
+
 	role, err := db.GetRoleByID(roleID)
 	if err != nil {
 		http.Error(w, `{"error":"国家不存在"}`, http.StatusNotFound)
 		return
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"role": role,
@@ -657,7 +676,7 @@ func handleAllLeaders(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"获取领导人列表失败"}`, http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"leaders": leaders,
@@ -669,10 +688,10 @@ func handleAllLeaders(w http.ResponseWriter, r *http.Request) {
 func handleLeaderInfo(w http.ResponseWriter, r *http.Request) {
 	leaderID := r.URL.Query().Get("id")
 	roleID := r.URL.Query().Get("role_id")
-	
+
 	var leader *Leader
 	var err error
-	
+
 	if leaderID != "" {
 		// 通过领导人 ID 查询（需要额外实现）
 		http.Error(w, `{"error":"暂不支持通过 ID 查询"}`, http.StatusNotImplemented)
@@ -691,7 +710,7 @@ func handleLeaderInfo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"需要提供领导人 ID 或国家 ID"}`, http.StatusBadRequest)
 		return
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"leader": leader,
@@ -699,6 +718,13 @@ func handleLeaderInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 // WebSocket 处理
+const (
+	writeWait      = 10 * time.Second
+	pongWait       = 60 * time.Second
+	pingPeriod     = (pongWait * 9) / 10
+	maxMessageSize = 512
+)
+
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
@@ -720,15 +746,15 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		logger.Println("WebSocket 升级失败:", err)
 		return
 	}
-	
+
 	// 获取 agentID（从 URL 参数或 header）
 	agentID := r.URL.Query().Get("agentId")
 	if agentID == "" {
 		agentID = r.Header.Get("X-Agent-ID")
 	}
-	
+
 	logger.Printf("🔌 [WebSocket] 新连接：%s", agentID)
-	
+
 	client := &WebSocketClient{
 		hub:     hub,
 		conn:    conn,
@@ -744,15 +770,19 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *WebSocketClient) writePump() {
+	ticker := time.NewTicker(pingPeriod)
 	defer func() {
+		ticker.Stop()
 		c.conn.Close()
 	}()
 
 	for {
 		select {
 		case message, ok := <-c.send:
+			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
-				c.hub.broadcast <- nil
+				// 发送通道关闭，立即关闭连接
+				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
 
@@ -760,9 +790,17 @@ func (c *WebSocketClient) writePump() {
 			if err != nil {
 				return
 			}
-			w.Write(message)
+			if _, err := w.Write(message); err != nil {
+				return
+			}
 
 			if err := w.Close(); err != nil {
+				return
+			}
+
+		case <-ticker.C:
+			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
 		}
@@ -775,30 +813,41 @@ func (c *WebSocketClient) readPump() {
 		c.conn.Close()
 	}()
 
+	c.conn.SetReadLimit(maxMessageSize)
+	c.conn.SetReadDeadline(time.Now().Add(pongWait))
+	c.conn.SetPongHandler(func(string) error {
+		c.conn.SetReadDeadline(time.Now().Add(pongWait))
+		return nil
+	})
+
 	for {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
-			logger.Printf("⚠️ [WebSocket] 读取错误：%v", err)
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				logger.Printf("⚠️ [WebSocket] 读取错误（意外关闭）：%v", err)
+			} else {
+				logger.Printf("⚠️ [WebSocket] 读取错误：%v", err)
+			}
 			break
 		}
-		
+
 		logger.Printf("📨 [WebSocket] 收到消息 (TEST BUILD v2)：%s", string(message))
-		
+
 		// 解析消息并广播
 		var msg WebSocketMessage
 		if err := json.Unmarshal(message, &msg); err != nil {
 			logger.Printf("❌ [WebSocket] 解析失败：%v", err)
 			continue
 		}
-		
+
 		logger.Printf("✅ [WebSocket] 消息类型：%s, 内容：%s", msg.Type, msg.Content)
-		
+
 		// 添加发送者信息
 		msg.From = c.agentID
 		if msg.From == "" {
 			msg.From = "anonymous"
 		}
-		
+
 		// === DEBUG: 角色查询 ===
 		logger.Printf("🔍 [DEBUG] 开始查询角色，msg.From=%s", msg.From)
 		roleID, err := db.GetPlayerRole(msg.From)
@@ -811,9 +860,9 @@ func (c *WebSocketClient) readPump() {
 		}
 		logger.Printf("🔍 [DEBUG] 广播前 msg.RoleID=%s", msg.RoleID)
 		// === END DEBUG ===
-		
+
 		msg.Timestamp = time.Now().UTC().Format(time.RFC3339)
-		
+
 		// 广播消息
 		if msgBytes, err := json.Marshal(msg); err == nil {
 			c.hub.broadcast <- msgBytes
@@ -882,17 +931,17 @@ func handleResetRoles(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	
+
 	result, err := db.db.Exec("UPDATE roles SET player_id = NULL")
 	if err != nil {
 		log.Printf("❌ 重置角色失败：%v", err)
 		http.Error(w, fmt.Sprintf("重置失败：%v", err), http.StatusInternalServerError)
 		return
 	}
-	
+
 	rows, _ := result.RowsAffected()
 	log.Printf("✅ 已重置 %d 个角色的绑定", rows)
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
@@ -902,10 +951,10 @@ func handleResetRoles(w http.ResponseWriter, r *http.Request) {
 
 // AgentCommandRequest Agent 指令请求
 type AgentCommandRequest struct {
-	Action   string            `json:"action"`
-	Target   string            `json:"target"`
-	Params   map[string]string `json:"params,omitempty"`
-	Content  string            `json:"content,omitempty"`
+	Action  string            `json:"action"`
+	Target  string            `json:"target"`
+	Params  map[string]string `json:"params,omitempty"`
+	Content string            `json:"content,omitempty"`
 }
 
 // AgentDecision Agent 决策结果
@@ -1114,8 +1163,8 @@ type ImpactAnalysis struct {
 // handlePMAnalyze PM Agent 分析事件经济影响
 // PMCallbackRequest PM Agent 回调请求
 type PMCallbackRequest struct {
-	EventID   string          `json:"event_id"`
-	EventType string          `json:"event_type"`
+	EventID   string             `json:"event_id"`
+	EventType string             `json:"event_type"`
 	Analysis  *PMAnalyzeResponse `json:"analysis"`
 }
 
@@ -1137,7 +1186,7 @@ func handlePMCallback(w http.ResponseWriter, r *http.Request) {
 
 	// 计算具体价格变化
 	calculatePriceChanges(req.Analysis)
-	
+
 	// 更新经济数据
 	updateEconomicData(req.Analysis)
 
@@ -1153,7 +1202,7 @@ func handlePMCallback(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		logger.Printf("[PM Callback] ✅ 事件 %s 数据已更新", req.EventID)
-		
+
 		// 📲 发送 Telegram 通知
 		sendPMAnalysis(req.EventID, req.EventType, "", req.Analysis)
 	}
@@ -1179,10 +1228,10 @@ func handlePMAnalyze(w http.ResponseWriter, r *http.Request) {
 
 	// PM Agent 分析逻辑
 	analysis := analyzeEventImpact(req)
-	
+
 	// 计算具体价格变化
 	calculatePriceChanges(analysis)
-	
+
 	// 更新经济数据（如果有影响）
 	updateEconomicData(analysis)
 
@@ -1194,16 +1243,16 @@ func handlePMAnalyze(w http.ResponseWriter, r *http.Request) {
 // 当前经济基准数据 (2026 年 3 月) - 可动态更新
 var economicBaseline = map[string]float64{
 	// 股市
-	"spx":  6672.62, // 标普 500
+	"spx":  6672.62,  // 标普 500
 	"hsi":  25716.76, // 恒生指数
-	"ftse": 8342.15, // 富时 100
+	"ftse": 8342.15,  // 富时 100
 	// 加密货币
 	"btc": 70523, // 比特币
 	"eth": 2064,  // 以太坊
 	// 大宗商品
-	"oil":   96.35, // WTI 原油 $/桶
-	"gold":  5153.0, // 黄金 $/盎司
-	"silver": 86.84, // 白银 $/盎司
+	"oil":    96.35,  // WTI 原油 $/桶
+	"gold":   5153.0, // 黄金 $/盎司
+	"silver": 86.84,  // 白银 $/盎司
 }
 
 // 经济数据锁（并发安全）
@@ -1213,61 +1262,61 @@ var economicMutex sync.RWMutex
 func updateEconomicData(analysis *PMAnalyzeResponse) {
 	economicMutex.Lock()
 	defer economicMutex.Unlock()
-	
+
 	// 直接使用 PM Agent 分析的具体价格变化
 	if analysis.OilPriceChange != nil {
 		oldPrice := economicBaseline["oil"]
 		economicBaseline["oil"] = analysis.OilPriceChange.NewPrice
-		log.Printf("[经济] 原油价格更新：$%.2f → $%.2f (%.2f%%)", 
+		log.Printf("[经济] 原油价格更新：$%.2f → $%.2f (%.2f%%)",
 			oldPrice, economicBaseline["oil"], analysis.OilPriceChange.PercentChange)
 	}
-	
+
 	if analysis.GoldPriceChange != nil {
 		oldPrice := economicBaseline["gold"]
 		economicBaseline["gold"] = analysis.GoldPriceChange.NewPrice
-		log.Printf("[经济] 黄金价格更新：$%.2f → $%.2f (%.2f%%)", 
+		log.Printf("[经济] 黄金价格更新：$%.2f → $%.2f (%.2f%%)",
 			oldPrice, economicBaseline["gold"], analysis.GoldPriceChange.PercentChange)
 	}
-	
+
 	if analysis.SilverPriceChange != nil {
 		oldPrice := economicBaseline["silver"]
 		economicBaseline["silver"] = analysis.SilverPriceChange.NewPrice
-		log.Printf("[经济] 白银价格更新：$%.2f → $%.2f (%.2f%%)", 
+		log.Printf("[经济] 白银价格更新：$%.2f → $%.2f (%.2f%%)",
 			oldPrice, economicBaseline["silver"], analysis.SilverPriceChange.PercentChange)
 	}
-	
+
 	if analysis.BTCPriceChange != nil {
 		oldPrice := economicBaseline["btc"]
 		economicBaseline["btc"] = analysis.BTCPriceChange.NewPrice
-		log.Printf("[经济] BTC 价格更新：$%.2f → $%.2f (%.2f%%)", 
+		log.Printf("[经济] BTC 价格更新：$%.2f → $%.2f (%.2f%%)",
 			oldPrice, economicBaseline["btc"], analysis.BTCPriceChange.PercentChange)
 	}
-	
+
 	if analysis.ETHPriceChange != nil {
 		oldPrice := economicBaseline["eth"]
 		economicBaseline["eth"] = analysis.ETHPriceChange.NewPrice
-		log.Printf("[经济] ETH 价格更新：$%.2f → $%.2f (%.2f%%)", 
+		log.Printf("[经济] ETH 价格更新：$%.2f → $%.2f (%.2f%%)",
 			oldPrice, economicBaseline["eth"], analysis.ETHPriceChange.PercentChange)
 	}
-	
+
 	if analysis.SPXPriceChange != nil {
 		oldValue := economicBaseline["spx"]
 		economicBaseline["spx"] = analysis.SPXPriceChange.NewPrice
-		log.Printf("[经济] 标普 500 更新：%.2f → %.2f (%.2f%%)", 
+		log.Printf("[经济] 标普 500 更新：%.2f → %.2f (%.2f%%)",
 			oldValue, economicBaseline["spx"], analysis.SPXPriceChange.PercentChange)
 	}
-	
+
 	if analysis.HSIPriceChange != nil {
 		oldValue := economicBaseline["hsi"]
 		economicBaseline["hsi"] = analysis.HSIPriceChange.NewPrice
-		log.Printf("[经济] 恒生指数更新：%.2f → %.2f (%.2f%%)", 
+		log.Printf("[经济] 恒生指数更新：%.2f → %.2f (%.2f%%)",
 			oldValue, economicBaseline["hsi"], analysis.HSIPriceChange.PercentChange)
 	}
-	
+
 	if analysis.FTSEPriceChange != nil {
 		oldValue := economicBaseline["ftse"]
 		economicBaseline["ftse"] = analysis.FTSEPriceChange.NewPrice
-		log.Printf("[经济] 富时 100 更新：%.2f → %.2f (%.2f%%)", 
+		log.Printf("[经济] 富时 100 更新：%.2f → %.2f (%.2f%%)",
 			oldValue, economicBaseline["ftse"], analysis.FTSEPriceChange.PercentChange)
 	}
 }
@@ -1286,7 +1335,7 @@ func randomInRange(min, max float64) float64 {
 func getCurrentEconomicData() map[string]float64 {
 	economicMutex.RLock()
 	defer economicMutex.RUnlock()
-	
+
 	// 返回副本
 	data := make(map[string]float64)
 	for k, v := range economicBaseline {
@@ -1299,7 +1348,7 @@ func getCurrentEconomicData() map[string]float64 {
 // analyzeEventViaPMAgent 通过 OpenClaw Gateway 调用 PM Agent 分析事件
 func analyzeEventViaPMAgent(req PMAnalyzeRequest) *PMAnalyzeResponse {
 	logger.Printf("[PM Agent] 发送分析请求：%s (%s)", req.EventID, req.EventType)
-	
+
 	// 构建发送给 PM Agent 的消息
 	message := fmt.Sprintf(`📊 事件分析请求
 
@@ -1336,9 +1385,9 @@ JSON 格式：
   "summary": "🚨 中东局势推高油价和避险资产"
 }
 
-**现在请开始分析，直接返回 JSON 格式结果。**`, 
+**现在请开始分析，直接返回 JSON 格式结果。**`,
 		req.EventID, req.EventType, req.Location, req.Title, req.Description)
-	
+
 	// 发送消息给 PM Agent 并等待回复（90 秒超时）
 	reply, err := sendToAgentAndWait("pm", message, 90*time.Second)
 	if err != nil {
@@ -1346,16 +1395,16 @@ JSON 格式：
 		// 降级使用本地分析
 		return analyzeEventImpact(req)
 	}
-	
+
 	logger.Printf("[PM Agent] ✅ 收到回复，长度：%d 字符", len(reply))
-	
+
 	// 解析 PM Agent 的回复，提取 JSON 分析结果
 	analysis := parsePMAnalysisReply(reply)
 	if analysis == nil {
 		logger.Printf("⚠️ [PM Agent] 解析回复失败，使用本地分析")
 		return analyzeEventImpact(req)
 	}
-	
+
 	logger.Printf("[PM Agent] ✅ 解析成功：%s", analysis.Summary)
 	return analysis
 }
@@ -1365,43 +1414,43 @@ func parsePMAnalysisReply(reply string) *PMAnalyzeResponse {
 	// 尝试从回复中提取 JSON 代码块
 	jsonStart := strings.Index(reply, "```json")
 	jsonEnd := strings.Index(reply, "```")
-	
+
 	var jsonStr string
 	if jsonStart >= 0 && jsonEnd > jsonStart {
-		jsonStr = reply[jsonStart+7:jsonEnd] // 跳过 ```json
+		jsonStr = reply[jsonStart+7 : jsonEnd] // 跳过 ```json
 	} else {
 		// 尝试直接解析整个回复
 		jsonStr = reply
 	}
-	
+
 	// 清理 JSON 字符串
 	jsonStr = strings.TrimSpace(jsonStr)
-	
+
 	// 定义临时结构体用于解析
 	type TempAnalysis struct {
-		Oil    *ImpactAnalysis `json:"oil,omitempty"`
-		Gold   *ImpactAnalysis `json:"gold,omitempty"`
-		Silver *ImpactAnalysis `json:"silver,omitempty"`
-		BTC    *ImpactAnalysis `json:"btc,omitempty"`
-		ETH    *ImpactAnalysis `json:"eth,omitempty"`
-		SPX    *ImpactAnalysis `json:"spx,omitempty"`
-		HSI    *ImpactAnalysis `json:"hsi,omitempty"`
-		FTSE   *ImpactAnalysis `json:"ftse,omitempty"`
-		Summary string         `json:"summary,omitempty"`
+		Oil     *ImpactAnalysis `json:"oil,omitempty"`
+		Gold    *ImpactAnalysis `json:"gold,omitempty"`
+		Silver  *ImpactAnalysis `json:"silver,omitempty"`
+		BTC     *ImpactAnalysis `json:"btc,omitempty"`
+		ETH     *ImpactAnalysis `json:"eth,omitempty"`
+		SPX     *ImpactAnalysis `json:"spx,omitempty"`
+		HSI     *ImpactAnalysis `json:"hsi,omitempty"`
+		FTSE    *ImpactAnalysis `json:"ftse,omitempty"`
+		Summary string          `json:"summary,omitempty"`
 	}
-	
+
 	var tempAnalysis TempAnalysis
 	if err := json.Unmarshal([]byte(jsonStr), &tempAnalysis); err != nil {
 		logger.Printf("❌ [PM Agent] 解析 JSON 失败：%v", err)
 		logger.Printf("JSON 字符串：%s", jsonStr[:min(200, len(jsonStr))])
 		return nil
 	}
-	
+
 	// 转换为 PMAnalyzeResponse
 	response := &PMAnalyzeResponse{
 		Summary: tempAnalysis.Summary,
 	}
-	
+
 	if tempAnalysis.Oil != nil {
 		response.Oil = tempAnalysis.Oil
 	}
@@ -1426,7 +1475,7 @@ func parsePMAnalysisReply(reply string) *PMAnalyzeResponse {
 	if tempAnalysis.FTSE != nil {
 		response.FTSE = tempAnalysis.FTSE
 	}
-	
+
 	return response
 }
 
@@ -1443,92 +1492,92 @@ func analyzeEventImpact(req PMAnalyzeRequest) *PMAnalyzeResponse {
 	// 中东冲突事件分析
 	if req.EventType == "military" || req.EventType == "war_declaration" {
 		// 中东核心地区冲突（霍尔木兹海峡、核设施、大国卷入）
-		if req.Location == "Tehran" || req.Location == "Jerusalem" || 
-		   req.Location == "Iraq" || req.Location == "Syria" {
-			
+		if req.Location == "Tehran" || req.Location == "Jerusalem" ||
+			req.Location == "Iraq" || req.Location == "Syria" {
+
 			// 严重冲突：油价 +2-4%，黄金 +0.5-1.5%
 			response.Oil = &ImpactAnalysis{
 				Direction: "up",
-				Min: 2,
-				Max: 4,
-				Value: 3, // PM Agent 分析结果：取中间值
-				Reason: "中东局势紧张，霍尔木兹海峡航运风险",
+				Min:       2,
+				Max:       4,
+				Value:     3, // PM Agent 分析结果：取中间值
+				Reason:    "中东局势紧张，霍尔木兹海峡航运风险",
 			}
 			response.Gold = &ImpactAnalysis{
 				Direction: "up",
-				Min: 0.5,
-				Max: 1.5,
-				Value: 1,
-				Reason: "避险情绪推动黄金需求",
+				Min:       0.5,
+				Max:       1.5,
+				Value:     1,
+				Reason:    "避险情绪推动黄金需求",
 			}
 			response.Silver = &ImpactAnalysis{
 				Direction: "up",
-				Min: 0.5,
-				Max: 1.2,
-				Value: 0.85,
-				Reason: "贵金属避险需求上升",
+				Min:       0.5,
+				Max:       1.2,
+				Value:     0.85,
+				Reason:    "贵金属避险需求上升",
 			}
 			response.BTC = &ImpactAnalysis{
 				Direction: "up",
-				Min: 0.3,
-				Max: 1,
-				Value: 0.65,
-				Reason: "部分资金流向加密货币避险",
+				Min:       0.3,
+				Max:       1,
+				Value:     0.65,
+				Reason:    "部分资金流向加密货币避险",
 			}
 			response.ETH = &ImpactAnalysis{
 				Direction: "up",
-				Min: 0.5,
-				Max: 1.5,
-				Value: 1,
-				Reason: "加密货币市场跟随比特币",
+				Min:       0.5,
+				Max:       1.5,
+				Value:     1,
+				Reason:    "加密货币市场跟随比特币",
 			}
 			// 美股下跌
 			response.SPX = &ImpactAnalysis{
 				Direction: "down",
-				Min: 0.5,
-				Max: 1.5,
-				Value: 1,
-				Reason: "地缘政治风险打压市场信心",
+				Min:       0.5,
+				Max:       1.5,
+				Value:     1,
+				Reason:    "地缘政治风险打压市场信心",
 			}
 			// 港股小幅下跌（亚洲市场）
 			response.HSI = &ImpactAnalysis{
 				Direction: "down",
-				Min: 0.3,
-				Max: 1,
-				Value: 0.65,
-				Reason: "中东局势影响亚洲市场情绪",
+				Min:       0.3,
+				Max:       1,
+				Value:     0.65,
+				Reason:    "中东局势影响亚洲市场情绪",
 			}
 			// 英股影响较小
 			response.FTSE = &ImpactAnalysis{
 				Direction: "down",
-				Min: 0.2,
-				Max: 0.5,
-				Value: 0.35,
-				Reason: "欧洲市场受中东影响有限",
+				Min:       0.2,
+				Max:       0.5,
+				Value:     0.35,
+				Reason:    "欧洲市场受中东影响有限",
 			}
 			response.Summary = "中东军事冲突将温和推高油价和避险资产，全球股市小幅承压。关注能源板块和防御性资产。"
 		} else {
 			// 其他地区（沙特、阿联酋等）- 影响较小
 			response.Oil = &ImpactAnalysis{
 				Direction: "up",
-				Min: 1,
-				Max: 2,
-				Value: 1.5,
-				Reason: "地区冲突带来供应担忧",
+				Min:       1,
+				Max:       2,
+				Value:     1.5,
+				Reason:    "地区冲突带来供应担忧",
 			}
 			response.Gold = &ImpactAnalysis{
 				Direction: "up",
-				Min: 0.2,
-				Max: 0.5,
-				Value: 0.35,
-				Reason: "轻度避险需求",
+				Min:       0.2,
+				Max:       0.5,
+				Value:     0.35,
+				Reason:    "轻度避险需求",
 			}
 			response.Silver = &ImpactAnalysis{
 				Direction: "up",
-				Min: 0.2,
-				Max: 0.4,
-				Value: 0.3,
-				Reason: "跟随黄金走势",
+				Min:       0.2,
+				Max:       0.4,
+				Value:     0.3,
+				Reason:    "跟随黄金走势",
 			}
 			response.Summary = "地区冲突对经济影响有限，市场反应温和。"
 		}
@@ -1536,62 +1585,62 @@ func analyzeEventImpact(req PMAnalyzeRequest) *PMAnalyzeResponse {
 		// 经济事件
 		response.Oil = &ImpactAnalysis{
 			Direction: "down",
-			Min: 0.5,
-			Max: 1.5,
-			Value: 1,
-			Reason: "经济制裁或供应增加预期",
+			Min:       0.5,
+			Max:       1.5,
+			Value:     1,
+			Reason:    "经济制裁或供应增加预期",
 		}
 		response.SPX = &ImpactAnalysis{
 			Direction: "up",
-			Min: 0.3,
-			Max: 0.8,
-			Value: 0.55,
-			Reason: "经济政策利好市场",
+			Min:       0.3,
+			Max:       0.8,
+			Value:     0.55,
+			Reason:    "经济政策利好市场",
 		}
 		response.HSI = &ImpactAnalysis{
 			Direction: "up",
-			Min: 0.2,
-			Max: 0.5,
-			Value: 0.35,
-			Reason: "全球经济情绪改善",
+			Min:       0.2,
+			Max:       0.5,
+			Value:     0.35,
+			Reason:    "全球经济情绪改善",
 		}
 		response.Summary = "经济事件影响因具体政策而异，整体影响可控。"
 	} else if req.EventType == "diplomacy" {
 		// 外交事件
 		response.Gold = &ImpactAnalysis{
 			Direction: "down",
-			Min: 0.2,
-			Max: 0.5,
-			Value: 0.35,
-			Reason: "外交缓和降低避险需求",
+			Min:       0.2,
+			Max:       0.5,
+			Value:     0.35,
+			Reason:    "外交缓和降低避险需求",
 		}
 		response.Silver = &ImpactAnalysis{
 			Direction: "down",
-			Min: 0.1,
-			Max: 0.3,
-			Value: 0.2,
-			Reason: "跟随黄金走势",
+			Min:       0.1,
+			Max:       0.3,
+			Value:     0.2,
+			Reason:    "跟随黄金走势",
 		}
 		response.SPX = &ImpactAnalysis{
 			Direction: "up",
-			Min: 0.2,
-			Max: 0.5,
-			Value: 0.35,
-			Reason: "外交关系改善提振市场信心",
+			Min:       0.2,
+			Max:       0.5,
+			Value:     0.35,
+			Reason:    "外交关系改善提振市场信心",
 		}
 		response.HSI = &ImpactAnalysis{
 			Direction: "up",
-			Min: 0.1,
-			Max: 0.3,
-			Value: 0.2,
-			Reason: "市场情绪改善",
+			Min:       0.1,
+			Max:       0.3,
+			Value:     0.2,
+			Reason:    "市场情绪改善",
 		}
 		response.FTSE = &ImpactAnalysis{
 			Direction: "up",
-			Min: 0.1,
-			Max: 0.3,
-			Value: 0.2,
-			Reason: "市场情绪改善",
+			Min:       0.1,
+			Max:       0.3,
+			Value:     0.2,
+			Reason:    "市场情绪改善",
 		}
 		response.Summary = "外交事件通常影响有限，市场反应温和。"
 	} else {
@@ -1606,7 +1655,7 @@ func analyzeEventImpact(req PMAnalyzeRequest) *PMAnalyzeResponse {
 func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 	economicMutex.Lock()
 	defer economicMutex.Unlock()
-	
+
 	// 原油价格变化（使用 PM Agent 分析的具体值）
 	if analysis.Oil != nil {
 		baseline := economicBaseline["oil"]
@@ -1634,7 +1683,7 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 		economicBaseline["oil"] = analysis.OilPriceChange.NewPrice
 		logger.Printf("[经济] 原油更新：%.2f → %.2f (%.2f%%)", baseline, analysis.OilPriceChange.NewPrice, percentChange)
 	}
-	
+
 	// 黄金价格变化
 	if analysis.Gold != nil {
 		baseline := economicBaseline["gold"]
@@ -1661,7 +1710,7 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 		economicBaseline["gold"] = analysis.GoldPriceChange.NewPrice
 		logger.Printf("[经济] 黄金更新：%.2f → %.2f (%.2f%%)", baseline, analysis.GoldPriceChange.NewPrice, percentChange)
 	}
-	
+
 	// 白银价格变化
 	if analysis.Silver != nil {
 		baseline := economicBaseline["silver"]
@@ -1688,7 +1737,7 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 		economicBaseline["silver"] = analysis.SilverPriceChange.NewPrice
 		logger.Printf("[经济] 白银更新：%.2f → %.2f (%.2f%%)", baseline, analysis.SilverPriceChange.NewPrice, percentChange)
 	}
-	
+
 	// 比特币价格变化
 	if analysis.BTC != nil {
 		baseline := economicBaseline["btc"]
@@ -1715,7 +1764,7 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 		economicBaseline["btc"] = analysis.BTCPriceChange.NewPrice
 		logger.Printf("[经济] BTC 更新：%.2f → %.2f (%.2f%%)", baseline, analysis.BTCPriceChange.NewPrice, percentChange)
 	}
-	
+
 	// 以太坊价格变化
 	if analysis.ETH != nil {
 		baseline := economicBaseline["eth"]
@@ -1742,7 +1791,7 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 		economicBaseline["eth"] = analysis.ETHPriceChange.NewPrice
 		logger.Printf("[经济] ETH 更新：%.2f → %.2f (%.2f%%)", baseline, analysis.ETHPriceChange.NewPrice, percentChange)
 	}
-	
+
 	// 标普 500 变化
 	if analysis.SPX != nil {
 		baseline := economicBaseline["spx"]
@@ -1769,7 +1818,7 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 		economicBaseline["spx"] = analysis.SPXPriceChange.NewPrice
 		logger.Printf("[经济] 标普 500 更新：%.2f → %.2f (%.2f%%)", baseline, analysis.SPXPriceChange.NewPrice, percentChange)
 	}
-	
+
 	// 恒生指数变化
 	if analysis.HSI != nil {
 		baseline := economicBaseline["hsi"]
@@ -1796,7 +1845,7 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 		economicBaseline["hsi"] = analysis.HSIPriceChange.NewPrice
 		logger.Printf("[经济] 恒生指数更新：%.2f → %.2f (%.2f%%)", baseline, analysis.HSIPriceChange.NewPrice, percentChange)
 	}
-	
+
 	// 富时 100 变化
 	if analysis.FTSE != nil {
 		baseline := economicBaseline["ftse"]
@@ -1831,36 +1880,36 @@ func makeDecision(agentID, action, targetID string, myData, targetData *Role) *A
 	myPower := myData.Attributes.Army + myData.Attributes.AirForce + myData.Attributes.Navy
 	targetPower := targetData.Attributes.Army + targetData.Attributes.AirForce + targetData.Attributes.Navy
 	powerRatio := float64(myPower) / float64(targetPower)
-	
+
 	// 2. 获取双边关系（如果有）
 	relation, _ := db.GetRelation(agentID, targetID)
 	relationshipScore := 0.5 // 默认中立
 	if relation != nil {
 		relationshipScore = (float64(relation.Value) + 100.0) / 200.0 // 归一化到 0-1
 	}
-	
+
 	// 3. 计算经济代价（GDP 损失预估）
 	economicCost := calculateEconomicCost(myData, targetData, action)
-	
+
 	// 4. 评估盟友态度
 	allySupport := calculateAllySupport(agentID, targetID, action)
-	
+
 	// 5. 评估国内稳定度影响
 	domesticImpact := calculateDomesticImpact(myData, action)
-	
+
 	// 6. 根据 Agent 性格加权
 	personalityWeights := getPersonalityWeights(agentID)
-	
+
 	// 综合评分 (0-1)
 	score := powerRatio * 0.35 * personalityWeights.military
 	score += (1.0 - relationshipScore) * 0.25 * personalityWeights.diplomatic
 	score += (1.0 - economicCost) * 0.20 * personalityWeights.economic
 	score += allySupport * 0.10 * personalityWeights.ally
 	score += domesticImpact * 0.10 * personalityWeights.domestic
-	
+
 	// 决策阈值
 	threshold := personalityWeights.threshold
-	
+
 	// 特殊场景调整
 	if action == "declare_war" {
 		// 以色列对伊朗：核威胁零容忍
@@ -1873,17 +1922,17 @@ func makeDecision(agentID, action, targetID string, myData, targetData *Role) *A
 			threshold = 0.40
 		}
 	}
-	
+
 	if action == "sanction" {
 		// 制裁代价低，阈值降低
 		threshold -= 0.15
 	}
-	
+
 	if action == "military_exercise" {
 		// 军演威胁低，阈值降低
 		threshold -= 0.20
 	}
-	
+
 	// 确保阈值在合理范围
 	if threshold < 0.2 {
 		threshold = 0.2
@@ -1891,22 +1940,22 @@ func makeDecision(agentID, action, targetID string, myData, targetData *Role) *A
 	if threshold > 0.8 {
 		threshold = 0.8
 	}
-	
+
 	execute := score > threshold
-	
+
 	// 生成详细分析
 	analysis := generateDetailedAnalysis(powerRatio, relationshipScore, economicCost, allySupport, domesticImpact, score, threshold, agentID, action, targetID)
-	
+
 	// 生成简洁理由
 	reason := generateConciseReason(execute, score, threshold, action, targetID, agentID)
-	
+
 	confidence := "medium"
-	if score > threshold + 0.2 {
+	if score > threshold+0.2 {
 		confidence = "high"
-	} else if score < threshold - 0.2 {
+	} else if score < threshold-0.2 {
 		confidence = "low"
 	}
-	
+
 	return &AgentDecision{
 		Execute:    execute,
 		Reason:     reason,
@@ -1918,12 +1967,12 @@ func makeDecision(agentID, action, targetID string, myData, targetData *Role) *A
 
 // PersonalityWeights Agent 性格权重
 type PersonalityWeights struct {
-	military    float64 // 军力权重
-	diplomatic  float64 // 外交权重
-	economic    float64 // 经济权重
-	ally        float64 // 盟友权重
-	domestic    float64 // 国内权重
-	threshold   float64 // 决策阈值
+	military      float64 // 军力权重
+	diplomatic    float64 // 外交权重
+	economic      float64 // 经济权重
+	ally          float64 // 盟友权重
+	domestic      float64 // 国内权重
+	threshold     float64 // 决策阈值
 	riskTolerance float64 // 风险容忍度
 }
 
@@ -1931,54 +1980,54 @@ type PersonalityWeights struct {
 func getPersonalityWeights(agentID string) PersonalityWeights {
 	// 默认权重
 	defaultWeights := PersonalityWeights{
-		military:    1.0,
-		diplomatic:  1.0,
-		economic:    1.0,
-		ally:        1.0,
-		domestic:    1.0,
-		threshold:   0.6,
+		military:      1.0,
+		diplomatic:    1.0,
+		economic:      1.0,
+		ally:          1.0,
+		domestic:      1.0,
+		threshold:     0.6,
 		riskTolerance: 0.5,
 	}
-	
+
 	// 美国 (Trump): 风险偏好高，军事优先，经济次之
 	if agentID == "usa" || agentID == "trump" {
 		return PersonalityWeights{
-			military:    1.3,
-			diplomatic:  0.8,
-			economic:    0.7,
-			ally:        0.9,
-			domestic:    1.2,
-			threshold:   0.50,
+			military:      1.3,
+			diplomatic:    0.8,
+			economic:      0.7,
+			ally:          0.9,
+			domestic:      1.2,
+			threshold:     0.50,
 			riskTolerance: 0.8,
 		}
 	}
-	
+
 	// 伊朗：谨慎，重视盟友，经济敏感
 	if agentID == "iran" || agentID == "mujtaba" {
 		return PersonalityWeights{
-			military:    1.0,
-			diplomatic:  1.2,
-			economic:    1.1,
-			ally:        1.3,
-			domestic:    1.0,
-			threshold:   0.65,
+			military:      1.0,
+			diplomatic:    1.2,
+			economic:      1.1,
+			ally:          1.3,
+			domestic:      1.0,
+			threshold:     0.65,
 			riskTolerance: 0.6,
 		}
 	}
-	
+
 	// 以色列：军事优先，生存焦虑高
 	if agentID == "israel" || agentID == "netanyahu" {
 		return PersonalityWeights{
-			military:    1.5,
-			diplomatic:  0.7,
-			economic:    0.6,
-			ally:        1.0,
-			domestic:    1.1,
-			threshold:   0.55,
+			military:      1.5,
+			diplomatic:    0.7,
+			economic:      0.6,
+			ally:          1.0,
+			domestic:      1.1,
+			threshold:     0.55,
 			riskTolerance: 0.75,
 		}
 	}
-	
+
 	return defaultWeights
 }
 
@@ -1987,14 +2036,14 @@ func calculateEconomicCost(myData, targetData *Role, action string) float64 {
 	// 简化计算：基于 GDP 和贸易关系
 	myGDP := float64(myData.Attributes.Economy)
 	targetGDP := float64(targetData.Attributes.Economy)
-	
+
 	if action == "declare_war" {
 		// 战争代价高
-		return 0.6 + (targetGDP / (myGDP + targetGDP)) * 0.4
+		return 0.6 + (targetGDP/(myGDP+targetGDP))*0.4
 	}
 	if action == "sanction" {
 		// 制裁代价中等
-		return 0.3 + (targetGDP / (myGDP + targetGDP)) * 0.3
+		return 0.3 + (targetGDP/(myGDP+targetGDP))*0.3
 	}
 	if action == "military_exercise" {
 		// 军演代价低
@@ -2007,10 +2056,10 @@ func calculateEconomicCost(myData, targetData *Role, action string) float64 {
 func calculateAllySupport(agentID, targetID, action string) float64 {
 	// 简化：根据阵营判断
 	proWestern := []string{"usa", "israel", "saudi", "uae", "uk", "france"}
-	
+
 	isAgentWestern := contains(proWestern, agentID)
 	isTargetWestern := contains(proWestern, targetID)
-	
+
 	if action == "declare_war" {
 		if isAgentWestern && !isTargetWestern {
 			return 0.8 // 西方支持
@@ -2025,10 +2074,10 @@ func calculateAllySupport(agentID, targetID, action string) float64 {
 // calculateDomesticImpact 计算国内稳定度影响 (0-1)
 func calculateDomesticImpact(myData *Role, action string) float64 {
 	stability := float64(myData.Attributes.Stability) / 100.0
-	
+
 	if action == "declare_war" {
 		// 战争可能提升或降低稳定度
-		return 0.5 + (stability - 0.5) * 0.5
+		return 0.5 + (stability-0.5)*0.5
 	}
 	if action == "sanction" {
 		// 制裁通常有国内支持
@@ -2047,7 +2096,7 @@ func generateDetailedAnalysis(powerRatio, relationshipScore, economicCost, allyS
 	analysis += fmt.Sprintf("🏛️ 国内影响：%.1f/100 (权重 10%%)\n\n", (domesticImpact * 100))
 	analysis += fmt.Sprintf("📈 综合得分：%.2f\n", score)
 	analysis += fmt.Sprintf("🎯 决策阈值：%.2f\n", threshold)
-	
+
 	// 添加 Agent 特定分析
 	if agentID == "usa" || agentID == "trump" {
 		analysis += "\n🇺🇸 特朗普考量：中期选举、国内支持率、以色列安全"
@@ -2058,7 +2107,7 @@ func generateDetailedAnalysis(powerRatio, relationshipScore, economicCost, allyS
 	if agentID == "israel" || agentID == "netanyahu" {
 		analysis += "\n🇮🇱 以色列考量：生存威胁、核风险、美国支持"
 	}
-	
+
 	return analysis
 }
 
@@ -2075,7 +2124,7 @@ func generateConditions(execute bool, action, targetID string) string {
 	if !execute {
 		return "建议：加强外交斡旋，等待更好时机，或考虑替代方案（如制裁、军演）"
 	}
-	
+
 	if action == "declare_war" {
 		return "建议：设定有限目标，避免长期战争，准备应对报复"
 	}
