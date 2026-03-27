@@ -99,6 +99,24 @@ const POWER_ATTR_DESCRIPTIONS = {
   intel: { zh: '情报 - 情报收集能力', en: 'Intel - Intelligence gathering capability' },
 };
 
+// 简单的 Tooltip 组件（即时显示，无延迟）
+const Tooltip = ({ text, children }) => {
+  const [show, setShow] = useState(false);
+  
+  return (
+    <div 
+      className="stat-mini-with-tooltip"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      {children}
+      {show && text && (
+        <div className="custom-tooltip">{text}</div>
+      )}
+    </div>
+  );
+};
+
 // 势力数据
 const FACTIONS = [
   { 
@@ -907,38 +925,38 @@ function App() {
                   <div className="country-stats">
                     {/* 第一排：8 项属性 */}
                     <div className="stats-row stats-row-1">
-                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.army.zh : POWER_ATTR_DESCRIPTIONS.army.en}>
+                      <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.army.zh : POWER_ATTR_DESCRIPTIONS.army.en}>
                         <span className="stat-mini-icon">🪖</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.army || 0}</span>
-                      </div>
-                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.navy.zh : POWER_ATTR_DESCRIPTIONS.navy.en}>
+                      </Tooltip>
+                      <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.navy.zh : POWER_ATTR_DESCRIPTIONS.navy.en}>
                         <span className="stat-mini-icon">⚓</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.navy || 0}</span>
-                      </div>
-                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.airForce.zh : POWER_ATTR_DESCRIPTIONS.airForce.en}>
+                      </Tooltip>
+                      <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.airForce.zh : POWER_ATTR_DESCRIPTIONS.airForce.en}>
                         <span className="stat-mini-icon">✈️</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.airForce || 0}</span>
-                      </div>
-                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.nuclear.zh : POWER_ATTR_DESCRIPTIONS.nuclear.en}>
+                      </Tooltip>
+                      <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.nuclear.zh : POWER_ATTR_DESCRIPTIONS.nuclear.en}>
                         <span className="stat-mini-icon">☢️</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.nuclear || 0}</span>
-                      </div>
-                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.economy.zh : POWER_ATTR_DESCRIPTIONS.economy.en}>
+                      </Tooltip>
+                      <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.economy.zh : POWER_ATTR_DESCRIPTIONS.economy.en}>
                         <span className="stat-mini-icon">💰</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.economy || 0}</span>
-                      </div>
-                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.stability.zh : POWER_ATTR_DESCRIPTIONS.stability.en}>
+                      </Tooltip>
+                      <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.stability.zh : POWER_ATTR_DESCRIPTIONS.stability.en}>
                         <span className="stat-mini-icon">🏛️</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.stability || 0}</span>
-                      </div>
-                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.diplomacy.zh : POWER_ATTR_DESCRIPTIONS.diplomacy.en}>
+                      </Tooltip>
+                      <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.diplomacy.zh : POWER_ATTR_DESCRIPTIONS.diplomacy.en}>
                         <span className="stat-mini-icon">🤝</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.diplomacy || 0}</span>
-                      </div>
-                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.intel.zh : POWER_ATTR_DESCRIPTIONS.intel.en}>
+                      </Tooltip>
+                      <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.intel.zh : POWER_ATTR_DESCRIPTIONS.intel.en}>
                         <span className="stat-mini-icon">👁️</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.intel || 0}</span>
-                      </div>
+                      </Tooltip>
                     </div>
                     
                     {/* 第二排：国家旗帜 + 国家名称 | 💪 国力总分 | 势力徽章 */}
