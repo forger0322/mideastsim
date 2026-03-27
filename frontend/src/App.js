@@ -17,17 +17,42 @@ import { world } from './services/api';
 import { t, useTranslation, setLang, translateEvent } from './i18n';
 import './App.css';
 
-// 领导人数据
-const LEADERS = [
-  { id: 'trump', name: '唐纳德·特朗普', nameEn: 'Donald Trump', location: '美国', locationEn: 'United States', status: 'Active', avatar: '🇺🇸', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Donald_Trump_official_portrait.jpg/220px-Donald_Trump_official_portrait.jpg', lat: 37.0902, lng: -95.7129 },
-  { id: 'netanyahu', name: '本雅明·内塔尼亚胡', nameEn: 'Benjamin Netanyahu', location: '以色列', locationEn: 'Israel', status: 'Active', avatar: '🇮🇱', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Netanyahu_2017_%28cropped%29.jpg/220px-Netanyahu_2017_%28cropped%29.jpg', lat: 31.0461, lng: 34.8516 },
-  { id: 'mujtaba', name: '穆杰塔巴·萨德尔', nameEn: 'Mujtaba Sadr', location: '伊拉克', locationEn: 'Iraq', status: 'Active', avatar: '🇮🇶', image: 'https://ui-avatars.com/api/?name=Mujtaba+Sadr&size=220&background=8B1A1A&color=fff', lat: 33.2232, lng: 43.6793 },
-  { id: 'assad', name: '巴沙尔·阿萨德', nameEn: 'Bashar al-Assad', location: '叙利亚', locationEn: 'Syria', status: 'Active', avatar: '🇸🇾', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Bashar_al-Assad_in_Moscow%2C_18_May_2023_%28cropped%29.jpg/220px-Bashar_al-Assad_in_Moscow%2C_18_May_2023_%28cropped%29.jpg', lat: 34.8021, lng: 38.9968 },
-  { id: 'khamenei', name: '阿里·哈梅内伊', nameEn: 'Ali Khamenei', location: '伊朗', locationEn: 'Iran', status: 'Active', avatar: '🇮🇷', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Ali_Khamenei_in_Mashhad_%282016%29_02_%28cropped%29.jpg/220px-Ali_Khamenei_in_Mashhad_%282016%29_02_%28cropped%29.jpg', lat: 32.4279, lng: 53.6880 },
-  { id: 'salman', name: '萨勒曼国王', nameEn: 'King Salman', location: '沙特', locationEn: 'Saudi Arabia', status: 'Active', avatar: '🇸🇦', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Salman_bin_Abdulaziz_Al_Saud_2019.jpg/220px-Salman_bin_Abdulaziz_Al_Saud_2019.jpg', lat: 23.8859, lng: 45.0792 },
-  { id: 'sisi', name: '阿卜杜勒 - 法塔赫·塞西', nameEn: 'Abdel Fattah el-Sisi', location: '埃及', locationEn: 'Egypt', status: 'Active', avatar: '🇪🇬', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Abdel_Fattah_el-Sisi_2015.jpg/220px-Abdel_Fattah_el-Sisi_2015.jpg', lat: 26.8206, lng: 30.8025 },
-  { id: 'erdogan', name: '雷杰普·塔伊普·埃尔多安', nameEn: 'Recep Tayyip Erdogan', location: '土耳其', locationEn: 'Turkey', status: 'Active', avatar: '🇹🇷', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Recep_Tayyip_Erdogan_%282023%29_%28cropped%29.jpg/220px-Recep_Tayyip_Erdogan_%282023%29_%28cropped%29.jpg', lat: 38.9637, lng: 35.2433 },
-];
+// 国家到领导人的映射（根据国家 ID）
+const COUNTRY_LEADER_MAP = {
+  'IRN': { name: '阿里·哈梅内伊', nameEn: 'Ali Khamenei', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Ali_Khamenei_in_Mashhad_%282016%29_02_%28cropped%29.jpg/220px-Ali_Khamenei_in_Mashhad_%282016%29_02_%28cropped%29.jpg' },
+  'IRQ': { name: '穆杰塔巴·萨德尔', nameEn: 'Mujtaba Sadr', image: 'https://ui-avatars.com/api/?name=Mujtaba+Sadr&size=220&background=8B1A1A&color=fff' },
+  'SYR': { name: '巴沙尔·阿萨德', nameEn: 'Bashar al-Assad', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Bashar_al-Assad_in_Moscow%2C_18_May_2023_%28cropped%29.jpg/220px-Bashar_al-Assad_in_Moscow%2C_18_May_2023_%28cropped%29.jpg' },
+  'ISR': { name: '本雅明·内塔尼亚胡', nameEn: 'Benjamin Netanyahu', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Netanyahu_2017_%28cropped%29.jpg/220px-Netanyahu_2017_%28cropped%29.jpg' },
+  'USA': { name: '唐纳德·特朗普', nameEn: 'Donald Trump', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Donald_Trump_official_portrait.jpg/220px-Donald_Trump_official_portrait.jpg' },
+  'SAU': { name: '萨勒曼国王', nameEn: 'King Salman', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Salman_bin_Abdulaziz_Al_Saud_2019.jpg/220px-Salman_bin_Abdulaziz_Al_Saud_2019.jpg' },
+  'EGY': { name: '阿卜杜勒 - 法塔赫·塞西', nameEn: 'Abdel Fattah el-Sisi', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Abdel_Fattah_el-Sisi_2015.jpg/220px-Abdel_Fattah_el-Sisi_2015.jpg' },
+  'TUR': { name: '雷杰普·塔伊普·埃尔多安', nameEn: 'Recep Tayyip Erdogan', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Recep_Tayyip_Erdogan_%282023%29_%28cropped%29.jpg/220px-Recep_Tayyip_Erdogan_%282023%29_%28cropped%29.jpg' },
+  'JOR': { name: '阿卜杜拉二世', nameEn: 'Abdullah II', image: 'https://ui-avatars.com/api/?name=Abdullah+II&size=220&background=1E4F8A&color=fff' },
+  'LBN': { name: '约瑟夫·奥恩', nameEn: 'Joseph Aoun', image: 'https://ui-avatars.com/api/?name=Joseph+Aoun&size=220&background=8B1A1A&color=fff' },
+  'PSE': { name: '马哈茂德·阿巴斯', nameEn: 'Mahmoud Abbas', image: 'https://ui-avatars.com/api/?name=Mahmoud+Abbas&size=220&background=8B1A1A&color=fff' },
+  'YEM': { name: '拉沙德·阿里米', nameEn: 'Rashad al-Alimi', image: 'https://ui-avatars.com/api/?name=Rashad+al-Alimi&size=220&background=B8860B&color=fff' },
+  'OMN': { name: '海赛姆·本·塔里克', nameEn: 'Haitham bin Tariq', image: 'https://ui-avatars.com/api/?name=Haitham+bin+Tariq&size=220&background=B8860B&color=fff' },
+  'KWT': { name: '米沙勒·艾哈迈德', nameEn: 'Mishal Al-Ahmad', image: 'https://ui-avatars.com/api/?name=Mishal+Al-Ahmad&size=220&background=B8860B&color=fff' },
+  'QAT': { name: '塔米姆·本·哈马德', nameEn: 'Tamim bin Hamad', image: 'https://ui-avatars.com/api/?name=Tamim+bin+Hamad&size=220&background=B8860B&color=fff' },
+  'ARE': { name: '穆罕默德·本·扎耶德', nameEn: 'Mohamed bin Zayed', image: 'https://ui-avatars.com/api/?name=Mohamed+bin+Zayed&size=220&background=B8860B&color=fff' },
+  'BHR': { name: '哈马德·本·伊萨', nameEn: 'Hamad bin Isa', image: 'https://ui-avatars.com/api/?name=Hamad+bin+Isa&size=220&background=B8860B&color=fff' },
+  'AFG': { name: '海巴图拉·阿洪扎达', nameEn: 'Hibatullah Akhundzada', image: 'https://ui-avatars.com/api/?name=Hibatullah+Akhundzada&size=220&background=7B7B7B&color=fff' },
+  'ARM': { name: '尼科尔·帕希尼扬', nameEn: 'Nikol Pashinyan', image: 'https://ui-avatars.com/api/?name=Nikol+Pashinyan&size=220&background=7B7B7B&color=fff' },
+  'AZE': { name: '伊利哈姆·阿利耶夫', nameEn: 'Ilham Aliyev', image: 'https://ui-avatars.com/api/?name=Ilham+Aliyev&size=220&background=7B7B7B&color=fff' },
+  'GEO': { name: '萨洛梅·祖拉比什维利', nameEn: 'Salome Zourabichvili', image: 'https://ui-avatars.com/api/?name=Salome+Zourabichvili&size=220&background=7B7B7B&color=fff' },
+};
+
+// 国力属性描述（用于 tooltip）
+const POWER_ATTR_DESCRIPTIONS = {
+  army: { zh: '军力 - 陆军作战能力', en: 'Army - Land combat capability' },
+  navy: { zh: '海军 - 海上作战力量', en: 'Navy - Naval combat force' },
+  airForce: { zh: '空军 - 空中作战力量', en: 'Air Force - Air combat force' },
+  nuclear: { zh: '核武 - 核威慑能力', en: 'Nuclear - Nuclear deterrent' },
+  economy: { zh: '经济 - 国家经济实力', en: 'Economy - National economic strength' },
+  stability: { zh: '稳定 - 国内政治稳定性', en: 'Stability - Domestic political stability' },
+  diplomacy: { zh: '外交 - 国际外交影响力', en: 'Diplomacy - International diplomatic influence' },
+  intel: { zh: '情报 - 情报收集能力', en: 'Intel - Intelligence gathering capability' },
+};
 
 // 势力数据
 const FACTIONS = [
@@ -159,9 +184,13 @@ function App() {
                               (attrs.diplomacy || 0) + 
                               (attrs.intel || 0);
             
+            // 获取对应国家领导人头像
+            const leader = COUNTRY_LEADER_MAP[countryId] || COUNTRY_LEADER_MAP['IRN'];
+            
             setUserCountryPower({
               name: userRole.name,
-              flag: userRole.flag || '🏛️',
+              leaderImage: leader.image,
+              leaderName: lang === 'zh' ? leader.name : leader.nameEn,
               totalPower,
               attributes: attrs,
               faction: userRole.faction
@@ -178,7 +207,7 @@ function App() {
     // 每 60 秒刷新一次
     const pollInterval = setInterval(fetchUserCountryPower, 60000);
     return () => clearInterval(pollInterval);
-  }, [currentRole]);
+  }, [currentRole, lang]);
   
   // 地图引用
   const mapResetRef = useRef(null);
@@ -795,44 +824,49 @@ function App() {
             <div className="country-power-display">
               {userCountryPower ? (
                 <>
-                  {/* 左侧：国家旗帜（跨两排） */}
+                  {/* 左侧：国家领导人头像（跨两排） */}
                   <div className="country-flag-wrapper">
-                    <span className="country-flag">{userCountryPower.flag}</span>
+                    <img 
+                      src={userCountryPower.leaderImage} 
+                      alt={userCountryPower.leaderName}
+                      className="leader-image"
+                      title={userCountryPower.leaderName}
+                    />
                   </div>
                   
                   {/* 右侧：两排布局 */}
                   <div className="country-stats">
                     {/* 第一排：8 项属性 */}
                     <div className="stats-row stats-row-1">
-                      <div className="stat-mini" title="军力">
+                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.army.zh : POWER_ATTR_DESCRIPTIONS.army.en}>
                         <span className="stat-mini-icon">🪖</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.army || 0}</span>
                       </div>
-                      <div className="stat-mini" title="海军">
+                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.navy.zh : POWER_ATTR_DESCRIPTIONS.navy.en}>
                         <span className="stat-mini-icon">⚓</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.navy || 0}</span>
                       </div>
-                      <div className="stat-mini" title="空军">
+                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.airForce.zh : POWER_ATTR_DESCRIPTIONS.airForce.en}>
                         <span className="stat-mini-icon">✈️</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.airForce || 0}</span>
                       </div>
-                      <div className="stat-mini" title="核武">
+                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.nuclear.zh : POWER_ATTR_DESCRIPTIONS.nuclear.en}>
                         <span className="stat-mini-icon">☢️</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.nuclear || 0}</span>
                       </div>
-                      <div className="stat-mini" title="经济">
+                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.economy.zh : POWER_ATTR_DESCRIPTIONS.economy.en}>
                         <span className="stat-mini-icon">💰</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.economy || 0}</span>
                       </div>
-                      <div className="stat-mini" title="稳定">
+                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.stability.zh : POWER_ATTR_DESCRIPTIONS.stability.en}>
                         <span className="stat-mini-icon">🏛️</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.stability || 0}</span>
                       </div>
-                      <div className="stat-mini" title="外交">
+                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.diplomacy.zh : POWER_ATTR_DESCRIPTIONS.diplomacy.en}>
                         <span className="stat-mini-icon">🤝</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.diplomacy || 0}</span>
                       </div>
-                      <div className="stat-mini" title="情报">
+                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.intel.zh : POWER_ATTR_DESCRIPTIONS.intel.en}>
                         <span className="stat-mini-icon">👁️</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.intel || 0}</span>
                       </div>
@@ -857,7 +891,7 @@ function App() {
                 <>
                   {/* 加载中状态 */}
                   <div className="country-flag-wrapper">
-                    <span className="country-flag">🇮🇷</span>
+                    <div className="leader-image-loading"></div>
                   </div>
                   <div className="country-stats">
                     <div className="stats-row stats-row-1">
