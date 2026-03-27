@@ -87,6 +87,9 @@ function App() {
   // 导航状态
   const [currentPage, setCurrentPage] = useState('map');
   
+  // 用户国家实力数据
+  const [userCountryPower, setUserCountryPower] = useState(null);
+  
   // UI 状态
   const [showEventPanel, setShowEventPanel] = useState(false);
   const [showEconomicPanel, setShowEconomicPanel] = useState(false);
@@ -130,6 +133,51 @@ function App() {
         faction: currentRole.faction,
       });
     }
+  }, [currentRole]);
+
+  // 获取用户绑定国家的实力数据
+  useEffect(() => {
+    const fetchUserCountryPower = async () => {
+      try {
+        // 确定要查询的国家 ID（游客默认为伊朗 IRN）
+        const countryId = currentRole?.role_id || 'IRN';
+        
+        const response = await fetch(`/api/roles`);
+        if (response.ok) {
+          const data = await response.json();
+          const roles = data.roles || data;
+          const userRole = roles.find(r => r.id === countryId);
+          
+          if (userRole) {
+            const attrs = userRole.attributes || {};
+            const totalPower = (attrs.army || 0) + 
+                              (attrs.navy || 0) + 
+                              (attrs.airForce || 0) + 
+                              (attrs.nuclear || 0) + 
+                              (attrs.economy || 0) + 
+                              (attrs.stability || 0) + 
+                              (attrs.diplomacy || 0) + 
+                              (attrs.intel || 0);
+            
+            setUserCountryPower({
+              name: userRole.name,
+              flag: userRole.flag || '🏛️',
+              totalPower,
+              attributes: attrs,
+              faction: userRole.faction
+            });
+          }
+        }
+      } catch (error) {
+        console.error('获取用户国家实力失败:', error);
+      }
+    };
+
+    fetchUserCountryPower();
+    
+    // 每 60 秒刷新一次
+    const pollInterval = setInterval(fetchUserCountryPower, 60000);
+    return () => clearInterval(pollInterval);
   }, [currentRole]);
   
   // 地图引用
@@ -741,18 +789,32 @@ function App() {
             </div>
           </div>
 
-          {/* 中央：世界统计 + 经济数据 */}
+          {/* 中央：国家实力 + 经济数据 */}
           <div className="header-center">
-            {/* 世界统计 - 只保留热点 */}
-            {worldState && (
-              <div className="world-stats">
-                <div className="stat-item clickable" onClick={() => setShowFactionPanel(true)}>
-                  <span className="stat-icon">🔥</span>
-                  <span className="stat-label">{lang === 'zh' ? '热点:' : 'Hotspots:'}</span>
-                  <span className="stat-value">{worldState.hotspots?.length || 0}{lang === 'zh' ? '处' : ''}</span>
-                </div>
-              </div>
-            )}
+            {/* 用户绑定国家实力 */}
+            <div className="country-power-display">
+              {userCountryPower ? (
+                <>
+                  <span className="country-flag">{userCountryPower.flag}</span>
+                  <span className="country-name">{userCountryPower.name}</span>
+                  <span className="power-value">💪 {userCountryPower.totalPower.toLocaleString()}</span>
+                  <span className="faction-badge-small" style={{ 
+                    background: userCountryPower.faction === '抵抗轴心' ? '#8B1A1A' : 
+                               userCountryPower.faction === '美以联盟' ? '#1E4F8A' : 
+                               userCountryPower.faction === '温和联盟' ? '#B8860B' : 
+                               userCountryPower.faction === '亲穆兄会' ? '#2D5A27' : '#7B7B7B'
+                  }}>
+                    {userCountryPower.faction || '-'}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="country-flag">🇮🇷</span>
+                  <span className="country-name">伊朗</span>
+                  <span className="power-value">💪 加载中...</span>
+                </>
+              )}
+            </div>
 
             {/* 资源条 - 可点击打开经济面板 */}
             {worldState && worldState.economic && (
@@ -802,10 +864,17 @@ function App() {
             <div className="right-column">
               {/* 第一行：时间（左）+ 用户信息（右） */}
               <div className="top-row">
-                {/* 时间显示 */}
+                {/* 时间显示 - 统一格式 */}
                 <div className="time-display">
                   <span className="time-icon">🕐</span>
-                  <span className="time-value">{new Date().toLocaleTimeString(lang === 'zh' ? 'zh-CN' : 'en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}, {new Date().toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                  <span className="time-value">
+                    {(() => {
+                      const now = new Date();
+                      const time = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+                      const date = now.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+                      return `${time}, ${date}`;
+                    })()}
+                  </span>
                 </div>
                 
                 {/* 用户信息 + 登出 */}
