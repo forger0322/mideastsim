@@ -108,10 +108,20 @@ const Tooltip = ({ text, children }) => {
   const handleMouseEnter = () => {
     if (ref.current) {
       const rect = ref.current.getBoundingClientRect();
-      setPosition({
-        top: rect.top - 8,
-        left: rect.left + rect.width / 2
-      });
+      const tooltipHeight = 40; // 估算 tooltip 高度
+      const screenPadding = 10; // 屏幕边缘留白
+      
+      // 计算位置：显示在元素上方
+      let top = rect.top - tooltipHeight - 8;
+      let left = rect.left + rect.width / 2;
+      
+      // 边界检测：防止超出屏幕
+      if (top < screenPadding) {
+        // 如果上方空间不够，显示在下方
+        top = rect.bottom + 8;
+      }
+      
+      setPosition({ top, left });
     }
     setShow(true);
   };
