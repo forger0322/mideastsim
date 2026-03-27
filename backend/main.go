@@ -1105,8 +1105,8 @@ type PriceChange struct {
 // ImpactAnalysis 影响分析
 type ImpactAnalysis struct {
 	Direction string  `json:"direction"` // "up" or "down"
-	Min       float64 `json:"min"`
-	Max       float64 `json:"max"`
+	Min       float64 `json:"min_change"`
+	Max       float64 `json:"max_change"`
 	Value     float64 `json:"value"` // PM Agent 分析的具体影响百分比（取中间值）
 	Reason    string  `json:"reason"`
 }
