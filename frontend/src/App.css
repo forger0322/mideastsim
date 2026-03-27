@@ -739,15 +739,15 @@
 /* 自定义 tooltip - 即时显示 */
 .custom-tooltip {
   position: fixed;
-  background: linear-gradient(145deg, #1a1a2e, #0f0f1a);
-  color: #f0e6d2;
+  background: rgba(45, 35, 22, 0.95);
+  color: var(--text-light);
   padding: 8px 14px;
   border-radius: 6px;
   font-size: 0.8rem;
   white-space: nowrap;
   z-index: 9999;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(212, 175, 55, 0.2);
-  border: 1px solid rgba(212, 175, 55, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(212, 175, 55, 0.3);
+  border: 1px solid var(--gold);
   font-family: 'JetBrains Mono', monospace;
   letter-spacing: 0.5px;
   pointer-events: none;
