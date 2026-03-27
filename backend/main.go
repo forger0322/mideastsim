@@ -95,6 +95,9 @@ func main() {
 		}
 	}
 
+	// 🆕 初始化经济数据定时更新
+	initEconomicData()
+
 	// 🆕 初始化 Agent 记忆系统
 	if err := db.CreateAgentMemoryTable(); err != nil {
 		logger.Printf("⚠️ Agent 记忆表初始化警告：%v", err)
@@ -1307,6 +1310,53 @@ var economicChanges = map[string]float64{
 
 // 经济数据锁（并发安全）
 var economicMutex sync.RWMutex
+
+// initEconomicData 初始化经济数据并启动定时更新
+func initEconomicData() {
+	// 每 60 秒随机波动经济数据
+	go func() {
+		ticker := time.NewTicker(60 * time.Second)
+		defer ticker.Stop()
+		for range ticker.C {
+			updateEconomicDataRandomly()
+		}
+	}()
+}
+
+// updateEconomicDataRandomly 随机更新经济数据（模拟市场波动）
+func updateEconomicDataRandomly() {
+	economicMutex.Lock()
+	defer economicMutex.Unlock()
+
+	// 随机波动范围：±2%
+	rand.Seed(time.Now().UnixNano())
+
+	// 股市波动
+	for _, key := range []string{"spx", "hsi", "ftse"} {
+		change := (rand.Float64() - 0.5) * 4 // -2% to +2%
+		economicBaseline[key] = economicBaseline[key] * (1 + change/100)
+		economicChanges[key] = change
+	}
+
+	// 加密货币波动（更大波动：±5%）
+	for _, key := range []string{"btc", "eth"} {
+		change := (rand.Float64() - 0.5) * 10 // -5% to +5%
+		economicBaseline[key] = economicBaseline[key] * (1 + change/100)
+		economicChanges[key] = change
+	}
+
+	// 大宗商品波动：±3%
+	for _, key := range []string{"oil", "gold", "silver"} {
+		change := (rand.Float64() - 0.5) * 6 // -3% to +3%
+		economicBaseline[key] = economicBaseline[key] * (1 + change/100)
+		economicChanges[key] = change
+	}
+
+	log.Printf("[经济更新] 市场波动：油价$%.2f (%.2f%%), 黄金$%.2f (%.2f%%), BTC$%.2f (%.2f%%)",
+		economicBaseline["oil"], economicChanges["oil"],
+		economicBaseline["gold"], economicChanges["gold"],
+		economicBaseline["btc"], economicChanges["btc"])
+}
 
 // 更新经济数据（使用 PM Agent 分析的具体值）
 func updateEconomicData(analysis *PMAnalyzeResponse) {
