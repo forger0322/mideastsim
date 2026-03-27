@@ -649,8 +649,8 @@
   margin-right: 8px;
 }
 
-/* 领导人头像 */
-.leader-image {
+/* 领导人头像 - 顶部状态栏 */
+.header-center .leader-image {
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -661,7 +661,7 @@
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
-.leader-image:hover {
+.header-center .leader-image:hover {
   transform: scale(1.05);
   border-color: rgba(255, 255, 255, 0.4);
 }
