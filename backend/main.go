@@ -1602,8 +1602,11 @@ func analyzeEventImpact(req PMAnalyzeRequest) *PMAnalyzeResponse {
 	return response
 }
 
-// calculatePriceChanges 计算具体价格变化
+// calculatePriceChanges 计算具体价格变化并更新全局经济状态
 func calculatePriceChanges(analysis *PMAnalyzeResponse) {
+	economicMutex.Lock()
+	defer economicMutex.Unlock()
+	
 	// 原油价格变化（使用 PM Agent 分析的具体值）
 	if analysis.Oil != nil {
 		baseline := economicBaseline["oil"]
@@ -1627,6 +1630,9 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 			NewPrice:      math.Round((baseline+priceChange)*100) / 100,
 			Currency:      "$",
 		}
+		// 更新全局经济状态
+		economicBaseline["oil"] = analysis.OilPriceChange.NewPrice
+		logger.Printf("[经济] 原油更新：%.2f → %.2f (%.2f%%)", baseline, analysis.OilPriceChange.NewPrice, percentChange)
 	}
 	
 	// 黄金价格变化
@@ -1651,6 +1657,9 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 			NewPrice:      math.Round((baseline+priceChange)*100) / 100,
 			Currency:      "$",
 		}
+		// 更新全局经济状态
+		economicBaseline["gold"] = analysis.GoldPriceChange.NewPrice
+		logger.Printf("[经济] 黄金更新：%.2f → %.2f (%.2f%%)", baseline, analysis.GoldPriceChange.NewPrice, percentChange)
 	}
 	
 	// 白银价格变化
@@ -1675,6 +1684,9 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 			NewPrice:      math.Round((baseline+priceChange)*100) / 100,
 			Currency:      "$",
 		}
+		// 更新全局经济状态
+		economicBaseline["silver"] = analysis.SilverPriceChange.NewPrice
+		logger.Printf("[经济] 白银更新：%.2f → %.2f (%.2f%%)", baseline, analysis.SilverPriceChange.NewPrice, percentChange)
 	}
 	
 	// 比特币价格变化
@@ -1699,6 +1711,9 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 			NewPrice:      math.Round((baseline+priceChange)*100) / 100,
 			Currency:      "$",
 		}
+		// 更新全局经济状态
+		economicBaseline["btc"] = analysis.BTCPriceChange.NewPrice
+		logger.Printf("[经济] BTC 更新：%.2f → %.2f (%.2f%%)", baseline, analysis.BTCPriceChange.NewPrice, percentChange)
 	}
 	
 	// 以太坊价格变化
@@ -1723,6 +1738,9 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 			NewPrice:      math.Round((baseline+priceChange)*100) / 100,
 			Currency:      "$",
 		}
+		// 更新全局经济状态
+		economicBaseline["eth"] = analysis.ETHPriceChange.NewPrice
+		logger.Printf("[经济] ETH 更新：%.2f → %.2f (%.2f%%)", baseline, analysis.ETHPriceChange.NewPrice, percentChange)
 	}
 	
 	// 标普 500 变化
@@ -1747,6 +1765,9 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 			NewPrice:      math.Round((baseline+priceChange)*100) / 100,
 			Currency:      "pts",
 		}
+		// 更新全局经济状态
+		economicBaseline["spx"] = analysis.SPXPriceChange.NewPrice
+		logger.Printf("[经济] 标普 500 更新：%.2f → %.2f (%.2f%%)", baseline, analysis.SPXPriceChange.NewPrice, percentChange)
 	}
 	
 	// 恒生指数变化
@@ -1771,6 +1792,9 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 			NewPrice:      math.Round((baseline+priceChange)*100) / 100,
 			Currency:      "pts",
 		}
+		// 更新全局经济状态
+		economicBaseline["hsi"] = analysis.HSIPriceChange.NewPrice
+		logger.Printf("[经济] 恒生指数更新：%.2f → %.2f (%.2f%%)", baseline, analysis.HSIPriceChange.NewPrice, percentChange)
 	}
 	
 	// 富时 100 变化
@@ -1795,6 +1819,9 @@ func calculatePriceChanges(analysis *PMAnalyzeResponse) {
 			NewPrice:      math.Round((baseline+priceChange)*100) / 100,
 			Currency:      "pts",
 		}
+		// 更新全局经济状态
+		economicBaseline["ftse"] = analysis.FTSEPriceChange.NewPrice
+		logger.Printf("[经济] 富时 100 更新：%.2f → %.2f (%.2f%%)", baseline, analysis.FTSEPriceChange.NewPrice, percentChange)
 	}
 }
 
