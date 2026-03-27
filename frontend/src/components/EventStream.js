@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from '../i18n';
 import './EventStream.css';
 
 function EventStream({ events, onEventSelect, availableRoles = [] }) {
+  const { lang } = useTranslation();
   // 展开的事件 ID
   const [expandedEventId, setExpandedEventId] = useState(null);
   
@@ -104,11 +106,11 @@ function EventStream({ events, onEventSelect, availableRoles = [] }) {
               <div className="event-header">
                 <span className="event-icon">{getEventIcon(event.type)}</span>
                 <span className="event-time">{formatTime(event.timestamp)}</span>
-                <span className="event-location">{event.location}</span>
+                <span className="event-location">{lang === 'zh' ? event.location_zh || event.location : event.location}</span>
                 
                 {/* PM 分析徽章 */}
                 {event.data?.pm_analysis && (
-                  <span className="pm-badge" title="PM Agent 已分析经济影响">
+                  <span className="pm-badge" title={lang === 'zh' ? 'PM Agent 已分析经济影响' : 'PM Agent analyzed economic impact'}>
                     🤖
                     {event.data?.pm_analysis.oil && (
                       <span className={`pm-indicator ${event.data?.pm_analysis.oil.direction}`}>
@@ -121,7 +123,7 @@ function EventStream({ events, onEventSelect, availableRoles = [] }) {
                 <span className="event-expand-icon">{expandedEventId === event.id ? '▲' : '▼'}</span>
               </div>
               <div className="event-summary">
-                {event.title || event.text}
+                {lang === 'zh' ? event.title_zh || event.title || event.text : event.title || event.text}
               </div>
               
               {/* 展开的详情 */}
@@ -171,7 +173,7 @@ function EventStream({ events, onEventSelect, availableRoles = [] }) {
                       </div>
                       
                       <div className="war-description">
-                        <p>{event.description}</p>
+                        <p>{lang === 'zh' ? event.description_zh || event.description : event.description}</p>
                       </div>
                       
                       <div className="war-actions">
@@ -183,7 +185,7 @@ function EventStream({ events, onEventSelect, availableRoles = [] }) {
                     <>
                       <div className="event-description">
                         <strong>📝 详情:</strong>
-                        <p>{event.description || event.text}</p>
+                        <p>{lang === 'zh' ? event.description_zh || event.description || event.text : event.description || event.text}</p>
                       </div>
                       
                       {/* PM Agent 分析 */}
