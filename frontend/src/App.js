@@ -17,54 +17,61 @@ import { world } from './services/api';
 import { t, useTranslation, setLang, translateEvent } from './i18n';
 import './App.css';
 
-// 领导人数据
+// 领导人数据 - 使用与 WorldMapNew.js 相同的本地图片路径
+const IMAGE_BASE = '/images/leaders';
+
 const LEADERS = [
-  { id: 'trump', name: '唐纳德·特朗普', nameEn: 'Donald Trump', location: '美国', locationEn: 'United States', status: 'Active', avatar: '🇺🇸', image: 'https://ui-avatars.com/api/?name=Donald+Trump&size=220&background=002868&color=fff', lat: 37.0902, lng: -95.7129 },
-  { id: 'netanyahu', name: '本雅明·内塔尼亚胡', nameEn: 'Benjamin Netanyahu', location: '以色列', locationEn: 'Israel', status: 'Active', avatar: '🇮🇱', image: 'https://ui-avatars.com/api/?name=Benjamin+Netanyahu&size=220&background=0038b8&color=fff', lat: 31.0461, lng: 34.8516 },
-  { id: 'mujtaba', name: '穆杰塔巴·萨德尔', nameEn: 'Mujtaba Sadr', location: '伊拉克', locationEn: 'Iraq', status: 'Active', avatar: '🇮🇶', image: 'https://ui-avatars.com/api/?name=Mujtaba+Sadr&size=220&background=8B1A1A&color=fff', lat: 33.2232, lng: 43.6793 },
-  { id: 'assad', name: '巴沙尔·阿萨德', nameEn: 'Bashar al-Assad', location: '叙利亚', locationEn: 'Syria', status: 'Active', avatar: '🇸🇾', image: 'https://ui-avatars.com/api/?name=Bashar+al-Assad&size=220&background=8B1A1A&color=fff', lat: 34.8021, lng: 38.9968 },
-  { id: 'khamenei', name: '阿里·哈梅内伊', nameEn: 'Ali Khamenei', location: '伊朗', locationEn: 'Iran', status: 'Active', avatar: '🇮🇷', image: 'https://ui-avatars.com/api/?name=Ali+Khamenei&size=220&background=8B1A1A&color=fff', lat: 32.4279, lng: 53.6880 },
-  { id: 'salman', name: '萨勒曼国王', nameEn: 'King Salman', location: '沙特', locationEn: 'Saudi Arabia', status: 'Active', avatar: '🇸🇦', image: 'https://ui-avatars.com/api/?name=King+Salman&size=220&background=B8860B&color=fff', lat: 23.8859, lng: 45.0792 },
-  { id: 'sisi', name: '阿卜杜勒 - 法塔赫·塞西', nameEn: 'Abdel Fattah el-Sisi', location: '埃及', locationEn: 'Egypt', status: 'Active', avatar: '🇪🇬', image: 'https://ui-avatars.com/api/?name=Abdel+Fattah+el-Sisi&size=220&background=C8102E&color=fff', lat: 26.8206, lng: 30.8025 },
-  { id: 'erdogan', name: '雷杰普·塔伊普·埃尔多安', nameEn: 'Recep Tayyip Erdogan', location: '土耳其', locationEn: 'Turkey', status: 'Active', avatar: '🇹🇷', image: 'https://ui-avatars.com/api/?name=Recep+Tayyip+Erdogan&size=220&background=E30A17&color=fff', lat: 38.9637, lng: 35.2433 },
-  { id: 'abdullah', name: '阿卜杜拉二世', nameEn: 'Abdullah II', location: '约旦', locationEn: 'Jordan', status: 'Active', avatar: '🇯🇴', image: 'https://ui-avatars.com/api/?name=Abdullah+II&size=220&background=1E4F8A&color=fff', lat: 31.9454, lng: 35.9284 },
-  { id: 'aoun', name: '约瑟夫·奥恩', nameEn: 'Joseph Aoun', location: '黎巴嫩', locationEn: 'Lebanon', status: 'Active', avatar: '🇱🇧', image: 'https://ui-avatars.com/api/?name=Joseph+Aoun&size=220&background=8B1A1A&color=fff', lat: 33.8547, lng: 35.8623 },
-  { id: 'abbas', name: '马哈茂德·阿巴斯', nameEn: 'Mahmoud Abbas', location: '巴勒斯坦', locationEn: 'Palestine', status: 'Active', avatar: '🇵🇸', image: 'https://ui-avatars.com/api/?name=Mahmoud+Abbas&size=220&background=8B1A1A&color=fff', lat: 31.9522, lng: 35.2332 },
-  { id: 'alimi', name: '拉沙德·阿里米', nameEn: 'Rashad al-Alimi', location: '也门', locationEn: 'Yemen', status: 'Active', avatar: '🇾🇪', image: 'https://ui-avatars.com/api/?name=Rashad+al-Alimi&size=220&background=B8860B&color=fff', lat: 15.3694, lng: 44.191 },
-  { id: 'haitham', name: '海赛姆·本·塔里克', nameEn: 'Haitham bin Tariq', location: '阿曼', locationEn: 'Oman', status: 'Active', avatar: '🇴🇲', image: 'https://ui-avatars.com/api/?name=Haitham+bin+Tariq&size=220&background=B8860B&color=fff', lat: 21.4735, lng: 55.9754 },
-  { id: 'mishal', name: '米沙勒·艾哈迈德', nameEn: 'Mishal Al-Ahmad', location: '科威特', locationEn: 'Kuwait', status: 'Active', avatar: '🇰🇼', image: 'https://ui-avatars.com/api/?name=Mishal+Al-Ahmad&size=220&background=B8860B&color=fff', lat: 29.3117, lng: 47.4818 },
-  { id: 'tamim', name: '塔米姆·本·哈马德', nameEn: 'Tamim bin Hamad', location: '卡塔尔', locationEn: 'Qatar', status: 'Active', avatar: '🇶🇦', image: 'https://ui-avatars.com/api/?name=Tamim+bin+Hamad&size=220&background=B8860B&color=fff', lat: 25.3548, lng: 51.1839 },
-  { id: 'mohamed', name: '穆罕默德·本·扎耶德', nameEn: 'Mohamed bin Zayed', location: '阿联酋', locationEn: 'UAE', status: 'Active', avatar: '🇦🇪', image: 'https://ui-avatars.com/api/?name=Mohamed+bin+Zayed&size=220&background=B8860B&color=fff', lat: 23.4241, lng: 53.8478 },
-  { id: 'hamad', name: '哈马德·本·伊萨', nameEn: 'Hamad bin Isa', location: '巴林', locationEn: 'Bahrain', status: 'Active', avatar: '🇧🇭', image: 'https://ui-avatars.com/api/?name=Hamad+bin+Isa&size=220&background=B8860B&color=fff', lat: 26.0667, lng: 50.5577 },
-  { id: 'akhundzada', name: '海巴图拉·阿洪扎达', nameEn: 'Hibatullah Akhundzada', location: '阿富汗', locationEn: 'Afghanistan', status: 'Active', avatar: '🇦🇫', image: 'https://ui-avatars.com/api/?name=Hibatullah+Akhundzada&size=220&background=7B7B7B&color=fff', lat: 33.9391, lng: 67.71 },
-  { id: 'pashinyan', name: '尼科尔·帕希尼扬', nameEn: 'Nikol Pashinyan', location: '亚美尼亚', locationEn: 'Armenia', status: 'Active', avatar: '🇦🇲', image: 'https://ui-avatars.com/api/?name=Nikol+Pashinyan&size=220&background=7B7B7B&color=fff', lat: 40.0691, lng: 45.0382 },
-  { id: 'aliyev', name: '伊利哈姆·阿利耶夫', nameEn: 'Ilham Aliyev', location: '阿塞拜疆', locationEn: 'Azerbaijan', status: 'Active', avatar: '🇦🇿', image: 'https://ui-avatars.com/api/?name=Ilham+Aliyev&size=220&background=7B7B7B&color=fff', lat: 40.1431, lng: 47.5769 },
-  { id: 'zourabichvili', name: '萨洛梅·祖拉比什维利', nameEn: 'Salome Zourabichvili', location: '格鲁吉亚', locationEn: 'Georgia', status: 'Active', avatar: '🇬🇪', image: 'https://ui-avatars.com/api/?name=Salome+Zourabichvili&size=220&background=7B7B7B&color=fff', lat: 42.3154, lng: 43.3569 },
+  { id: 'trump', name: '唐纳德·特朗普', nameEn: 'Donald Trump', location: '美国', locationEn: 'United States', status: 'Active', avatar: '🇺🇸', image: `${IMAGE_BASE}/trump.png`, lat: 37.0902, lng: -95.7129 },
+  { id: 'netanyahu', name: '本雅明·内塔尼亚胡', nameEn: 'Benjamin Netanyahu', location: '以色列', locationEn: 'Israel', status: 'Active', avatar: '🇮🇱', image: `${IMAGE_BASE}/netanyahu.png`, lat: 31.0461, lng: 34.8516 },
+  { id: 'mujtaba', name: '穆杰塔巴·哈梅内伊', nameEn: 'Mujtaba Khamenei', location: '伊朗', locationEn: 'Iran', status: 'Active', avatar: '🇮🇷', image: `${IMAGE_BASE}/mujtaba.png`, lat: 32.4279, lng: 53.6880 },
+  { id: 'assad', name: '巴沙尔·阿萨德', nameEn: 'Bashar al-Assad', location: '叙利亚', locationEn: 'Syria', status: 'Active', avatar: '🇸🇾', image: `${IMAGE_BASE}/assad.png`, lat: 34.8021, lng: 38.9968 },
+  { id: 'khamenei', name: '阿里·哈梅内伊', nameEn: 'Ali Khamenei', location: '伊朗', locationEn: 'Iran', status: 'Active', avatar: '🇮🇷', image: `${IMAGE_BASE}/khamenei.png`, lat: 32.4279, lng: 53.6880 },
+  { id: 'salman', name: '萨勒曼国王', nameEn: 'King Salman', location: '沙特', locationEn: 'Saudi Arabia', status: 'Active', avatar: '🇸🇦', image: `${IMAGE_BASE}/salman.png`, lat: 23.8859, lng: 45.0792 },
+  { id: 'sisi', name: '阿卜杜勒 - 法塔赫·塞西', nameEn: 'Abdel Fattah el-Sisi', location: '埃及', locationEn: 'Egypt', status: 'Active', avatar: '🇪🇬', image: `${IMAGE_BASE}/sisi.png`, lat: 26.8206, lng: 30.8025 },
+  { id: 'erdogan', name: '雷杰普·塔伊普·埃尔多安', nameEn: 'Recep Tayyip Erdogan', location: '土耳其', locationEn: 'Turkey', status: 'Active', avatar: '🇹🇷', image: `${IMAGE_BASE}/erdogan.png`, lat: 38.9637, lng: 35.2433 },
+  { id: 'abdullah', name: '阿卜杜拉二世', nameEn: 'Abdullah II', location: '约旦', locationEn: 'Jordan', status: 'Active', avatar: '🇯🇴', image: `${IMAGE_BASE}/abdullah.png`, lat: 31.9454, lng: 35.9284 },
+  { id: 'aoun', name: '约瑟夫·奥恩', nameEn: 'Joseph Aoun', location: '黎巴嫩', locationEn: 'Lebanon', status: 'Active', avatar: '🇱🇧', image: `${IMAGE_BASE}/aoun.png`, lat: 33.8547, lng: 35.8623 },
+  { id: 'abbas', name: '马哈茂德·阿巴斯', nameEn: 'Mahmoud Abbas', location: '巴勒斯坦', locationEn: 'Palestine', status: 'Active', avatar: '🇵🇸', image: `${IMAGE_BASE}/abbas.png`, lat: 31.9522, lng: 35.2332 },
+  { id: 'alimi', name: '拉沙德·阿里米', nameEn: 'Rashad al-Alimi', location: '也门', locationEn: 'Yemen', status: 'Active', avatar: '🇾🇪', image: `${IMAGE_BASE}/alimi.png`, lat: 15.3694, lng: 44.191 },
+  { id: 'haitham', name: '海赛姆·本·塔里克', nameEn: 'Haitham bin Tariq', location: '阿曼', locationEn: 'Oman', status: 'Active', avatar: '🇴🇲', image: `${IMAGE_BASE}/haitham.png`, lat: 21.4735, lng: 55.9754 },
+  { id: 'mishal', name: '米沙勒·艾哈迈德', nameEn: 'Mishal Al-Ahmad', location: '科威特', locationEn: 'Kuwait', status: 'Active', avatar: '🇰🇼', image: `${IMAGE_BASE}/mishal.png`, lat: 29.3117, lng: 47.4818 },
+  { id: 'tamim', name: '塔米姆·本·哈马德', nameEn: 'Tamim bin Hamad', location: '卡塔尔', locationEn: 'Qatar', status: 'Active', avatar: '🇶🇦', image: `${IMAGE_BASE}/tamim.png`, lat: 25.3548, lng: 51.1839 },
+  { id: 'mohamed', name: '穆罕默德·本·扎耶德', nameEn: 'Mohamed bin Zayed', location: '阿联酋', locationEn: 'UAE', status: 'Active', avatar: '🇦🇪', image: `${IMAGE_BASE}/mbz.png`, lat: 23.4241, lng: 53.8478 },
+  { id: 'hamad', name: '哈马德·本·伊萨', nameEn: 'Hamad bin Isa', location: '巴林', locationEn: 'Bahrain', status: 'Active', avatar: '🇧🇭', image: `${IMAGE_BASE}/hamad.png`, lat: 26.0667, lng: 50.5577 },
+  { id: 'akhundzada', name: '海巴图拉·阿洪扎达', nameEn: 'Hibatullah Akhundzada', location: '阿富汗', locationEn: 'Afghanistan', status: 'Active', avatar: '🇦🇫', image: `${IMAGE_BASE}/akhundzada.png`, lat: 33.9391, lng: 67.71 },
+  { id: 'pashinyan', name: '尼科尔·帕希尼扬', nameEn: 'Nikol Pashinyan', location: '亚美尼亚', locationEn: 'Armenia', status: 'Active', avatar: '🇦🇲', image: `${IMAGE_BASE}/pashinyan.png`, lat: 40.0691, lng: 45.0382 },
+  { id: 'aliyev', name: '伊利哈姆·阿利耶夫', nameEn: 'Ilham Aliyev', location: '阿塞拜疆', locationEn: 'Azerbaijan', status: 'Active', avatar: '🇦🇿', image: `${IMAGE_BASE}/aliyev.png`, lat: 40.1431, lng: 47.5769 },
+  { id: 'zourabichvili', name: '萨洛梅·祖拉比什维利', nameEn: 'Salome Zourabichvili', location: '格鲁吉亚', locationEn: 'Georgia', status: 'Active', avatar: '🇬🇪', image: `${IMAGE_BASE}/zourabichvili.png`, lat: 42.3154, lng: 43.3569 },
+  { id: 'rashid', name: '阿卜杜勒·拉蒂夫·拉希德', nameEn: 'Abdul Latif Rashid', location: '伊拉克', locationEn: 'Iraq', status: 'Active', avatar: '🇮🇶', image: `${IMAGE_BASE}/rashid.png`, lat: 33.2232, lng: 43.6793 },
+  { id: 'qassem', name: '纳伊姆·卡西姆', nameEn: 'Naim Qassem', location: '黎巴嫩', locationEn: 'Lebanon', status: 'Active', avatar: '🇱🇧', image: `${IMAGE_BASE}/qassem.png`, lat: 33.8547, lng: 35.8623 },
+  { id: 'meshaal', name: '谢赫·米沙勒', nameEn: 'Sheikh Mishal', location: '科威特', locationEn: 'Kuwait', status: 'Active', avatar: '🇰🇼', image: `${IMAGE_BASE}/meshaal.png`, lat: 29.3117, lng: 47.4818 },
+  { id: 'putin', name: '弗拉基米尔·普京', nameEn: 'Vladimir Putin', location: '俄罗斯', locationEn: 'Russia', status: 'Active', avatar: '🇷🇺', image: `${IMAGE_BASE}/putin.png`, lat: 61.524, lng: 105.3188 },
 ];
 
-// 国家 ID 到领导人 ID 的映射
+// 国家 ID 到领导人 ID 的映射（使用与地图组件相同的图片文件）
 const COUNTRY_TO_LEADER_ID = {
-  'IRN': 'khamenei',
-  'IRQ': 'mujtaba',
-  'SYR': 'assad',
-  'ISR': 'netanyahu',
-  'USA': 'trump',
-  'SAU': 'salman',
-  'EGY': 'sisi',
-  'TUR': 'erdogan',
-  'JOR': 'abdullah',
-  'LBN': 'aoun',
-  'PSE': 'abbas',
-  'YEM': 'alimi',
-  'OMN': 'haitham',
-  'KWT': 'mishal',
-  'QAT': 'tamim',
-  'ARE': 'mohamed',
-  'BHR': 'hamad',
-  'AFG': 'akhundzada',
-  'ARM': 'pashinyan',
-  'AZE': 'aliyev',
-  'GEO': 'zourabichvili',
+  'IRN': 'mujtaba',      // 伊朗 - 穆杰塔巴·哈梅内伊
+  'IRQ': 'rashid',       // 伊拉克 - 阿卜杜勒·拉蒂夫·拉希德
+  'SYR': 'assad',        // 叙利亚 - 巴沙尔·阿萨德
+  'ISR': 'netanyahu',    // 以色列 - 本雅明·内塔尼亚胡
+  'USA': 'trump',        // 美国 - 唐纳德·特朗普
+  'SAU': 'salman',       // 沙特 - 萨勒曼国王
+  'EGY': 'sisi',         // 埃及 - 塞西
+  'TUR': 'erdogan',      // 土耳其 - 埃尔多安
+  'JOR': 'abdullah',     // 约旦 - 阿卜杜拉二世
+  'LBN': 'qassem',       // 黎巴嫩 - 纳伊姆·卡西姆（真主党领袖）
+  'PSE': 'abbas',        // 巴勒斯坦 - 马哈茂德·阿巴斯
+  'YEM': 'alimi',        // 也门 - 拉沙德·阿里米
+  'OMN': 'haitham',      // 阿曼 - 海赛姆
+  'KWT': 'meshaal',      // 科威特 - 谢赫·米沙勒
+  'QAT': 'tamim',        // 卡塔尔 - 塔米姆
+  'ARE': 'mbz',          // 阿联酋 - 穆罕默德·本·扎耶德
+  'BHR': 'hamad',        // 巴林 - 哈马德
+  'AFG': 'akhundzada',   // 阿富汗 - 阿洪扎达
+  'ARM': 'pashinyan',    // 亚美尼亚 - 帕希尼扬
+  'AZE': 'aliyev',       // 阿塞拜疆 - 阿利耶夫
+  'GEO': 'zourabichvili',// 格鲁吉亚 - 祖拉比什维利
+  'RUS': 'putin',        // 俄罗斯 - 普京
 };
 
 // 从 LEADERS 数组生成 COUNTRY_LEADER_MAP（统一数据源）
