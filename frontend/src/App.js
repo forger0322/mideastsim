@@ -260,6 +260,11 @@ function App() {
         // 确定要查询的国家 ID（游客默认为伊朗 IRN）
         const countryId = currentRole?.role_id || 'IRN';
         
+        // 调试日志：显示当前角色
+        console.log('[HeaderCenter] currentRole:', currentRole);
+        console.log('[HeaderCenter] countryId:', countryId);
+        console.log('[HeaderCenter] 是否游客模式:', !currentRole);
+        
         const response = await fetch(`/api/roles`);
         if (response.ok) {
           const data = await response.json();
