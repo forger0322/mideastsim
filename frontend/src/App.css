@@ -671,13 +671,18 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 100%);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.1) 100%);
   animation: shimmer 1.5s infinite;
 }
 
 @keyframes shimmer {
-  0% { background-position: -100px 0; }
-  100% { background-position: 100px 0; }
+  0% {
+    background-position: -100px 0;
+  }
+
+  100% {
+    background-position: 100px 0;
+  }
 }
 
 /* 右侧统计区域 */
@@ -724,33 +729,10 @@
   padding: 2px 4px;
   border-radius: 3px;
   transition: background 0.2s ease;
-  position: relative;
 }
 
 .stat-mini:hover {
   background: rgba(255, 255, 255, 0.1);
-}
-
-/* 自定义 tooltip - 使用 visibility 控制显示 */
-.stat-mini[data-tooltip]:hover::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-4px);
-  background: #1a1a2e;
-  color: #f0e6d2;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  white-space: nowrap;
-  z-index: 1000;
-  margin-bottom: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
-  pointer-events: none;
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  font-family: 'JetBrains Mono', monospace;
-  letter-spacing: 0.5px;
 }
 
 .stat-mini-icon {
@@ -2931,6 +2913,7 @@ body {
     padding: 12px 20px;
   }
 }
+
 /* ========== 用户信息（从 NavBar 移植） ========== */
 .user-info {
   display: flex;

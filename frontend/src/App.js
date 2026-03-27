@@ -907,59 +907,35 @@ function App() {
                   <div className="country-stats">
                     {/* 第一排：8 项属性 */}
                     <div className="stats-row stats-row-1">
-                      <div 
-                        className="stat-mini" 
-                        data-tooltip={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.army.zh : POWER_ATTR_DESCRIPTIONS.army.en}
-                      >
+                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.army.zh : POWER_ATTR_DESCRIPTIONS.army.en}>
                         <span className="stat-mini-icon">🪖</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.army || 0}</span>
                       </div>
-                      <div 
-                        className="stat-mini"
-                        data-tooltip={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.navy.zh : POWER_ATTR_DESCRIPTIONS.navy.en}
-                      >
+                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.navy.zh : POWER_ATTR_DESCRIPTIONS.navy.en}>
                         <span className="stat-mini-icon">⚓</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.navy || 0}</span>
                       </div>
-                      <div 
-                        className="stat-mini"
-                        data-tooltip={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.airForce.zh : POWER_ATTR_DESCRIPTIONS.airForce.en}
-                      >
+                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.airForce.zh : POWER_ATTR_DESCRIPTIONS.airForce.en}>
                         <span className="stat-mini-icon">✈️</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.airForce || 0}</span>
                       </div>
-                      <div 
-                        className="stat-mini"
-                        data-tooltip={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.nuclear.zh : POWER_ATTR_DESCRIPTIONS.nuclear.en}
-                      >
+                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.nuclear.zh : POWER_ATTR_DESCRIPTIONS.nuclear.en}>
                         <span className="stat-mini-icon">☢️</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.nuclear || 0}</span>
                       </div>
-                      <div 
-                        className="stat-mini"
-                        data-tooltip={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.economy.zh : POWER_ATTR_DESCRIPTIONS.economy.en}
-                      >
+                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.economy.zh : POWER_ATTR_DESCRIPTIONS.economy.en}>
                         <span className="stat-mini-icon">💰</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.economy || 0}</span>
                       </div>
-                      <div 
-                        className="stat-mini"
-                        data-tooltip={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.stability.zh : POWER_ATTR_DESCRIPTIONS.stability.en}
-                      >
+                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.stability.zh : POWER_ATTR_DESCRIPTIONS.stability.en}>
                         <span className="stat-mini-icon">🏛️</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.stability || 0}</span>
                       </div>
-                      <div 
-                        className="stat-mini"
-                        data-tooltip={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.diplomacy.zh : POWER_ATTR_DESCRIPTIONS.diplomacy.en}
-                      >
+                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.diplomacy.zh : POWER_ATTR_DESCRIPTIONS.diplomacy.en}>
                         <span className="stat-mini-icon">🤝</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.diplomacy || 0}</span>
                       </div>
-                      <div 
-                        className="stat-mini"
-                        data-tooltip={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.intel.zh : POWER_ATTR_DESCRIPTIONS.intel.en}
-                      >
+                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.intel.zh : POWER_ATTR_DESCRIPTIONS.intel.en}>
                         <span className="stat-mini-icon">👁️</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.intel || 0}</span>
                       </div>
