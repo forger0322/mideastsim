@@ -254,57 +254,95 @@ func simulationLoop(db *Database) {
 
 // generateRandomEvent 生成随机事件
 func generateRandomEvent(db *Database) {
-	eventTypes := []string{"diplomacy", "military", "economic"}
-	locations := []string{"Tehran", "Jerusalem", "Riyadh", "Damascus", "Baghdad"}
-
-	// 🆕 使用真正的随机性，而不是确定性算法
-	eventType := eventTypes[rand.Intn(len(eventTypes))]
-	location := locations[rand.Intn(len(locations))]
-
-	// 中英文事件标题
-	eventTitles := map[string]map[string]string{
-		"Tehran": {
-			"zh": "德黑兰权力交接",
-			"en": "Tehran Power Transition",
-		},
-		"Jerusalem": {
-			"zh": "耶路撒冷紧张局势",
-			"en": "Jerusalem Tensions Rise",
-		},
-		"Riyadh": {
-			"zh": "利雅得紧急斡旋",
-			"en": "Riyadh Emergency Mediation",
-		},
-		"Damascus": {
-			"zh": "大马士革军事动态",
-			"en": "Damascus Military Movement",
-		},
-		"Baghdad": {
-			"zh": "巴格达外交会谈",
-			"en": "Baghdad Diplomatic Talks",
-		},
+	// 所有国家/地点（14 个中东国家）
+	locations := []string{
+		"Tehran", "Jerusalem", "Riyadh", "Damascus", "Baghdad",
+		"Abu Dhabi", "Cairo", "Ankara", "Amman", "Beirut",
+		"Doha", "Kuwait City", "Muscat", "Sanaa", "Ramallah",
 	}
 
-	// 中英文地点
+	// 中英文地点名称
 	locationNames := map[string]map[string]string{
-		"Tehran":    {"zh": "德黑兰", "en": "Tehran"},
-		"Jerusalem": {"zh": "耶路撒冷", "en": "Jerusalem"},
-		"Riyadh":    {"zh": "利雅得", "en": "Riyadh"},
-		"Damascus":  {"zh": "大马士革", "en": "Damascus"},
-		"Baghdad":   {"zh": "巴格达", "en": "Baghdad"},
+		"Tehran":       {"zh": "德黑兰", "en": "Tehran"},
+		"Jerusalem":    {"zh": "耶路撒冷", "en": "Jerusalem"},
+		"Riyadh":       {"zh": "利雅得", "en": "Riyadh"},
+		"Damascus":     {"zh": "大马士革", "en": "Damascus"},
+		"Baghdad":      {"zh": "巴格达", "en": "Baghdad"},
+		"Abu Dhabi":    {"zh": "阿布扎比", "en": "Abu Dhabi"},
+		"Cairo":        {"zh": "开罗", "en": "Cairo"},
+		"Ankara":       {"zh": "安卡拉", "en": "Ankara"},
+		"Amman":        {"zh": "安曼", "en": "Amman"},
+		"Beirut":       {"zh": "贝鲁特", "en": "Beirut"},
+		"Doha":         {"zh": "多哈", "en": "Doha"},
+		"Kuwait City":  {"zh": "科威特城", "en": "Kuwait City"},
+		"Muscat":       {"zh": "马斯喀特", "en": "Muscat"},
+		"Sanaa":        {"zh": "萨那", "en": "Sanaa"},
+		"Ramallah":     {"zh": "拉马拉", "en": "Ramallah"},
+	}
+
+	// 事件类型
+	eventTypes := []string{"diplomacy", "military", "economic"}
+	eventType := eventTypes[rand.Intn(len(eventTypes))]
+
+	// 随机选择地点
+	location := locations[rand.Intn(len(locations))]
+
+	// 根据事件类型随机选择标题（每个类型多个选项）
+	militaryTitles := []struct{ en, zh string }{
+		{"Military Exercise Conducted", "举行军事演习"},
+		{"Troop Movement Detected", "发现部队调动"},
+		{"Border Security Enhanced", "加强边境安全"},
+		{"Defense Minister Meeting", "国防部长会晤"},
+		{"New Weapons System Deployed", "部署新武器系统"},
+		{"Naval Patrol Increased", "增加海军巡逻"},
+		{"Air Defense Drill Completed", "完成防空演习"},
+	}
+
+	diplomacyTitles := []struct{ en, zh string }{
+		{"Emergency Mediation Hosted", "主持紧急斡旋"},
+		{"High-Level Diplomatic Talks", "高级别外交会谈"},
+		{"Peace Proposal Submitted", "提交和平方案"},
+		{"Regional Summit Announced", "宣布地区峰会"},
+		{"Ambassador Appointed", "任命新大使"},
+		{"Trade Delegation Visit", "贸易代表团访问"},
+		{"Joint Communique Issued", "发布联合公报"},
+	}
+
+	economicTitles := []struct{ en, zh string }{
+		{"Economic Reform Announced", "宣布经济改革"},
+		{"Oil Production Adjusted", "调整石油产量"},
+		{"New Trade Agreement Signed", "签署新贸易协定"},
+		{"Investment Forum Held", "举办投资论坛"},
+		{"Currency Fluctuation Reported", "货币波动报告"},
+		{"Infrastructure Project Launched", "启动基础设施项目"},
+		{"Economic Sanctions Imposed", "实施经济制裁"},
+	}
+
+	var title, titleZh string
+	switch eventType {
+	case "military":
+		t := militaryTitles[rand.Intn(len(militaryTitles))]
+		title = t.en
+		titleZh = t.zh
+	case "diplomacy":
+		t := diplomacyTitles[rand.Intn(len(diplomacyTitles))]
+		title = t.en
+		titleZh = t.zh
+	case "economic":
+		t := economicTitles[rand.Intn(len(economicTitles))]
+		title = t.en
+		titleZh = t.zh
 	}
 
 	// 中英文事件类型描述
 	eventTypeDesc := map[string]map[string]string{
-		"diplomacy": {"zh": "外交", "en": "diplomacy"},
+		"diplomacy": {"zh": "外交", "en": "diplomatic"},
 		"military":  {"zh": "军事", "en": "military"},
 		"economic":  {"zh": "经济", "en": "economic"},
 	}
 
-	title := eventTitles[location]["en"]
-	titleZh := eventTitles[location]["zh"]
 	// 更自然的事件描述
-	description := fmt.Sprintf("A %s event has been reported in %s, reflecting ongoing regional developments.", eventType, location)
+	description := fmt.Sprintf("A %s event has been reported in %s, reflecting ongoing regional developments.", eventTypeDesc[eventType]["en"], location)
 	descriptionZh := fmt.Sprintf("%s发生%s事件，反映地区局势持续发展。", locationNames[location]["zh"], eventTypeDesc[eventType]["zh"])
 
 	// 🆕 去重检查：检查最近 5 分钟内是否已生成相同标题的事件
