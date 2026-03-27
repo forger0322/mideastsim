@@ -205,11 +205,17 @@ function App() {
         // 确定要查询的国家 ID（游客默认为伊朗 IRN）
         const countryId = currentRole?.role_id || 'IRN';
         
+        console.log('[DEBUG] 获取国家实力数据，countryId:', countryId);
+        console.log('[DEBUG] COUNTRY_LEADER_MAP:', COUNTRY_LEADER_MAP);
+        console.log('[DEBUG] COUNTRY_TO_LEADER_ID:', COUNTRY_TO_LEADER_ID);
+        
         const response = await fetch(`/api/roles`);
         if (response.ok) {
           const data = await response.json();
           const roles = data.roles || data;
           const userRole = roles.find(r => r.id === countryId);
+          
+          console.log('[DEBUG] userRole:', userRole);
           
           if (userRole) {
             const attrs = userRole.attributes || {};
@@ -225,10 +231,12 @@ function App() {
             // 获取对应国家领导人头像
             const leader = COUNTRY_LEADER_MAP[countryId] || COUNTRY_LEADER_MAP['IRN'];
             
+            console.log('[DEBUG] leader:', leader);
+            
             setUserCountryPower({
               name: userRole.name,
-              leaderImage: leader.image,
-              leaderName: lang === 'zh' ? leader.name : leader.nameEn,
+              leaderImage: leader?.image || 'https://ui-avatars.com/api/?name=Leader&size=220&background=8B1A1A&color=fff',
+              leaderName: lang === 'zh' ? leader?.name : leader?.nameEn || 'Unknown',
               totalPower,
               attributes: attrs,
               faction: userRole.faction
