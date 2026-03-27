@@ -349,7 +349,15 @@ func (m *OfflineAIManager) ExecuteAIActions(ruleEngine *RuleEngine) {
 				case "improve_relations":
 					// 改善关系 - 增加关系值
 					if cmd.TargetID != "" {
-						currentRel, _ := m.db.GetRelation(roleID, cmd.TargetID)
+						currentRel, err := m.db.GetRelation(roleID, cmd.TargetID)
+						if currentRel == nil || err != nil {
+							// 关系不存在，跳过
+							result = &ActionResult{
+								Success: false,
+								Message: fmt.Sprintf("%s 改善关系失败：与 %s 的关系不存在", roleID, cmd.TargetID),
+							}
+							break
+						}
 						newValue := currentRel.Value + 5
 						if newValue > 100 {
 							newValue = 100
@@ -375,7 +383,7 @@ func (m *OfflineAIManager) ExecuteAIActions(ruleEngine *RuleEngine) {
 				case "build_military":
 					// 发展军备 - 增加军力
 					role, err := m.db.GetRoleByID(roleID)
-					if err == nil {
+					if err == nil && role != nil {
 						newAttrs := role.Attributes
 						newAttrs.Army += 2
 						m.db.UpdateRoleAttributes(roleID, newAttrs)
