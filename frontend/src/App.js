@@ -65,7 +65,7 @@ const COUNTRY_TO_LEADER_ID = {
   'OMN': 'haitham',      // 阿曼 - 海赛姆
   'KWT': 'meshaal',      // 科威特 - 谢赫·米沙勒
   'QAT': 'tamim',        // 卡塔尔 - 塔米姆
-  'ARE': 'mbz',          // 阿联酋 - 穆罕默德·本·扎耶德
+  'ARE': 'mohamed',      // 阿联酋 - 穆罕默德·本·扎耶德
   'BHR': 'hamad',        // 巴林 - 哈马德
   'AFG': 'akhundzada',   // 阿富汗 - 阿洪扎达
   'ARM': 'pashinyan',    // 亚美尼亚 - 帕希尼扬
