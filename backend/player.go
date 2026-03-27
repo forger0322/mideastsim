@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // PlayerService 玩家服务
@@ -30,11 +31,13 @@ func NewPlayerService(db *Database, auth *AuthService, store *SessionStore) *Pla
 type RegisterRequest struct {
 	Username string `json:"username"`
 	Email    string `json:"email,omitempty"`
+	Password string `json:"password"`
 }
 
 // LoginRequest 登录请求
 type LoginRequest struct {
 	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 // AuthResponse 认证响应
@@ -70,14 +73,27 @@ func (s *PlayerService) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(req.Password) < 4 {
+		http.Error(w, `{"error":"密码长度至少 4 位"}`, http.StatusBadRequest)
+		return
+	}
+
+	// 哈希密码
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Printf("❌ 密码哈希失败：%v", err)
+		http.Error(w, `{"error":"服务器错误"}`, http.StatusInternalServerError)
+		return
+	}
+
 	// 生成玩家 ID
 	playerID := uuid.New().String()
 
 	// 插入玩家
-	_, err := s.db.db.Exec(`
-		INSERT INTO players (id, username, email)
-		VALUES (?, ?, ?)
-	`, playerID, req.Username, req.Email)
+	_, err = s.db.db.Exec(`
+		INSERT INTO players (id, username, email, password_hash)
+		VALUES (?, ?, ?, ?)
+	`, playerID, req.Username, req.Email, string(hashedPassword))
 
 	if err != nil {
 		http.Error(w, `{"error":"用户名已存在"}`, http.StatusConflict)
@@ -125,16 +141,22 @@ func (s *PlayerService) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 查询玩家
+	if req.Password == "" {
+		http.Error(w, `{"error":"密码不能为空"}`, http.StatusBadRequest)
+		return
+	}
+
+	// 查询玩家（包含 password_hash）
 	var player Player
 	var roleID, email sql.NullString
 	var lastLogin, createdAt sql.NullTime
+	var passwordHash sql.NullString
 	err := s.db.db.QueryRow(`
-		SELECT id, username, email, role_id, last_login, created_at
+		SELECT id, username, email, role_id, last_login, created_at, password_hash
 		FROM players WHERE username = ?
 	`, req.Username).Scan(
 		&player.ID, &player.Username, &email, &roleID,
-		&lastLogin, &createdAt,
+		&lastLogin, &createdAt, &passwordHash,
 	)
 	
 	player.Email = email
@@ -150,26 +172,25 @@ func (s *PlayerService) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err == sql.ErrNoRows {
-		// 自动注册
-		player.ID = uuid.New().String()
-		player.Username = req.Username
-		player.LastActive = time.Now()
-		player.CreatedAt = time.Now()
-
-		_, err := s.db.db.Exec(`
-			INSERT INTO players (id, username)
-			VALUES (?, ?)
-		`, player.ID, player.Username)
-
-		if err != nil {
-			log.Printf("❌ 创建玩家失败：%v", err)
-			http.Error(w, `{"error":"创建玩家失败"}`, http.StatusInternalServerError)
-			return
-		}
-	} else if err != nil {
+		http.Error(w, `{"error":"用户名或密码错误"}`, http.StatusUnauthorized)
+		return
+	}
+	
+	if err != nil {
 		log.Printf("❌ 查询玩家失败：%v", err)
 		http.Error(w, `{"error":"查询失败：`+err.Error()+`"}`, http.StatusInternalServerError)
 		return
+	}
+
+	// 验证密码
+	if passwordHash.Valid {
+		if err := bcrypt.CompareHashAndPassword([]byte(passwordHash.String), []byte(req.Password)); err != nil {
+			http.Error(w, `{"error":"用户名或密码错误"}`, http.StatusUnauthorized)
+			return
+		}
+	} else {
+		// 旧数据没有密码，允许登录（向后兼容）
+		log.Printf("⚠️ 用户 %s 没有密码哈希，允许登录（旧数据）", req.Username)
 	}
 
 	// 如果有绑定的角色，获取角色信息

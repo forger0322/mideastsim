@@ -60,12 +60,10 @@ const Auth = ({ onAuthSuccess }) => {
       }
     }
     
-    // 密码验证（仅注册时）
+    // 密码验证（仅注册时，简化验证）
     if (!isLogin) {
-      if (password.length < 8 || password.length > 16) {
-        errors.password = lang === 'zh' ? '密码长度必须为 8-16 位' : 'Password must be 8-16 characters';
-      } else if (!/[a-z]/.test(password) || !/[A-Z]/.test(password)) {
-        errors.password = lang === 'zh' ? '密码必须包含大小写字母' : 'Password must contain both uppercase and lowercase letters';
+      if (password.length < 4) {
+        errors.password = lang === 'zh' ? '密码长度至少 4 位' : 'Password must be at least 4 characters';
       }
     }
     
