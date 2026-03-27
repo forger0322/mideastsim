@@ -23,7 +23,7 @@ const EconomicPanel = ({ worldState, onClose }) => {
     }
   }, [worldState]);
 
-  // 基准数据（用于计算变化百分比）
+  // 基准数据（用于计算变化百分比）- 与后端 economicBaseline 初始值一致
   const baseline = {
     spx: 6672.62,
     hsi: 25716.76,
