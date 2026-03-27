@@ -417,15 +417,31 @@ function App() {
     setShowRoleSelector(false);
   }, []);
 
+  // 面板切换辅助函数 - 确保只打开一个面板
+  const showPanel = (panelName) => {
+    const panels = {
+      economic: setShowEconomicPanel,
+      diplomacy: setShowDiplomacyPanel,
+      military: setShowMilitaryPanel,
+      settings: setShowSettingsPanel,
+      leaderboard: setShowLeaderboard,
+      faction: setShowFactionPanel,
+    };
+
+    // 关闭所有面板
+    Object.entries(panels).forEach(([name, setter]) => {
+      setter(name === panelName);
+    });
+    setCurrentPage('map');
+  };
+
   // 导航处理
   const handleNavigate = (pageId) => {
-    console.log('=== handleNavigate ===', { pageId, before: { showEconomicPanel, showFactionPanel } });
     setCurrentPage(pageId);
 
     // 根据页面显示对应面板
     switch (pageId) {
       case 'map':
-        console.log('Showing: map (all panels false)');
         setShowEconomicPanel(false);
         setShowDiplomacyPanel(false);
         setShowMilitaryPanel(false);
@@ -434,39 +450,16 @@ function App() {
         setShowFactionPanel(false);
         break;
       case 'faction':
-        console.log('Showing: faction panel');
-        setShowEconomicPanel(false);
-        setShowDiplomacyPanel(false);
-        setShowMilitaryPanel(false);
-        setShowSettingsPanel(false);
-        setShowLeaderboard(false);
-        setShowFactionPanel(true);
-        setCurrentPage('map'); // 不保持 active 状态
+        showPanel('faction');
         break;
       case 'economy':
-        console.log('Showing: economy panel');
-        setShowEconomicPanel(true);
-        setShowDiplomacyPanel(false);
-        setShowMilitaryPanel(false);
-        setShowSettingsPanel(false);
-        setShowLeaderboard(false);
-        setCurrentPage('map'); // 不保持 active 状态
+        showPanel('economic');
         break;
       case 'diplomacy':
-        console.log('Showing: diplomacy panel');
-        setShowEconomicPanel(false);
-        setShowDiplomacyPanel(true);
-        setShowMilitaryPanel(false);
-        setShowSettingsPanel(false);
-        setShowLeaderboard(false);
-        setCurrentPage('map'); // 不保持 active 状态
+        showPanel('diplomacy');
         break;
       case 'military':
-        console.log('Showing: military panel');
-        setShowEconomicPanel(false);
-        setShowDiplomacyPanel(false);
-        setShowMilitaryPanel(true);
-        setShowSettingsPanel(false);
+        showPanel('military');
         setShowLeaderboard(false);
         setCurrentPage('map'); // 不保持 active 状态
         break;
@@ -1059,13 +1052,7 @@ function App() {
                 {worldState && worldState.economic && (
                   <div className="resource-bar clickable" onClick={(e) => {
                     e.stopPropagation();
-                    // 直接设置面板状态，确保只打开经济面板
-                    setShowEconomicPanel(true);
-                    setShowFactionPanel(false);
-                    setShowDiplomacyPanel(false);
-                    setShowMilitaryPanel(false);
-                    setShowSettingsPanel(false);
-                    setShowLeaderboard(false);
+                    showPanel('economic');
                   }}>
                     <div className="resource-item">
                       <span className="resource-label">{t('resources.oil')}</span>
