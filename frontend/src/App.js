@@ -219,9 +219,10 @@ function App() {
           
           if (userRole) {
             const attrs = userRole.attributes || {};
+            // 注意：API 返回的属性名可能是 air_force 而不是 airForce
             const totalPower = (attrs.army || 0) + 
                               (attrs.navy || 0) + 
-                              (attrs.airForce || 0) + 
+                              (attrs.air_force || attrs.airForce || 0) + 
                               (attrs.nuclear || 0) + 
                               (attrs.economy || 0) + 
                               (attrs.stability || 0) + 
@@ -238,8 +239,23 @@ function App() {
               leaderImage: leader?.image || 'https://ui-avatars.com/api/?name=Leader&size=220&background=8B1A1A&color=fff',
               leaderName: lang === 'zh' ? leader?.name : leader?.nameEn || 'Unknown',
               totalPower,
-              attributes: attrs,
+              attributes: {
+                army: attrs.army || 0,
+                navy: attrs.navy || 0,
+                airForce: attrs.air_force || attrs.airForce || 0,
+                nuclear: attrs.nuclear || 0,
+                economy: attrs.economy || 0,
+                stability: attrs.stability || 0,
+                diplomacy: attrs.diplomacy || 0,
+                intel: attrs.intel || 0,
+              },
               faction: userRole.faction
+            });
+            
+            console.log('[DEBUG] setUserCountryPower 完成:', {
+              name: userRole.name,
+              leaderImage: leader?.image,
+              totalPower,
             });
           }
         }
