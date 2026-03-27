@@ -8,19 +8,36 @@ class WorldWebSocket {
     this.actionListeners = [];
     // 使用环境变量配置（支持本地和远程部署）
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsHost = process.env.REACT_APP_WS_HOST || window.location.hostname;
-    const wsPort = process.env.REACT_APP_WS_PORT || '8080';
-    this.url = `${protocol}//${wsHost}:${wsPort}/ws`;
+
+    // 开发环境：用 setupProxy 代理（/ws → 8080）
+    // 生产环境：优先用环境变量，其次用同源
+    const isDevelopment = process.env.NODE_ENV === 'development';
+
+    let wsUrl;
+    if (isDevelopment) {
+      // 开发环境：通过 setupProxy 代理（localhost:9090/ws）
+      // setupProxy 会自动转到 http://127.0.0.1:8080
+      wsUrl = `${protocol}//localhost${window.location.port ? ':' + window.location.port : ''}/ws`;
+      console.log(`[WebSocket] DEV 模式，使用本地代理: ${wsUrl}`);
+    } else {
+      // 生产环境：优先用环境变量，次选同源
+      const customWsHost = process.env.REACT_APP_WS_HOST;
+      const customWsPort = process.env.REACT_APP_WS_PORT;
+
+      if (customWsHost) {
+        // 用环境变量指定的远程 WS 地址
+        wsUrl = `${protocol}//${customWsHost}${customWsPort && customWsPort !== '80' && customWsPort !== '443' ? ':' + customWsPort : ''}/ws`;
+        console.log(`[WebSocket] PROD 模式，使用环境变量: ${wsUrl}`);
+      } else {
+        // 自动用当前页面的域名端口，路径映射到 /ws
+        // 假设前端和后端都通过同一个 Nginx 代理，前端 9090 → Nginx 代理 /ws 到后端 8080
+        wsUrl = `${protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}/ws`;
+        console.log(`[WebSocket] PROD 模式，使用同源: ${wsUrl}`);
+      }
+    }
+
+    this.url = wsUrl;
     this.reconnectTimer = null;
-  }
-
-  connect(agentId = 'unknown') {
-    const url = agentId !== 'unknown' ? `${this.url}?agentId=${agentId}` : this.url;
-    console.log('🔌 [WebSocket] 尝试连接:', url);
-    console.log('🔌 [WebSocket] agentId:', agentId);
-    console.log('🔌 [WebSocket] 环境变量:', { wsHost: process.env.REACT_APP_WS_HOST, wsPort: process.env.REACT_APP_WS_PORT });
-    this.ws = new WebSocket(url);
-
     this.ws.onopen = () => {
       console.log('✅ [WebSocket] 连接成功！');
     };

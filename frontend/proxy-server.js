@@ -31,7 +31,16 @@ const server = http.createServer((req, res) => {
   if (url.startsWith('/api')) {
     const options = new URL(url, API_URL);
     
-    const proxyReq = (options.protocol === 'https:' ? https : http).request(options, (proxyRes) => {
+    // 构建请求头（只转发存在的头）
+    const proxyHeaders = {};
+    if (req.headers['content-type']) proxyHeaders['Content-Type'] = req.headers['content-type'];
+    if (req.headers['authorization']) proxyHeaders['Authorization'] = req.headers['authorization'];
+    if (req.headers['content-length']) proxyHeaders['Content-Length'] = req.headers['content-length'];
+    
+    const proxyReq = (options.protocol === 'https:' ? https : http).request(options, {
+      method: req.method,
+      headers: proxyHeaders
+    }, (proxyRes) => {
       res.writeHead(proxyRes.statusCode, {
         ...proxyRes.headers,
         'Access-Control-Allow-Origin': '*',
