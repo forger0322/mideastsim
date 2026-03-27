@@ -205,17 +205,11 @@ function App() {
         // 确定要查询的国家 ID（游客默认为伊朗 IRN）
         const countryId = currentRole?.role_id || 'IRN';
         
-        console.log('[DEBUG] 获取国家实力数据，countryId:', countryId);
-        console.log('[DEBUG] COUNTRY_LEADER_MAP:', COUNTRY_LEADER_MAP);
-        console.log('[DEBUG] COUNTRY_TO_LEADER_ID:', COUNTRY_TO_LEADER_ID);
-        
         const response = await fetch(`/api/roles`);
         if (response.ok) {
           const data = await response.json();
           const roles = data.roles || data;
           const userRole = roles.find(r => r.id === countryId);
-          
-          console.log('[DEBUG] userRole:', userRole);
           
           if (userRole) {
             const attrs = userRole.attributes || {};
@@ -231,8 +225,6 @@ function App() {
             
             // 获取对应国家领导人头像
             const leader = COUNTRY_LEADER_MAP[countryId] || COUNTRY_LEADER_MAP['IRN'];
-            
-            console.log('[DEBUG] leader:', leader);
             
             setUserCountryPower({
               name: userRole.name,
@@ -250,12 +242,6 @@ function App() {
                 intel: attrs.intel || 0,
               },
               faction: userRole.faction
-            });
-            
-            console.log('[DEBUG] setUserCountryPower 完成:', {
-              name: userRole.name,
-              leaderImage: leader?.image,
-              totalPower,
             });
           }
         }
@@ -887,18 +873,16 @@ function App() {
               {userCountryPower ? (
                 <>
                   {/* 左侧：国家领导人头像（跨两排） */}
-                  <div className="country-flag-wrapper" style={{ border: '1px solid red' }}>
+                  <div className="country-flag-wrapper">
                     <img 
                       src={userCountryPower.leaderImage} 
                       alt={userCountryPower.leaderName}
                       className="leader-image"
                       title={userCountryPower.leaderName}
-                      style={{ border: '2px solid green', display: 'block' }}
                       onError={(e) => {
                         console.error('图片加载失败:', e.target.src);
                         e.target.src = 'https://ui-avatars.com/api/?name=Leader&size=220&background=8B1A1A&color=fff';
                       }}
-                      onLoad={() => console.log('图片加载成功:', userCountryPower.leaderImage)}
                     />
                   </div>
                   
