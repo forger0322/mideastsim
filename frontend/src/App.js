@@ -887,12 +887,18 @@ function App() {
               {userCountryPower ? (
                 <>
                   {/* 左侧：国家领导人头像（跨两排） */}
-                  <div className="country-flag-wrapper">
+                  <div className="country-flag-wrapper" style={{ border: '1px solid red' }}>
                     <img 
                       src={userCountryPower.leaderImage} 
                       alt={userCountryPower.leaderName}
                       className="leader-image"
                       title={userCountryPower.leaderName}
+                      style={{ border: '2px solid green', display: 'block' }}
+                      onError={(e) => {
+                        console.error('图片加载失败:', e.target.src);
+                        e.target.src = 'https://ui-avatars.com/api/?name=Leader&size=220&background=8B1A1A&color=fff';
+                      }}
+                      onLoad={() => console.log('图片加载成功:', userCountryPower.leaderImage)}
                     />
                   </div>
                   
