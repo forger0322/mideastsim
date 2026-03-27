@@ -739,14 +739,14 @@
 /* 自定义 tooltip - 即时显示 */
 .custom-tooltip {
   position: fixed;
-  background: rgba(45, 35, 22, 0.95);
+  background: rgba(93, 64, 55, 0.9);
   color: var(--text-light);
   padding: 8px 14px;
   border-radius: 6px;
   font-size: 0.8rem;
   white-space: nowrap;
   z-index: 9999;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(212, 175, 55, 0.3);
   border: 1px solid var(--gold);
   font-family: 'JetBrains Mono', monospace;
   letter-spacing: 0.5px;
@@ -795,7 +795,8 @@
 .stats-row-2 {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 16px;
   padding-top: 6px;
 }
 
@@ -825,6 +826,8 @@
   font-size: 0.9rem;
   white-space: nowrap;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  min-width: 80px;
+  text-align: center;
 }
 
 .faction-badge-small {
