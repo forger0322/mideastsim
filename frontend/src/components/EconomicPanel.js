@@ -18,8 +18,8 @@ const EconomicPanel = ({ worldState, onClose }) => {
 
   // 从 worldState 获取经济数据
   useEffect(() => {
-    if (worldState && worldState.economy) {
-      setEconomy(worldState.economy);
+    if (worldState && worldState.economic) {
+      setEconomy(worldState.economic);
     }
   }, [worldState]);
 

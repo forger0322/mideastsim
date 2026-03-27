@@ -2352,8 +2352,8 @@
 }
 
 .relation-item {
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid #8b5a2b;
+  background: rgba(139, 90, 43, 0.08);
+  border: 1px solid rgba(139, 90, 43, 0.2);
   border-radius: 10px;
   padding: 15px 20px;
   display: flex;
@@ -2361,12 +2361,12 @@
   justify-content: space-between;
   gap: 20px;
   transition: all 0.3s ease;
-  font-family: 'KaiTi', 'STKaiti', serif;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .relation-item:hover {
-  background: rgba(255, 255, 255, 0.7);
-  border-color: #d4af37;
+  background: rgba(139, 90, 43, 0.12);
+  border-color: rgba(139, 90, 43, 0.3);
   transform: translateX(5px);
   box-shadow: 0 3px 15px rgba(139, 90, 43, 0.2);
 }
@@ -2379,6 +2379,13 @@
   font-size: 15px;
   color: #2c2416;
   font-weight: bold;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.relation-countries .country-name {
+  color: #2c2416;
+  font-family: 'JetBrains Mono', monospace;
+  text-shadow: none;
 }
 
 .country-flag {

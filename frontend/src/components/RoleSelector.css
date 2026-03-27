@@ -167,21 +167,21 @@
 }
 
 .roles-grid::-webkit-scrollbar {
-  width: 10px;
+  width: 10px !important;
 }
 
 .roles-grid::-webkit-scrollbar-track {
-  background: rgba(139, 90, 43, 0.2);
-  border: 1px solid var(--border-brown);
+  background: rgba(139, 90, 43, 0.15) !important;
+  border-radius: 4px;
 }
 
 .roles-grid::-webkit-scrollbar-thumb {
-  background: var(--border-brown);
-  border: 2px solid var(--parchment);
+  background: rgba(212, 175, 55, 0.6) !important;
+  border-radius: 4px;
 }
 
 .roles-grid::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-red);
+  background: rgba(212, 175, 55, 0.8) !important;
 }
 
 /* 角色卡片 - 兵书卡片样式 */

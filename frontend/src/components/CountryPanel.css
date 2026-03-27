@@ -1,0 +1,724 @@
+/* CountryPanel.css - 国家面板样式 */
+
+.country-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 10px 10px 40px 10px;
+  max-height: 70vh;
+  overflow-y: auto;
+  background: transparent;
+  border-radius: 10px;
+  color: #2C2416;
+}
+
+/* Modal 标题栏中的 Tabs */
+.country-panel-header-tabs {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.country-header-tab {
+  padding: 8px 16px;
+  background: rgba(255, 248, 220, 0.6);
+  border: 1px solid rgba(139, 90, 43, 0.3);
+  border-radius: 6px;
+  color: #2C2416;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.country-header-tab:hover {
+  background: rgba(255, 248, 220, 0.8);
+  border-color: rgba(139, 90, 43, 0.5);
+  color: #2C2416;
+}
+
+.country-header-tab.active {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.4), rgba(139, 90, 43, 0.3));
+  border-color: rgba(139, 90, 43, 0.6);
+  color: #2C2416;
+  font-weight: 700;
+}
+
+/* ========== 子面板切换标签（旧版，保留兼容） ========== */
+.country-panel-tabs {
+  display: flex;
+  gap: 12px;
+  border-bottom: 2px solid rgba(139, 90, 43, 0.2);
+  padding-bottom: 0;
+}
+
+.country-tab {
+  padding: 12px 24px;
+  background: rgba(139, 90, 43, 0.08);
+  border: 2px solid rgba(139, 90, 43, 0.2);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2C2416;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  top: 2px;
+}
+
+.country-tab:hover {
+  background: rgba(139, 90, 43, 0.12);
+  border-color: rgba(139, 90, 43, 0.3);
+}
+
+.country-tab.active {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(139, 90, 43, 0.15));
+  border-color: rgba(212, 175, 55, 0.5);
+  font-weight: 700;
+  box-shadow: 0 -2px 8px rgba(139, 90, 43, 0.15);
+}
+
+/* ========== 国家列表 ========== */
+.countries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.countries-header {
+  display: grid;
+  grid-template-columns: 0.5fr 2fr 0.8fr 1.2fr 1fr 1.5fr;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: rgba(139, 90, 43, 0.12);
+  border: 1px solid rgba(139, 90, 43, 0.2);
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2C2416;
+}
+
+.countries-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 40px;
+  color: #2C2416;
+}
+
+.country-item {
+  display: grid;
+  grid-template-columns: 0.5fr 2fr 0.8fr 1.2fr 1fr 1.5fr;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: rgba(139, 90, 43, 0.08);
+  border: 1px solid rgba(139, 90, 43, 0.2);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  color: #2C2416 !important;
+}
+
+.country-item:hover {
+  background: rgba(139, 90, 43, 0.12);
+  border-color: rgba(139, 90, 43, 0.3);
+  transform: translateX(4px);
+}
+
+/* 国家列 */
+.col-country {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* 国家面板列表中的国家名称（不影响其他地方） */
+.country-item .country-name {
+  font-weight: 600;
+  color: #2C2416 !important;
+  text-shadow: none;
+}
+
+.country-item .country-flag {
+  font-size: 20px;
+  filter: none;
+}
+
+/* 国力列 */
+.col-power {
+  text-align: center;
+}
+
+.power-value {
+  font-size: 16px;
+  font-weight: 800;
+  color: #8B6914 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 10px rgba(139, 105, 20, 0.6) !important;
+  letter-spacing: 0.5px;
+}
+
+/* 稳定度列 */
+.col-stability {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stability-bar-bg {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(139, 90, 43, 0.15);
+  overflow: hidden;
+}
+
+.stability-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  min-width: 4px;
+}
+
+/* 稳定度进度条颜色 - 根据数值动态变化 */
+.stability-bar-fill.high {
+  background: linear-gradient(90deg, #4CAF50, #8BC34A);
+}
+
+.stability-bar-fill.medium {
+  background: linear-gradient(90deg, #FFC107, #FF9800);
+}
+
+.stability-bar-fill.low {
+  background: linear-gradient(90deg, #FF5722, #F44336);
+}
+
+.stability-bar-fill.negative {
+  background: linear-gradient(90deg, #8B1A1A, #DC2626);
+  box-shadow: 0 0 8px rgba(220, 38, 38, 0.6);
+}
+
+.stability-value {
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 35px;
+  text-align: right;
+}
+
+/* 派系列 */
+.col-faction {
+  display: flex;
+  justify-content: center;
+}
+
+.faction-badge-small {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* 领导人列 */
+.col-leader {
+  font-size: 12px;
+  color: rgba(44, 36, 22, 0.8);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.leader-name-small {
+  font-weight: 500;
+}
+
+/* ========== 势力对比 ========== */
+.factions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  padding-bottom: 40px;
+  color: #2C2416;
+}
+
+.faction-card {
+  background: rgba(255, 248, 220, 0.95);
+  border: 2px solid rgba(139, 90, 43, 0.2);
+  border-left: 4px solid;
+  border-radius: 10px;
+  padding: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(139, 90, 43, 0.15);
+  position: relative;
+  overflow: hidden;
+  color: #2C2416;
+}
+
+.faction-card .faction-description,
+.faction-card .faction-countries,
+.faction-card .countries-label,
+.faction-card .countries-list,
+.faction-card .strength-value {
+  color: #2C2416 !important;
+}
+
+.faction-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.08;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* 抵抗轴心 - 红色主题 */
+.faction-card[data-faction="resistance"] {
+  background: linear-gradient(135deg, rgba(139, 26, 26, 0.15), rgba(255, 248, 220, 0.92));
+  border-color: rgba(139, 26, 26, 0.35);
+}
+.faction-card[data-faction="resistance"]::before {
+  background: linear-gradient(135deg, #8B1A1A, transparent);
+  opacity: 0.08;
+}
+.faction-card[data-faction="resistance"]:hover {
+  box-shadow: 0 8px 20px rgba(139, 26, 26, 0.4);
+  background: linear-gradient(135deg, rgba(139, 26, 26, 0.85), rgba(139, 26, 26, 0.75));
+}
+.faction-card[data-faction="resistance"]:hover * {
+  color: #fff !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* 美以联盟 - 蓝色主题 */
+.faction-card[data-faction="usisrael"] {
+  background: linear-gradient(135deg, rgba(30, 79, 138, 0.15), rgba(255, 248, 220, 0.92));
+  border-color: rgba(30, 79, 138, 0.35);
+}
+.faction-card[data-faction="usisrael"]::before {
+  background: linear-gradient(135deg, #1E4F8A, transparent);
+  opacity: 0.08;
+}
+.faction-card[data-faction="usisrael"]:hover {
+  box-shadow: 0 8px 20px rgba(30, 79, 138, 0.4);
+  background: linear-gradient(135deg, rgba(30, 79, 138, 0.85), rgba(30, 79, 138, 0.75));
+}
+.faction-card[data-faction="usisrael"]:hover * {
+  color: #fff !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* 温和联盟 - 金色主题 */
+.faction-card[data-faction="moderate"] {
+  background: linear-gradient(135deg, rgba(184, 134, 11, 0.15), rgba(255, 248, 220, 0.92));
+  border-color: rgba(184, 134, 11, 0.35);
+}
+.faction-card[data-faction="moderate"]::before {
+  background: linear-gradient(135deg, #B8860B, transparent);
+  opacity: 0.08;
+}
+.faction-card[data-faction="moderate"]:hover {
+  box-shadow: 0 8px 20px rgba(184, 134, 11, 0.4);
+  background: linear-gradient(135deg, rgba(184, 134, 11, 0.85), rgba(184, 134, 11, 0.75));
+}
+.faction-card[data-faction="moderate"]:hover * {
+  color: #fff !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* 亲穆兄会 - 绿色主题 */
+.faction-card[data-faction="brotherhood"] {
+  background: linear-gradient(135deg, rgba(34, 139, 34, 0.15), rgba(255, 248, 220, 0.92));
+  border-color: rgba(34, 139, 34, 0.35);
+}
+.faction-card[data-faction="brotherhood"]::before {
+  background: linear-gradient(135deg, #228B22, transparent);
+  opacity: 0.08;
+}
+.faction-card[data-faction="brotherhood"]:hover {
+  box-shadow: 0 8px 20px rgba(34, 139, 34, 0.4);
+  background: linear-gradient(135deg, rgba(34, 139, 34, 0.85), rgba(34, 139, 34, 0.75));
+}
+.faction-card[data-faction="brotherhood"]:hover * {
+  color: #fff !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.faction-card:hover {
+  transform: translateY(-4px);
+}
+
+.faction-card:hover::before {
+  opacity: 0.15;
+}
+
+.faction-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(139, 90, 43, 0.15);
+}
+
+.faction-card-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Times New Roman', serif;
+  letter-spacing: 0.5px;
+}
+
+.faction-strength {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.strength-bar {
+  width: 80px;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(139, 90, 43, 0.15);
+  overflow: hidden;
+}
+
+.strength-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.strength-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #2C2416;
+  min-width: 35px;
+  text-align: right;
+}
+
+.faction-description {
+  font-size: 13px;
+  color: rgba(44, 36, 22, 0.8);
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+.faction-countries {
+  font-size: 12px;
+  color: rgba(44, 36, 22, 0.7);
+}
+
+.countries-label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.countries-list {
+  line-height: 1.6;
+}
+
+/* ========== 国家详情弹窗 ========== */
+.country-detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(45, 35, 22, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.country-detail-modal {
+  background: linear-gradient(180deg, rgba(255, 248, 220, 0.98), rgba(245, 230, 211, 0.97));
+  border: 2px solid rgba(212, 175, 55, 0.4);
+  border-radius: 12px;
+  width: min(550px, 90vw);
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(212, 175, 55, 0.1);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.country-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+  background: rgba(212, 175, 55, 0.1);
+  border-radius: 12px 12px 0 0;
+}
+
+.country-detail-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.country-detail-flag {
+  font-size: 42px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.country-detail-title h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #2C2416;
+  font-family: 'Times New Roman', serif;
+  letter-spacing: 1px;
+}
+
+.country-detail-close {
+  width: 36px;
+  height: 36px;
+  border: 2px solid rgba(139, 90, 43, 0.3);
+  background: rgba(255, 248, 220, 0.8);
+  border-radius: 8px;
+  font-size: 24px;
+  color: #2C2416;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.country-detail-close:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: rgba(212, 175, 55, 0.5);
+  transform: rotate(90deg);
+}
+
+.country-detail-content {
+  padding: 24px;
+}
+
+.detail-section {
+  margin-bottom: 24px;
+}
+
+.detail-section:last-child {
+  margin-bottom: 0;
+}
+
+.detail-section h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #2C2416;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(139, 90, 43, 0.2);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  background: rgba(139, 90, 43, 0.08);
+  border-radius: 6px;
+  border: 1px solid rgba(139, 90, 43, 0.15);
+}
+
+.detail-label {
+  font-size: 11px;
+  color: #2C2416 !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #2C2416 !important;
+}
+
+.detail-value.power-value {
+  color: #8B6914 !important;
+  font-size: 18px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 12px rgba(139, 105, 20, 0.5) !important;
+  font-weight: 800;
+}
+
+.detail-value.faction-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #fff !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
+  text-align: center;
+  font-weight: 700;
+}
+
+/* 实力详情进度条 */
+.power-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.power-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.power-bar-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2C2416;
+  min-width: 100px;
+}
+
+.power-bar-bg {
+  flex: 1;
+  height: 10px;
+  border-radius: 5px;
+  background: rgba(139, 90, 43, 0.15);
+  overflow: hidden;
+}
+
+.power-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
+.power-bar-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2C2416;
+  min-width: 35px;
+  text-align: right;
+}
+
+/* 领导人信息 */
+.leader-info {
+  padding: 16px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.leader-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2C2416;
+  margin-bottom: 4px;
+  font-family: 'Times New Roman', serif;
+}
+
+.leader-title {
+  font-size: 13px;
+  color: rgba(44, 36, 22, 0.7);
+  font-weight: 500;
+}
+
+/* 当前状态 */
+.status-text {
+  padding: 14px 18px;
+  background: rgba(139, 90, 43, 0.08);
+  border-left: 4px solid rgba(212, 175, 55, 0.5);
+  border-radius: 6px;
+  font-size: 14px;
+  color: #2C2416;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+/* 滚动条美化 */
+.countries-items::-webkit-scrollbar,
+.factions-grid::-webkit-scrollbar,
+.country-detail-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.countries-items::-webkit-scrollbar-track,
+.factions-grid::-webkit-scrollbar-track,
+.country-detail-modal::-webkit-scrollbar-track {
+  background: rgba(139, 90, 43, 0.1);
+  border-radius: 4px;
+}
+
+.countries-items::-webkit-scrollbar-thumb,
+.factions-grid::-webkit-scrollbar-thumb,
+.country-detail-modal::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.5);
+  border-radius: 4px;
+}
+
+.countries-items::-webkit-scrollbar-thumb:hover,
+.factions-grid::-webkit-scrollbar-thumb:hover,
+.country-detail-modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.7);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .countries-header,
+  .country-item {
+    grid-template-columns: 0.5fr 1.5fr 0.6fr 1fr;
+    gap: 12px;
+  }
+
+  .col-faction,
+  .col-leader {
+    display: none;
+  }
+
+  .factions-grid {
+    grid-template-columns: 1fr;
+  }
+}

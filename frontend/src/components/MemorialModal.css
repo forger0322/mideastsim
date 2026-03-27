@@ -25,7 +25,7 @@
 /* 奏折容器 */
 .memorial-container {
   width: min(500px, 90vw);
-  max-height: 80vh;
+  max-height: 85vh;
   background: #f5e6d3;
   background-image: 
     linear-gradient(rgba(139, 69, 19, 0.05) 1px, transparent 1px),
@@ -38,6 +38,12 @@
   flex-direction: column;
   animation: unroll 0.3s ease-out;
   overflow: visible;
+}
+
+/* 宽版容器（用于国家面板等） */
+.memorial-container.wide {
+  width: min(1100px, 95vw);
+  max-height: 85vh;
 }
 
 /* 禁用动画的容器 */
@@ -123,16 +129,24 @@
 .memorial-content {
   padding: 20px 30px;
   position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* 标题区 */
 .memorial-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   border-bottom: 2px solid #8b5a2b;
   padding-bottom: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .memorial-title {
@@ -141,6 +155,15 @@
   color: #2C2416;
   margin: 0;
   font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.memorial-header-tabs {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
 }
 
 .title-seal {
@@ -150,14 +173,13 @@
   border: 2px solid #d4af37;
   box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
   flex-shrink: 0;
+  align-self: flex-end;
 }
 
 /* 内容区 */
 .memorial-body {
   font-family: 'KaiTi', 'STKaiti', serif;
   color: #2C2416;
-  max-height: 65vh;
-  overflow-y: auto;
   padding-right: 10px;
 }
 
@@ -205,21 +227,21 @@
 
 /* 自定义滚动条 */
 .memorial-body::-webkit-scrollbar {
-  width: 8px;
+  width: 8px !important;
 }
 
 .memorial-body::-webkit-scrollbar-track {
-  background: #eadab8;
+  background: rgba(139, 90, 43, 0.15) !important;
   border-radius: 4px;
 }
 
 .memorial-body::-webkit-scrollbar-thumb {
-  background: #8b5a2b;
+  background: rgba(212, 175, 55, 0.6) !important;
   border-radius: 4px;
 }
 
 .memorial-body::-webkit-scrollbar-thumb:hover {
-  background: #6b4a2b;
+  background: rgba(212, 175, 55, 0.8) !important;
 }
 
 /* 关闭按钮（火漆印） */

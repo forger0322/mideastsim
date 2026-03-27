@@ -1,7 +1,7 @@
 import React from 'react';
 import './MemorialModal.css';
 
-const MemorialModal = ({ isOpen, onClose, title, children, type = 'default', width, disableAnimation = false }) => {
+const MemorialModal = ({ isOpen, onClose, title, children, headerChildren, type = 'default', width, disableAnimation = false }) => {
   if (!isOpen) return null;
 
   // 根据类型设置印章颜色
@@ -25,9 +25,12 @@ const MemorialModal = ({ isOpen, onClose, title, children, type = 'default', wid
 
   const containerStyle = width ? { width: width, minWidth: width } : {};
   const isLeaderboard = title && title.includes('排行榜');
+  const isWide = type === '国家' || (width && width.includes('1100px'));
   const containerClass = disableAnimation || isLeaderboard 
     ? 'memorial-container no-animation leaderboard-modal' 
-    : 'memorial-container';
+    : isWide 
+      ? 'memorial-container wide' 
+      : 'memorial-container';
   const overlayClass = disableAnimation || isLeaderboard 
     ? 'memorial-overlay no-animation' 
     : 'memorial-overlay';
@@ -48,6 +51,7 @@ const MemorialModal = ({ isOpen, onClose, title, children, type = 'default', wid
           <div className="memorial-header">
             <h3 className="memorial-title">{title}</h3>
             <div className="title-seal" style={{ backgroundColor: getSealColor() }}></div>
+            {headerChildren && <div className="memorial-header-tabs">{headerChildren}</div>}
           </div>
 
           {/* 内容区 */}

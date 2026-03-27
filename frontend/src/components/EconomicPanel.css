@@ -1,12 +1,12 @@
 /* frontend/src/components/EconomicPanel.css */
 
 .economic-panel {
-  background: rgba(10, 12, 16, 0.98);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  overflow: hidden;
-  max-width: 800px;
-  margin: 0 auto;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+  max-width: none;
+  margin: 0;
 }
 
 .panel-header {
@@ -22,17 +22,17 @@
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: #F0E6D2;
+  color: #2C2416;
   font-family: 'JetBrains Mono', monospace;
 }
 
 .close-btn {
   width: 32px;
   height: 32px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(139, 90, 43, 0.2);
   border: none;
   border-radius: 6px;
-  color: #F0E6D2;
+  color: #2C2416;
   font-size: 24px;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -56,7 +56,7 @@
 .section h4 {
   margin: 0 0 12px;
   font-size: 14px;
-  color: #000000;
+  color: #2C2416;
   font-family: 'JetBrains Mono', monospace;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -70,8 +70,8 @@
 }
 
 .stock-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(139, 90, 43, 0.08);
+  border: 1px solid rgba(139, 90, 43, 0.2);
   border-radius: 10px;
   padding: 16px;
   text-align: center;
@@ -79,8 +79,8 @@
 }
 
 .stock-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(139, 90, 43, 0.12);
+  border-color: rgba(139, 90, 43, 0.3);
 }
 
 .stock-icon {
@@ -90,7 +90,7 @@
 
 .stock-name {
   font-size: 13px;
-  color: #000000;
+  color: #2C2416;
   margin-bottom: 6px;
   font-family: 'JetBrains Mono', monospace;
 }
@@ -98,7 +98,7 @@
 .stock-value {
   font-size: 18px;
   font-weight: 700;
-  color: #000000;
+  color: #2C2416;
   font-family: 'JetBrains Mono', monospace;
   margin-bottom: 4px;
 }
@@ -127,8 +127,8 @@
 
 .commodity-card,
 .crypto-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(139, 90, 43, 0.08);
+  border: 1px solid rgba(139, 90, 43, 0.2);
   border-radius: 10px;
   padding: 16px;
   text-align: center;
@@ -137,8 +137,8 @@
 
 .commodity-card:hover,
 .crypto-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(139, 90, 43, 0.12);
+  border-color: rgba(139, 90, 43, 0.3);
 }
 
 .commodity-icon,
@@ -150,7 +150,7 @@
 .commodity-name,
 .crypto-name {
   font-size: 13px;
-  color: #000000;
+  color: #2C2416;
   margin-bottom: 6px;
   font-family: 'JetBrains Mono', monospace;
 }
@@ -159,7 +159,7 @@
 .crypto-value {
   font-size: 18px;
   font-weight: 700;
-  color: #000000;
+  color: #2C2416;
   font-family: 'JetBrains Mono', monospace;
   margin-bottom: 4px;
 }

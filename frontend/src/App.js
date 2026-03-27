@@ -12,6 +12,7 @@ import RoleSelector from './components/RoleSelector';
 import WorldChannel from './components/WorldChannel';
 import MemorialModal from './components/MemorialModal';
 import EventStream from './components/EventStream';
+import CountryPanel from './components/CountryPanel';
 import { storage } from './config/api';
 import { world } from './services/api';
 import { t, useTranslation, setLang, translateEvent } from './i18n';
@@ -197,6 +198,7 @@ function App() {
   const [worldState, setWorldState] = useState(null);
   const [events, setEvents] = useState([]);
   const [wars, setWars] = useState([]); // 进行中的战争
+  const [relations, setRelations] = useState([]); // 外交关系数据
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isPlaying, setIsPlaying] = useState(true);
   const [selectedCountry, setSelectedCountry] = useState(null);
@@ -211,7 +213,8 @@ function App() {
   // UI 状态
   const [showEventPanel, setShowEventPanel] = useState(false);
   const [showEconomicPanel, setShowEconomicPanel] = useState(false);
-  const [showFactionPanel, setShowFactionPanel] = useState(false);
+  const [showCountryPanel, setShowCountryPanel] = useState(false);
+  const [countryPanelTab, setCountryPanelTab] = useState('countries'); // 'countries' | 'factions'
   const [showLeaderPanel, setShowLeaderPanel] = useState(false);
   const [showDiplomacyPanel, setShowDiplomacyPanel] = useState(false);
   const [showMilitaryPanel, setShowMilitaryPanel] = useState(false);
@@ -419,24 +422,58 @@ function App() {
 
   // 面板切换辅助函数 - 确保只打开一个面板
   const showPanel = (panelName) => {
+    console.log('showPanel called:', panelName);
     const panels = {
       economic: setShowEconomicPanel,
       diplomacy: setShowDiplomacyPanel,
       military: setShowMilitaryPanel,
       settings: setShowSettingsPanel,
       leaderboard: setShowLeaderboard,
-      faction: setShowFactionPanel,
+      country: setShowCountryPanel,
     };
 
     // 关闭所有面板
     Object.entries(panels).forEach(([name, setter]) => {
       setter(name === panelName);
     });
+    
+    // 打开外交面板时获取关系数据
+    if (panelName === 'diplomacy') {
+      fetchRelations();
+    }
+    
+    console.log('showMilitaryPanel should be:', panelName === 'military');
     setCurrentPage('map');
+  };
+
+  // 获取外交关系数据
+  const fetchRelations = async () => {
+    try {
+      const res = await fetch('/api/world/relations');
+      if (res.ok) {
+        const data = await res.json();
+        setRelations(data.relations || []);
+      }
+    } catch (error) {
+      console.error('获取外交关系数据失败:', error);
+    }
+  };
+
+  // 安全获取当前国家代码（处理 role_id 可能是对象的情况）
+  const getCurrentCountry = () => {
+    if (!player) return 'IRN';
+    const roleId = player.role_id;
+    if (typeof roleId === 'object' && roleId !== null) {
+      return roleId.Valid ? roleId.String : 'IRN';
+    }
+    return roleId || player.country || 'IRN';
   };
 
   // 导航处理
   const handleNavigate = (pageId) => {
+    console.log('=== handleNavigate ===');
+    console.log('pageId:', pageId);
+    console.log('showMilitaryPanel before:', showMilitaryPanel);
     setCurrentPage(pageId);
 
     // 根据页面显示对应面板
@@ -447,10 +484,10 @@ function App() {
         setShowMilitaryPanel(false);
         setShowSettingsPanel(false);
         setShowLeaderboard(false);
-        setShowFactionPanel(false);
+        setShowCountryPanel(false);
         break;
-      case 'faction':
-        showPanel('faction');
+      case 'country':
+        showPanel('country');
         break;
       case 'economy':
         showPanel('economic');
@@ -1131,11 +1168,11 @@ function App() {
                   {/* 第二行：导航按钮 */}
                   <nav className="header-nav">
                     <button
-                      className={`nav-item ${currentPage === 'faction' ? 'active' : ''}`}
-                      onClick={() => handleNavigate('faction')}
+                      className={`nav-item ${currentPage === 'country' ? 'active' : ''}`}
+                      onClick={() => handleNavigate('country')}
                     >
-                      <span className="nav-icon">👥</span>
-                      <span className="nav-label">{lang === 'zh' ? '势力' : 'Faction'}</span>
+                      <span className="nav-icon">🌍</span>
+                      <span className="nav-label">{lang === 'zh' ? '国家' : 'Countries'}</span>
                     </button>
                     <button
                       className={`nav-item ${currentPage === 'economy' ? 'active' : ''}`}
@@ -1361,67 +1398,40 @@ function App() {
                 type="外交"
                 width="min(700px, 90vw)"
               >
-                <DiplomacyPanel onClose={() => setShowDiplomacyPanel(false)} />
+                <DiplomacyPanel 
+                  relations={relations} 
+                  currentCountry={getCurrentCountry()}
+                  onClose={() => setShowDiplomacyPanel(false)} 
+                />
               </MemorialModal>
             )}
 
-            {/* ========== 二级页面：势力详情 ========== */}
-            {showFactionPanel && (
+            {/* ========== 国家面板 ========== */}
+            {showCountryPanel && (
               <MemorialModal
-                isOpen={showFactionPanel}
-                onClose={() => setShowFactionPanel(false)}
-                title={lang === 'zh' ? '⚔️ 势力对比' : '⚔️ Faction Comparison'}
-                type={lang === 'zh' ? '策略' : 'Strategy'}
+                isOpen={showCountryPanel}
+                onClose={() => setShowCountryPanel(false)}
+                title={lang === 'zh' ? '🌍 国家总览' : '🌍 Countries'}
+                type={lang === 'zh' ? '国家' : 'Country'}
+                width="min(1100px, 95vw)"
+                headerChildren={
+                  <div className="country-panel-header-tabs">
+                    <button
+                      className={`country-header-tab ${countryPanelTab === 'countries' ? 'active' : ''}`}
+                      onClick={() => setCountryPanelTab('countries')}
+                    >
+                      🌍 {lang === 'zh' ? '国家列表' : 'Countries'}
+                    </button>
+                    <button
+                      className={`country-header-tab ${countryPanelTab === 'factions' ? 'active' : ''}`}
+                      onClick={() => setCountryPanelTab('factions')}
+                    >
+                      ⚔️ {lang === 'zh' ? '势力对比' : 'Factions'}
+                    </button>
+                  </div>
+                }
               >
-                <div className="factions-grid">
-                  {FACTIONS.map(faction => {
-                    const factionNameEn = {
-                      '抵抗轴心': 'Resistance Axis',
-                      '美以联盟': 'US-Israel Alliance',
-                      '温和联盟': 'Moderate Alliance',
-                      '亲穆兄会': 'Muslim Brotherhood',
-                    }[faction.name];
-                    const descEn = {
-                      '抵抗轴心': 'Regional resistance alliance led by Iran',
-                      '美以联盟': 'Strategic alliance between US and Israel',
-                      '温和联盟': 'Moderate Arab states alliance in Gulf region',
-                      '亲穆兄会': 'Political forces supporting Muslim Brotherhood',
-                    }[faction.name];
-                    const countriesEn = {
-                      '抵抗轴心': ['Iran', 'Iraq', 'Syria', 'Lebanon', 'Palestine'],
-                      '美以联盟': ['USA', 'Israel', 'Jordan'],
-                      '温和联盟': ['Saudi Arabia', 'Egypt', 'UAE', 'Kuwait', 'Qatar', 'Bahrain', 'Oman', 'Yemen'],
-                      '亲穆兄会': ['Turkey', 'Qatar'],
-                    }[faction.name];
-
-                    return (
-                      <div
-                        key={faction.id}
-                        className="faction-card"
-                        style={{ borderLeftColor: faction.color }}
-                        onClick={() => setSelectedFaction(faction)}
-                      >
-                        <div className="faction-card-header">
-                          <h3 style={{ color: faction.color }}>{lang === 'zh' ? faction.name : factionNameEn}</h3>
-                          <div className="faction-strength">
-                            <div className="strength-bar">
-                              <div
-                                className="strength-fill"
-                                style={{ width: `${faction.strength}%`, background: faction.color }}
-                              ></div>
-                            </div>
-                            <span className="strength-value">{faction.strength}</span>
-                          </div>
-                        </div>
-                        <p className="faction-description">{lang === 'zh' ? faction.description : descEn}</p>
-                        <div className="faction-countries">
-                          <span className="countries-label">{lang === 'zh' ? '控制国家:' : 'Countries:'}</span>
-                          <div className="countries-list">{(lang === 'zh' ? faction.countries : countriesEn).join(' · ')}</div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                <CountryPanel activeTab={countryPanelTab} onClose={() => setShowCountryPanel(false)} />
               </MemorialModal>
             )}
 
@@ -1469,22 +1479,10 @@ function App() {
               </MemorialModal>
             )}
 
-            {/* ========== 外交面板 ========== */}
-            {showDiplomacyPanel && (
-              <MemorialModal
-                isOpen={showDiplomacyPanel}
-                onClose={() => setShowDiplomacyPanel(false)}
-                title={t('diplomacy.title')}
-                type="外交"
-                width="min(700px, 90vw)"
-              >
-                <DiplomacyPanel onClose={() => setShowDiplomacyPanel(false)} />
-              </MemorialModal>
-            )}
-
             {/* ========== 军事面板 ========== */}
             {showMilitaryPanel && (
               <MemorialModal
+                isOpen={showMilitaryPanel}
                 onClose={() => setShowMilitaryPanel(false)}
                 title={t('military.title')}
                 type="军事"

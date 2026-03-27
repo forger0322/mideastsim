@@ -175,21 +175,21 @@
 }
 
 .message-list::-webkit-scrollbar {
-  width: 8px;
+  width: 8px !important;
 }
 
 .message-list::-webkit-scrollbar-track {
-  background: rgba(139, 90, 43, 0.1);
+  background: rgba(139, 90, 43, 0.15) !important;
   border-radius: 4px;
 }
 
 .message-list::-webkit-scrollbar-thumb {
-  background: #8b5a2b;
+  background: rgba(212, 175, 55, 0.6) !important;
   border-radius: 4px;
 }
 
 .message-list::-webkit-scrollbar-thumb:hover {
-  background: #d4af37;
+  background: rgba(212, 175, 55, 0.8) !important;
 }
 
 .empty-message {
