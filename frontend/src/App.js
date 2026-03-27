@@ -1057,7 +1057,7 @@ function App() {
 
             {/* 资源条 - 可点击打开经济面板 */}
             {worldState && worldState.economic && (
-              <div className="resource-bar clickable" onClick={() => setShowEconomicPanel(true)}>
+              <div className="resource-bar clickable" onClick={(e) => { e.stopPropagation(); setShowEconomicPanel(true); }}>
                 <div className="resource-item">
                   <span className="resource-label">{t('resources.oil')}</span>
                   <span className="resource-value">

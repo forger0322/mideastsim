@@ -485,18 +485,18 @@ func getWorldState() map[string]interface{} {
 		"wars":      wars,
 		"economy": map[string]interface{}{
 			"stocks": map[string]interface{}{
-				"spx":  economicData["spx"],
-				"hsi":  economicData["hsi"],
-				"ftse": economicData["ftse"],
+				"spx":  map[string]interface{}{"value": economicData["spx"], "change": economicChanges["spx"]},
+				"hsi":  map[string]interface{}{"value": economicData["hsi"], "change": economicChanges["hsi"]},
+				"ftse": map[string]interface{}{"value": economicData["ftse"], "change": economicChanges["ftse"]},
 			},
 			"crypto": map[string]interface{}{
-				"btc": economicData["btc"],
-				"eth": economicData["eth"],
+				"btc": map[string]interface{}{"value": economicData["btc"], "change": economicChanges["btc"]},
+				"eth": map[string]interface{}{"value": economicData["eth"], "change": economicChanges["eth"]},
 			},
 			"commodities": map[string]interface{}{
-				"oil":    economicData["oil"],
-				"gold":   economicData["gold"],
-				"silver": economicData["silver"],
+				"oil":    map[string]interface{}{"value": economicData["oil"], "change": economicChanges["oil"]},
+				"gold":   map[string]interface{}{"value": economicData["gold"], "change": economicChanges["gold"]},
+				"silver": map[string]interface{}{"value": economicData["silver"], "change": economicChanges["silver"]},
 			},
 		},
 	}
@@ -1293,6 +1293,18 @@ var economicBaseline = map[string]float64{
 	"silver": 86.84,  // 白银 $/盎司
 }
 
+// 经济数据变化百分比
+var economicChanges = map[string]float64{
+	"spx":  0,
+	"hsi":  0,
+	"ftse": 0,
+	"btc":  0,
+	"eth":  0,
+	"oil":  0,
+	"gold": 0,
+	"silver": 0,
+}
+
 // 经济数据锁（并发安全）
 var economicMutex sync.RWMutex
 
@@ -1305,6 +1317,7 @@ func updateEconomicData(analysis *PMAnalyzeResponse) {
 	if analysis.OilPriceChange != nil {
 		oldPrice := economicBaseline["oil"]
 		economicBaseline["oil"] = analysis.OilPriceChange.NewPrice
+		economicChanges["oil"] = analysis.OilPriceChange.PercentChange
 		log.Printf("[经济] 原油价格更新：$%.2f → $%.2f (%.2f%%)",
 			oldPrice, economicBaseline["oil"], analysis.OilPriceChange.PercentChange)
 	}
@@ -1312,6 +1325,7 @@ func updateEconomicData(analysis *PMAnalyzeResponse) {
 	if analysis.GoldPriceChange != nil {
 		oldPrice := economicBaseline["gold"]
 		economicBaseline["gold"] = analysis.GoldPriceChange.NewPrice
+		economicChanges["gold"] = analysis.GoldPriceChange.PercentChange
 		log.Printf("[经济] 黄金价格更新：$%.2f → $%.2f (%.2f%%)",
 			oldPrice, economicBaseline["gold"], analysis.GoldPriceChange.PercentChange)
 	}
@@ -1319,6 +1333,7 @@ func updateEconomicData(analysis *PMAnalyzeResponse) {
 	if analysis.SilverPriceChange != nil {
 		oldPrice := economicBaseline["silver"]
 		economicBaseline["silver"] = analysis.SilverPriceChange.NewPrice
+		economicChanges["silver"] = analysis.SilverPriceChange.PercentChange
 		log.Printf("[经济] 白银价格更新：$%.2f → $%.2f (%.2f%%)",
 			oldPrice, economicBaseline["silver"], analysis.SilverPriceChange.PercentChange)
 	}
@@ -1326,6 +1341,7 @@ func updateEconomicData(analysis *PMAnalyzeResponse) {
 	if analysis.BTCPriceChange != nil {
 		oldPrice := economicBaseline["btc"]
 		economicBaseline["btc"] = analysis.BTCPriceChange.NewPrice
+		economicChanges["btc"] = analysis.BTCPriceChange.PercentChange
 		log.Printf("[经济] BTC 价格更新：$%.2f → $%.2f (%.2f%%)",
 			oldPrice, economicBaseline["btc"], analysis.BTCPriceChange.PercentChange)
 	}
@@ -1333,6 +1349,7 @@ func updateEconomicData(analysis *PMAnalyzeResponse) {
 	if analysis.ETHPriceChange != nil {
 		oldPrice := economicBaseline["eth"]
 		economicBaseline["eth"] = analysis.ETHPriceChange.NewPrice
+		economicChanges["eth"] = analysis.ETHPriceChange.PercentChange
 		log.Printf("[经济] ETH 价格更新：$%.2f → $%.2f (%.2f%%)",
 			oldPrice, economicBaseline["eth"], analysis.ETHPriceChange.PercentChange)
 	}
@@ -1340,6 +1357,7 @@ func updateEconomicData(analysis *PMAnalyzeResponse) {
 	if analysis.SPXPriceChange != nil {
 		oldValue := economicBaseline["spx"]
 		economicBaseline["spx"] = analysis.SPXPriceChange.NewPrice
+		economicChanges["spx"] = analysis.SPXPriceChange.PercentChange
 		log.Printf("[经济] 标普 500 更新：%.2f → %.2f (%.2f%%)",
 			oldValue, economicBaseline["spx"], analysis.SPXPriceChange.PercentChange)
 	}
@@ -1347,6 +1365,7 @@ func updateEconomicData(analysis *PMAnalyzeResponse) {
 	if analysis.HSIPriceChange != nil {
 		oldValue := economicBaseline["hsi"]
 		economicBaseline["hsi"] = analysis.HSIPriceChange.NewPrice
+		economicChanges["hsi"] = analysis.HSIPriceChange.PercentChange
 		log.Printf("[经济] 恒生指数更新：%.2f → %.2f (%.2f%%)",
 			oldValue, economicBaseline["hsi"], analysis.HSIPriceChange.PercentChange)
 	}

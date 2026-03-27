@@ -35,28 +35,46 @@ const EconomicPanel = ({ worldState, onClose }) => {
     silver: 86.84,
   };
 
+  // 辅助函数：获取经济数据值（支持新旧格式）
+  const getEconValue = (data, baselineKey) => {
+    if (!data) return baseline[baselineKey];
+    if (typeof data === 'object' && data.value !== undefined) {
+      return data.value;
+    }
+    return data;
+  };
+
+  const getEconChange = (data, baselineKey) => {
+    if (!data) return 0;
+    if (typeof data === 'object' && data.change !== undefined) {
+      return data.change;
+    }
+    // 旧格式：计算百分比
+    return ((data - baseline[baselineKey]) / baseline[baselineKey] * 100).toFixed(2);
+  };
+
   // 构建动态数据
   const stocks = economy ? [
     { 
       nameKey: 'economy.spx', 
       key: 'SPX', 
       icon: '🇺🇸', 
-      value: economy.stocks?.spx || baseline.spx,
-      change: economy.stocks?.spx ? ((economy.stocks.spx - baseline.spx) / baseline.spx * 100).toFixed(2) : -1.5
+      value: getEconValue(economy.stocks?.spx, 'spx'),
+      change: getEconChange(economy.stocks?.spx, 'spx')
     },
     { 
       nameKey: 'economy.hsi', 
       key: 'HSI', 
       icon: '🇭🇰', 
-      value: economy.stocks?.hsi || baseline.hsi,
-      change: economy.stocks?.hsi ? ((economy.stocks.hsi - baseline.hsi) / baseline.hsi * 100).toFixed(2) : -0.70
+      value: getEconValue(economy.stocks?.hsi, 'hsi'),
+      change: getEconChange(economy.stocks?.hsi, 'hsi')
     },
     { 
       nameKey: 'economy.ftse', 
       key: 'FTSE', 
       icon: '🇬🇧', 
-      value: economy.stocks?.ftse || baseline.ftse,
-      change: economy.stocks?.ftse ? ((economy.stocks.ftse - baseline.ftse) / baseline.ftse * 100).toFixed(2) : 0.45
+      value: getEconValue(economy.stocks?.ftse, 'ftse'),
+      change: getEconChange(economy.stocks?.ftse, 'ftse')
     },
   ] : [];
 
@@ -65,15 +83,15 @@ const EconomicPanel = ({ worldState, onClose }) => {
       nameKey: 'economy.btc', 
       key: 'BTC', 
       icon: '₿', 
-      value: economy.crypto?.btc || baseline.btc,
-      change: economy.crypto?.btc ? ((economy.crypto.btc - baseline.btc) / baseline.btc * 100).toFixed(2) : 0.58
+      value: getEconValue(economy.crypto?.btc, 'btc'),
+      change: getEconChange(economy.crypto?.btc, 'btc')
     },
     { 
       nameKey: 'economy.eth', 
       key: 'ETH', 
       icon: '♦', 
-      value: economy.crypto?.eth || baseline.eth,
-      change: economy.crypto?.eth ? ((economy.crypto.eth - baseline.eth) / baseline.eth * 100).toFixed(2) : 1.81
+      value: getEconValue(economy.crypto?.eth, 'eth'),
+      change: getEconChange(economy.crypto?.eth, 'eth')
     },
   ] : [];
 
@@ -82,22 +100,22 @@ const EconomicPanel = ({ worldState, onClose }) => {
       nameKey: 'economy.oil', 
       key: 'Oil', 
       icon: '🛢️', 
-      value: economy.commodities?.oil || baseline.oil,
-      change: economy.commodities?.oil ? ((economy.commodities.oil - baseline.oil) / baseline.oil * 100).toFixed(2) : 3.2
+      value: getEconValue(economy.commodities?.oil, 'oil'),
+      change: getEconChange(economy.commodities?.oil, 'oil')
     },
     { 
       nameKey: 'economy.gold', 
       key: 'Gold', 
       icon: '🥇', 
-      value: economy.commodities?.gold || baseline.gold,
-      change: economy.commodities?.gold ? ((economy.commodities.gold - baseline.gold) / baseline.gold * 100).toFixed(2) : 1.8
+      value: getEconValue(economy.commodities?.gold, 'gold'),
+      change: getEconChange(economy.commodities?.gold, 'gold')
     },
     { 
       nameKey: 'economy.silver', 
       key: 'Silver', 
       icon: '🥈', 
-      value: economy.commodities?.silver || baseline.silver,
-      change: economy.commodities?.silver ? ((economy.commodities.silver - baseline.silver) / baseline.silver * 100).toFixed(2) : 1.28
+      value: getEconValue(economy.commodities?.silver, 'silver'),
+      change: getEconChange(economy.commodities?.silver, 'silver')
     },
   ] : [];
 
