@@ -233,8 +233,18 @@ function App() {
             // 获取对应国家领导人头像
             const leader = COUNTRY_LEADER_MAP[countryId] || COUNTRY_LEADER_MAP['IRN'];
             
+            // 国家旗帜映射
+            const FLAG_MAP = {
+              'IRN': '🇮🇷', 'IRQ': '🇮🇶', 'SYR': '🇸🇾', 'ISR': '🇮🇱', 'USA': '🇺🇸',
+              'SAU': '🇸🇦', 'EGY': '🇪🇬', 'TUR': '🇹🇷', 'JOR': '🇯🇴', 'LBN': '🇱🇧',
+              'PSE': '🇵🇸', 'YEM': '🇾🇪', 'OMN': '🇴🇲', 'KWT': '🇰🇼', 'QAT': '🇶🇦',
+              'ARE': '🇦🇪', 'BHR': '🇧🇭', 'AFG': '🇦🇫', 'ARM': '🇦🇲', 'AZE': '🇦🇿',
+              'GEO': '🇬🇪', 'RUS': '🇷🇺'
+            };
+            
             setUserCountryPower({
               name: userRole.name,
+              flag: FLAG_MAP[countryId] || '🏳️',
               leaderImage: leader?.image || 'https://ui-avatars.com/api/?name=Leader&size=220&background=8B1A1A&color=fff',
               leaderName: lang === 'zh' ? leader?.name : leader?.nameEn || 'Unknown',
               totalPower,
@@ -897,43 +907,69 @@ function App() {
                   <div className="country-stats">
                     {/* 第一排：8 项属性 */}
                     <div className="stats-row stats-row-1">
-                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.army.zh : POWER_ATTR_DESCRIPTIONS.army.en}>
+                      <div 
+                        className="stat-mini" 
+                        data-tooltip={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.army.zh : POWER_ATTR_DESCRIPTIONS.army.en}
+                      >
                         <span className="stat-mini-icon">🪖</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.army || 0}</span>
                       </div>
-                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.navy.zh : POWER_ATTR_DESCRIPTIONS.navy.en}>
+                      <div 
+                        className="stat-mini"
+                        data-tooltip={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.navy.zh : POWER_ATTR_DESCRIPTIONS.navy.en}
+                      >
                         <span className="stat-mini-icon">⚓</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.navy || 0}</span>
                       </div>
-                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.airForce.zh : POWER_ATTR_DESCRIPTIONS.airForce.en}>
+                      <div 
+                        className="stat-mini"
+                        data-tooltip={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.airForce.zh : POWER_ATTR_DESCRIPTIONS.airForce.en}
+                      >
                         <span className="stat-mini-icon">✈️</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.airForce || 0}</span>
                       </div>
-                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.nuclear.zh : POWER_ATTR_DESCRIPTIONS.nuclear.en}>
+                      <div 
+                        className="stat-mini"
+                        data-tooltip={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.nuclear.zh : POWER_ATTR_DESCRIPTIONS.nuclear.en}
+                      >
                         <span className="stat-mini-icon">☢️</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.nuclear || 0}</span>
                       </div>
-                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.economy.zh : POWER_ATTR_DESCRIPTIONS.economy.en}>
+                      <div 
+                        className="stat-mini"
+                        data-tooltip={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.economy.zh : POWER_ATTR_DESCRIPTIONS.economy.en}
+                      >
                         <span className="stat-mini-icon">💰</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.economy || 0}</span>
                       </div>
-                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.stability.zh : POWER_ATTR_DESCRIPTIONS.stability.en}>
+                      <div 
+                        className="stat-mini"
+                        data-tooltip={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.stability.zh : POWER_ATTR_DESCRIPTIONS.stability.en}
+                      >
                         <span className="stat-mini-icon">🏛️</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.stability || 0}</span>
                       </div>
-                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.diplomacy.zh : POWER_ATTR_DESCRIPTIONS.diplomacy.en}>
+                      <div 
+                        className="stat-mini"
+                        data-tooltip={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.diplomacy.zh : POWER_ATTR_DESCRIPTIONS.diplomacy.en}
+                      >
                         <span className="stat-mini-icon">🤝</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.diplomacy || 0}</span>
                       </div>
-                      <div className="stat-mini" title={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.intel.zh : POWER_ATTR_DESCRIPTIONS.intel.en}>
+                      <div 
+                        className="stat-mini"
+                        data-tooltip={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.intel.zh : POWER_ATTR_DESCRIPTIONS.intel.en}
+                      >
                         <span className="stat-mini-icon">👁️</span>
                         <span className="stat-mini-value">{userCountryPower.attributes.intel || 0}</span>
                       </div>
                     </div>
                     
-                    {/* 第二排：国家名称、国力总分、势力徽章 */}
+                    {/* 第二排：国家旗帜 + 国家名称 | 💪 国力总分 | 势力徽章 */}
                     <div className="stats-row stats-row-2">
+                      <span className="country-flag">{userCountryPower.flag}</span>
                       <span className="country-name">{userCountryPower.name}</span>
+                      <span className="power-divider">|</span>
                       <span className="power-value">💪 {userCountryPower.totalPower.toLocaleString()}</span>
                       <span className="faction-badge-small" style={{ 
                         background: userCountryPower.faction === '抵抗轴心' ? '#8B1A1A' : 
