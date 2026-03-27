@@ -104,30 +104,30 @@ const Tooltip = ({ text, children }) => {
   const [show, setShow] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const ref = useRef(null);
-  
+
   const handleMouseEnter = () => {
     if (ref.current) {
       const rect = ref.current.getBoundingClientRect();
       const tooltipHeight = 40; // 估算 tooltip 高度
       const screenPadding = 10; // 屏幕边缘留白
-      
+
       // 计算位置：显示在元素上方
       let top = rect.top - tooltipHeight - 8;
       let left = rect.left + rect.width / 2;
-      
+
       // 边界检测：防止超出屏幕
       if (top < screenPadding) {
         // 如果上方空间不够，显示在下方
         top = rect.bottom + 8;
       }
-      
+
       setPosition({ top, left });
     }
     setShow(true);
   };
-  
+
   return (
-    <div 
+    <div
       ref={ref}
       className="stat-mini-with-tooltip"
       onMouseEnter={handleMouseEnter}
@@ -135,8 +135,8 @@ const Tooltip = ({ text, children }) => {
     >
       {children}
       {show && text && (
-        <div className="custom-tooltip" style={{ 
-          top: position.top, 
+        <div className="custom-tooltip" style={{
+          top: position.top,
           left: position.left,
           transform: 'translateX(-50%) translateY(-4px)'
         }}>
@@ -149,34 +149,34 @@ const Tooltip = ({ text, children }) => {
 
 // 势力数据
 const FACTIONS = [
-  { 
-    id: 'resistance', 
-    name: '抵抗轴心', 
-    color: '#8B1A1A', 
+  {
+    id: 'resistance',
+    name: '抵抗轴心',
+    color: '#8B1A1A',
     countries: ['伊朗', '伊拉克', '叙利亚', '黎巴嫩', '巴勒斯坦'],
     strength: 85,
     description: '以伊朗为核心的地区抵抗力量联盟'
   },
-  { 
-    id: 'us-israel', 
-    name: '美以联盟', 
-    color: '#1E4F8A', 
+  {
+    id: 'us-israel',
+    name: '美以联盟',
+    color: '#1E4F8A',
     countries: ['美国', '以色列', '约旦'],
     strength: 92,
     description: '美国与以色列的战略合作联盟'
   },
-  { 
-    id: 'moderate', 
-    name: '温和联盟', 
-    color: '#B8860B', 
+  {
+    id: 'moderate',
+    name: '温和联盟',
+    color: '#B8860B',
     countries: ['沙特', '埃及', '阿联酋', '科威特', '卡塔尔', '巴林', '阿曼', '也门'],
     strength: 78,
     description: '海湾阿拉伯国家组成的温和派联盟'
   },
-  { 
-    id: 'brotherhood', 
-    name: '亲穆兄会', 
-    color: '#2D5A27', 
+  {
+    id: 'brotherhood',
+    name: '亲穆兄会',
+    color: '#2D5A27',
     countries: ['土耳其', '卡塔尔'],
     strength: 72,
     description: '支持穆斯林兄弟会的政治力量'
@@ -185,14 +185,14 @@ const FACTIONS = [
 
 function App() {
   const { t, lang } = useTranslation();
-  
+
   // 认证状态
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [player, setPlayer] = useState(null);
   const [currentRole, setCurrentRole] = useState(null);
   const [showAuth, setShowAuth] = useState(true);
   const [showRoleSelector, setShowRoleSelector] = useState(false);
-  
+
   // 游戏状态
   const [worldState, setWorldState] = useState(null);
   const [events, setEvents] = useState([]);
@@ -201,13 +201,13 @@ function App() {
   const [isPlaying, setIsPlaying] = useState(true);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [currentTimelineDate, setCurrentTimelineDate] = useState('today'); // 内部使用英文 key
-  
+
   // 导航状态
   const [currentPage, setCurrentPage] = useState('map');
-  
+
   // 用户国家实力数据
   const [userCountryPower, setUserCountryPower] = useState(null);
-  
+
   // UI 状态
   const [showEventPanel, setShowEventPanel] = useState(false);
   const [showEconomicPanel, setShowEconomicPanel] = useState(false);
@@ -220,10 +220,10 @@ function App() {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [selectedLeader, setSelectedLeader] = useState(null);
   const [selectedFaction, setSelectedFaction] = useState(null);
-  
+
   // 性能优化：直接状态更新（useTransition 增加开销）
   // const [isPending, startTransition] = useTransition();
-  
+
   // 决策弹窗状态（全局）
   const [decisionModal, setDecisionModal] = useState({
     show: false,
@@ -233,14 +233,14 @@ function App() {
     params: null,
     rejected: false
   });
-  
+
   // 当前国家（用于行动）- 从 currentRole 同步
   const [currentNation, setCurrentNation] = useState({
     id: 'IRN',
     name: '伊朗',
     flag: '🇮🇷',
   });
-  
+
   // 当 currentRole 变化时，更新 currentNation
   useEffect(() => {
     if (currentRole && currentRole.role_id) {
@@ -259,36 +259,36 @@ function App() {
       try {
         // 调试：显示 currentRole 的完整结构
         console.log('[HeaderCenter] currentRole 完整结构:', JSON.stringify(currentRole, null, 2));
-        
+
         // 确定要查询的国家 ID（游客默认为伊朗 IRN）
         // 兼容多种字段名：role_id, roleId, id
         const countryId = currentRole?.role_id?.String || currentRole?.role_id || currentRole?.roleId || currentRole?.id || 'IRN';
-        
+
         // 调试日志：显示当前角色
         console.log('[HeaderCenter] 解析后的 countryId:', countryId);
         console.log('[HeaderCenter] 是否游客模式:', !currentRole);
-        
+
         const response = await fetch(`/api/roles`);
         if (response.ok) {
           const data = await response.json();
           const roles = data.roles || data;
           const userRole = roles.find(r => r.id === countryId);
-          
+
           if (userRole) {
             const attrs = userRole.attributes || {};
             // 注意：API 返回的属性名可能是 air_force 而不是 airForce
-            const totalPower = (attrs.army || 0) + 
-                              (attrs.navy || 0) + 
-                              (attrs.air_force || attrs.airForce || 0) + 
-                              (attrs.nuclear || 0) + 
-                              (attrs.economy || 0) + 
-                              (attrs.stability || 0) + 
-                              (attrs.diplomacy || 0) + 
-                              (attrs.intel || 0);
-            
+            const totalPower = (attrs.army || 0) +
+              (attrs.navy || 0) +
+              (attrs.air_force || attrs.airForce || 0) +
+              (attrs.nuclear || 0) +
+              (attrs.economy || 0) +
+              (attrs.stability || 0) +
+              (attrs.diplomacy || 0) +
+              (attrs.intel || 0);
+
             // 获取对应国家领导人头像
             const leader = COUNTRY_LEADER_MAP[countryId] || COUNTRY_LEADER_MAP['IRN'];
-            
+
             // 国家旗帜映射
             const FLAG_MAP = {
               'IRN': '🇮🇷', 'IRQ': '🇮🇶', 'SYR': '🇸🇾', 'ISR': '🇮🇱', 'USA': '🇺🇸',
@@ -297,7 +297,7 @@ function App() {
               'ARE': '🇦🇪', 'BHR': '🇧🇭', 'AFG': '🇦🇫', 'ARM': '🇦🇲', 'AZE': '🇦🇿',
               'GEO': '🇬🇪', 'RUS': '🇷🇺'
             };
-            
+
             setUserCountryPower({
               name: userRole.name,
               flag: FLAG_MAP[countryId] || '🏳️',
@@ -324,16 +324,16 @@ function App() {
     };
 
     fetchUserCountryPower();
-    
+
     // 每 60 秒刷新一次
     const pollInterval = setInterval(fetchUserCountryPower, 60000);
     return () => clearInterval(pollInterval);
   }, [currentRole, lang]);
-  
+
   // 地图引用
   const mapResetRef = useRef(null);
   const mapLeaderSelectRef = useRef(null);
-  
+
   // 决策弹窗处理函数
   const handleShowDecision = useCallback((modalData) => {
     setDecisionModal({
@@ -341,20 +341,20 @@ function App() {
       ...modalData
     });
   }, []);
-  
+
   const handleCloseDecision = useCallback(() => {
     setDecisionModal(prev => ({ ...prev, show: false }));
   }, []);
-  
+
   const handleConfirmDecision = useCallback(async () => {
     const { action, target, params } = decisionModal;
-    
+
     setDecisionModal(prev => ({ ...prev, show: false, loading: true }));
-    
+
     try {
       const apiActions = await import('./services/api');
       const result = await apiActions.actions.execute(action.id, target, params);
-      
+
       if (result.success) {
         // 触发行完成回调
         window.dispatchEvent(new CustomEvent('actionComplete', { detail: result }));
@@ -371,10 +371,10 @@ function App() {
     setPlayer(authData.player);
     setIsAuthenticated(true);
     setShowAuth(false);
-    
+
     console.log('🔐 认证成功:', authData);
     console.log('📋 player.role_id:', authData.player?.role_id);
-    
+
     // 已有角色的玩家直接进入地图，没有角色的才显示选择器
     if (authData.token) {
       // 处理后端返回的 SQL NullString 格式：{"String":"ARE","Valid":true}
@@ -384,7 +384,7 @@ function App() {
         // 如果是 SQL NullString 格式（后端返回）
         (authData.player.role_id && authData.player.role_id.Valid === true)
       );
-      
+
       if (hasRole) {
         // 已有角色，直接进入地图
         console.log('✅ 玩家已绑定国家，直接进入游戏');
@@ -402,7 +402,7 @@ function App() {
   const handleRoleSelect = useCallback((role) => {
     setCurrentRole(role);
     setShowRoleSelector(false);
-    
+
     if (role) {
       storage.setRole(role);
     }
@@ -421,9 +421,9 @@ function App() {
   const handleNavigate = (pageId) => {
     console.log('=== handleNavigate ===', { pageId, before: { showEconomicPanel, showFactionPanel } });
     setCurrentPage(pageId);
-    
+
     // 根据页面显示对应面板
-    switch(pageId) {
+    switch (pageId) {
       case 'map':
         console.log('Showing: map (all panels false)');
         setShowEconomicPanel(false);
@@ -506,12 +506,12 @@ function App() {
     const checkAuth = () => {
       const storedPlayer = storage.getPlayer();
       const storedRole = storage.getRole();
-      
+
       if (storedPlayer) {
         setPlayer(storedPlayer);
         setIsAuthenticated(true);
         setShowAuth(false);
-        
+
         if (storedRole) {
           setCurrentRole(storedRole);
           setShowRoleSelector(false);
@@ -520,7 +520,7 @@ function App() {
         }
       }
     };
-    
+
     checkAuth();
   }, []);
 
@@ -543,10 +543,10 @@ function App() {
         <span class="toast-message">${event.detail.message || '行动执行成功！'}</span>
       `;
       document.body.appendChild(toast);
-      
+
       // 动画显示
       setTimeout(() => toast.classList.add('show'), 10);
-      
+
       // 3 秒后移除
       setTimeout(() => {
         toast.classList.remove('show');
@@ -564,10 +564,10 @@ function App() {
         <span class="toast-message">${event.detail.message || '行动执行失败！'}</span>
       `;
       document.body.appendChild(toast);
-      
+
       // 动画显示
       setTimeout(() => toast.classList.add('show'), 10);
-      
+
       // 3 秒后移除
       setTimeout(() => {
         toast.classList.remove('show');
@@ -593,7 +593,7 @@ function App() {
           throw new Error(`Failed to fetch world state: ${worldResponse.status}`);
         }
         const worldData = await worldResponse.json();
-        
+
         // 使用后端返回的真实经济数据
         const mergedData = {
           ...worldData,
@@ -638,10 +638,10 @@ function App() {
             domestic: {}
           }
         };
-        
+
         setWorldState(mergedData);
         setEvents(worldData.events || []);
-        
+
         // 获取战争状态
         try {
           const warsRes = await fetch('/api/world/wars');
@@ -681,7 +681,7 @@ function App() {
     };
 
     fetchData();
-    
+
     // 每 30 秒轮询更新
     const pollInterval = setInterval(() => {
       fetchData();
@@ -696,13 +696,13 @@ function App() {
   // PM Agent 分析事件影响
   const analyzeEventWithPM = async (event, auto = false) => {
     console.log('🤖 PM Agent 分析事件:', event.id, auto ? '(自动)' : '(手动)');
-    
+
     // 如果已经有分析，跳过
     if (event.pm_analysis) {
       console.log('✅ 已有分析，跳过');
       return;
     }
-    
+
     try {
       const token = localStorage.getItem('auth_token');
       const response = await fetch('/api/agent/pm/analyze', {
@@ -719,13 +719,13 @@ function App() {
           description: event.description
         })
       });
-      
+
       if (response.ok) {
         const analysis = await response.json();
         console.log('✅ PM Agent 分析结果:', analysis);
-        
-        setEvents(prevEvents => 
-          prevEvents.map(e => 
+
+        setEvents(prevEvents =>
+          prevEvents.map(e =>
             e.id === event.id ? { ...e, pm_analysis: analysis } : e
           )
         );
@@ -740,12 +740,12 @@ function App() {
   // 批量分析事件（打开事件面板时自动调用）
   const batchAnalyzeEvents = async (eventsToAnalyze) => {
     console.log('🤖 PM Agent 批量分析:', eventsToAnalyze.length, '个事件');
-    
+
     // 只分析前 5 个未分析的重要事件
     const eventsToProcess = eventsToAnalyze
       .filter(e => !e.pm_analysis)
       .slice(0, 5);
-    
+
     for (const event of eventsToProcess) {
       await analyzeEventWithPM(event, true);
       // 避免请求过快
@@ -765,7 +765,7 @@ function App() {
   const getCountryFaction = (countryName) => {
     const mapping = {
       '伊朗': '抵抗轴心',
-      '伊拉克': '抵抗轴心', 
+      '伊拉克': '抵抗轴心',
       '叙利亚': '抵抗轴心',
       '以色列': '美以联盟',
       '约旦': '美以联盟',
@@ -821,7 +821,7 @@ function App() {
   const handleTrackLeader = useCallback((leaderId) => {
     const appLeader = LEADERS.find(l => l.id === leaderId);
     console.log('🎯 追踪领导人:', appLeader);
-    
+
     if (appLeader) {
       if (mapLeaderSelectRef.current) {
         mapLeaderSelectRef.current(appLeader);
@@ -887,7 +887,7 @@ function App() {
     const diffMs = now - eventDate;
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
-    
+
     if (diffMins < 60) {
       return `${diffMins}分钟前`;
     } else if (diffHours < 24) {
@@ -952,786 +952,700 @@ function App() {
         {/* ========== 主游戏界面（仅当已认证且完成角色选择后显示） ========== */}
         {!showAuth && !showRoleSelector && (
           <>
-        {/* ========== 整合顶部栏：导航 + 状态 + 用户信息 ========== */}
-        <header className="app-header">
-          {/* 左侧：Logo 区域 */}
-          <div className="header-left">
-            <div className="logo-area">
-              <div className="logo">MIDEASTSIM</div>
-              <div className="game-subtitle">GEOPOLITICAL SIMULATION</div>
-            </div>
-          </div>
+            {/* ========== 整合顶部栏：导航 + 状态 + 用户信息 ========== */}
+            <header className="app-header">
+              {/* 左侧：Logo 区域 */}
+              <div className="header-left">
+                <div className="logo-area">
+                  <div className="logo">MIDEASTSIM</div>
+                  <div className="game-subtitle">GEOPOLITICAL SIMULATION</div>
+                </div>
+              </div>
 
-          {/* 中央：国家实力 + 经济数据 */}
-          <div className="header-center">
-            {/* 用户绑定国家实力 */}
-            <div className="country-power-display">
-              {userCountryPower ? (
-                <>
-                  {/* 左侧：国家领导人头像（跨两排） */}
-                  <div className="country-flag-wrapper">
-                    <img 
-                      src={userCountryPower.leaderImage} 
-                      alt={userCountryPower.leaderName}
-                      className="leader-image"
-                      title={userCountryPower.leaderName}
-                      onError={(e) => {
-                        console.error('图片加载失败:', e.target.src);
-                        e.target.src = 'https://ui-avatars.com/api/?name=Leader&size=220&background=8B1A1A&color=fff';
-                      }}
-                    />
-                  </div>
-                  
-                  {/* 右侧：两排布局 */}
-                  <div className="country-stats">
-                    {/* 第一排：8 项属性 */}
-                    <div className="stats-row stats-row-1">
-                      <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.army.zh : POWER_ATTR_DESCRIPTIONS.army.en}>
-                        <span className="stat-mini-icon">🪖</span>
-                        <span className="stat-mini-value">{userCountryPower.attributes.army || 0}</span>
-                      </Tooltip>
-                      <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.navy.zh : POWER_ATTR_DESCRIPTIONS.navy.en}>
-                        <span className="stat-mini-icon">⚓</span>
-                        <span className="stat-mini-value">{userCountryPower.attributes.navy || 0}</span>
-                      </Tooltip>
-                      <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.airForce.zh : POWER_ATTR_DESCRIPTIONS.airForce.en}>
-                        <span className="stat-mini-icon">✈️</span>
-                        <span className="stat-mini-value">{userCountryPower.attributes.airForce || 0}</span>
-                      </Tooltip>
-                      <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.nuclear.zh : POWER_ATTR_DESCRIPTIONS.nuclear.en}>
-                        <span className="stat-mini-icon">☢️</span>
-                        <span className="stat-mini-value">{userCountryPower.attributes.nuclear || 0}</span>
-                      </Tooltip>
-                      <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.economy.zh : POWER_ATTR_DESCRIPTIONS.economy.en}>
-                        <span className="stat-mini-icon">💰</span>
-                        <span className="stat-mini-value">{userCountryPower.attributes.economy || 0}</span>
-                      </Tooltip>
-                      <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.stability.zh : POWER_ATTR_DESCRIPTIONS.stability.en}>
-                        <span className="stat-mini-icon">🏛️</span>
-                        <span className="stat-mini-value">{userCountryPower.attributes.stability || 0}</span>
-                      </Tooltip>
-                      <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.diplomacy.zh : POWER_ATTR_DESCRIPTIONS.diplomacy.en}>
-                        <span className="stat-mini-icon">🤝</span>
-                        <span className="stat-mini-value">{userCountryPower.attributes.diplomacy || 0}</span>
-                      </Tooltip>
-                      <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.intel.zh : POWER_ATTR_DESCRIPTIONS.intel.en}>
-                        <span className="stat-mini-icon">👁️</span>
-                        <span className="stat-mini-value">{userCountryPower.attributes.intel || 0}</span>
-                      </Tooltip>
+              {/* 中央：国家实力 + 经济数据 */}
+              <div className="header-center">
+                {/* 用户绑定国家实力 */}
+                <div className="country-power-display">
+                  {userCountryPower ? (
+                    <>
+                      {/* 左侧：国家领导人头像（跨两排） */}
+                      <div className="country-flag-wrapper">
+                        <img
+                          src={userCountryPower.leaderImage}
+                          alt={userCountryPower.leaderName}
+                          className="leader-image"
+                          title={userCountryPower.leaderName}
+                          onError={(e) => {
+                            console.error('图片加载失败:', e.target.src);
+                            e.target.src = 'https://ui-avatars.com/api/?name=Leader&size=220&background=8B1A1A&color=fff';
+                          }}
+                        />
+                      </div>
+
+                      {/* 右侧：两排布局 */}
+                      <div className="country-stats">
+                        {/* 第一排：8 项属性 */}
+                        <div className="stats-row stats-row-1">
+                          <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.army.zh : POWER_ATTR_DESCRIPTIONS.army.en}>
+                            <span className="stat-mini-icon">🪖</span>
+                            <span className="stat-mini-value">{userCountryPower.attributes.army || 0}</span>
+                          </Tooltip>
+                          <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.navy.zh : POWER_ATTR_DESCRIPTIONS.navy.en}>
+                            <span className="stat-mini-icon">⚓</span>
+                            <span className="stat-mini-value">{userCountryPower.attributes.navy || 0}</span>
+                          </Tooltip>
+                          <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.airForce.zh : POWER_ATTR_DESCRIPTIONS.airForce.en}>
+                            <span className="stat-mini-icon">✈️</span>
+                            <span className="stat-mini-value">{userCountryPower.attributes.airForce || 0}</span>
+                          </Tooltip>
+                          <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.nuclear.zh : POWER_ATTR_DESCRIPTIONS.nuclear.en}>
+                            <span className="stat-mini-icon">☢️</span>
+                            <span className="stat-mini-value">{userCountryPower.attributes.nuclear || 0}</span>
+                          </Tooltip>
+                          <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.economy.zh : POWER_ATTR_DESCRIPTIONS.economy.en}>
+                            <span className="stat-mini-icon">💰</span>
+                            <span className="stat-mini-value">{userCountryPower.attributes.economy || 0}</span>
+                          </Tooltip>
+                          <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.stability.zh : POWER_ATTR_DESCRIPTIONS.stability.en}>
+                            <span className="stat-mini-icon">🏛️</span>
+                            <span className="stat-mini-value">{userCountryPower.attributes.stability || 0}</span>
+                          </Tooltip>
+                          <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.diplomacy.zh : POWER_ATTR_DESCRIPTIONS.diplomacy.en}>
+                            <span className="stat-mini-icon">🤝</span>
+                            <span className="stat-mini-value">{userCountryPower.attributes.diplomacy || 0}</span>
+                          </Tooltip>
+                          <Tooltip text={lang === 'zh' ? POWER_ATTR_DESCRIPTIONS.intel.zh : POWER_ATTR_DESCRIPTIONS.intel.en}>
+                            <span className="stat-mini-icon">👁️</span>
+                            <span className="stat-mini-value">{userCountryPower.attributes.intel || 0}</span>
+                          </Tooltip>
+                        </div>
+
+                        {/* 第二排：国家旗帜 + 国家名称 | 💪 国力总分 | 势力徽章 */}
+                        <div className="stats-row stats-row-2">
+                          <span className="country-flag">{userCountryPower.flag}</span>
+                          <span className="country-name">{userCountryPower.name}</span>
+                          <span className="power-divider">|</span>
+                          <span className="power-value">💪 {userCountryPower.totalPower.toLocaleString()}</span>
+                          <span className="faction-badge-small" style={{
+                            background: userCountryPower.faction === '抵抗轴心' ? '#8B1A1A' :
+                              userCountryPower.faction === '美以联盟' ? '#1E4F8A' :
+                                userCountryPower.faction === '温和联盟' ? '#B8860B' :
+                                  userCountryPower.faction === '亲穆兄会' ? '#2D5A27' : '#7B7B7B'
+                          }}>
+                            {userCountryPower.faction || '-'}
+                          </span>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* 加载中状态 */}
+                      <div className="country-flag-wrapper">
+                        <div className="leader-image-loading"></div>
+                      </div>
+                      <div className="country-stats">
+                        <div className="stats-row stats-row-1">
+                          <span className="loading-text">数据加载中...</span>
+                        </div>
+                        <div className="stats-row stats-row-2">
+                          <span className="country-name">伊朗</span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* 资源条 - 可点击打开经济面板 */}
+                {worldState && worldState.economic && (
+                  <div className="resource-bar clickable" onClick={(e) => {
+                    e.stopPropagation();
+                    // 直接设置面板状态，确保只打开经济面板
+                    setShowEconomicPanel(true);
+                    setShowFactionPanel(false);
+                    setShowDiplomacyPanel(false);
+                    setShowMilitaryPanel(false);
+                    setShowSettingsPanel(false);
+                    setShowLeaderboard(false);
+                  }}>
+                    <div className="resource-item">
+                      <span className="resource-label">{t('resources.oil')}</span>
+                      <span className="resource-value">
+                        ${worldState.economic.commodities?.Oil?.value?.replace('$', '') || '85.3'}
+                      </span>
+                      <span className={`resource-change ${(worldState.economic.commodities?.Oil?.change || 0) > 0 ? 'up' : 'down'
+                        }`}>
+                        {(worldState.economic.commodities?.Oil?.change || 0) > 0 ? '↑' : '↓'}
+                        {Math.abs(worldState.economic.commodities?.Oil?.change || 0)}%
+                      </span>
                     </div>
-                    
-                    {/* 第二排：国家旗帜 + 国家名称 | 💪 国力总分 | 势力徽章 */}
-                    <div className="stats-row stats-row-2">
-                      <span className="country-flag">{userCountryPower.flag}</span>
-                      <span className="country-name">{userCountryPower.name}</span>
-                      <span className="power-divider">|</span>
-                      <span className="power-value">💪 {userCountryPower.totalPower.toLocaleString()}</span>
-                      <span className="faction-badge-small" style={{ 
-                        background: userCountryPower.faction === '抵抗轴心' ? '#8B1A1A' : 
-                                   userCountryPower.faction === '美以联盟' ? '#1E4F8A' : 
-                                   userCountryPower.faction === '温和联盟' ? '#B8860B' : 
-                                   userCountryPower.faction === '亲穆兄会' ? '#2D5A27' : '#7B7B7B'
-                      }}>
-                        {userCountryPower.faction || '-'}
+                    <div className="resource-item">
+                      <span className="resource-label">{t('resources.gold')}</span>
+                      <span className="resource-value">
+                        ${worldState.economic.commodities?.Gold?.value?.replace('$', '') || '2150'}
+                      </span>
+                      <span className={`resource-change ${(worldState.economic.commodities?.Gold?.change || 0) > 0 ? 'up' : 'down'
+                        }`}>
+                        {(worldState.economic.commodities?.Gold?.change || 0) > 0 ? '↑' : '↓'}
+                        {Math.abs(worldState.economic.commodities?.Gold?.change || 0)}%
+                      </span>
+                    </div>
+                    <div className="resource-item">
+                      <span className="resource-label">{t('resources.btc')}</span>
+                      <span className="resource-value">
+                        ${worldState.economic.crypto?.BTC?.value?.replace('$', '') || '68200'}
+                      </span>
+                      <span className={`resource-change ${(worldState.economic.crypto?.BTC?.change || 0) > 0 ? 'up' : 'down'
+                        }`}>
+                        {(worldState.economic.crypto?.BTC?.change || 0) > 0 ? '↑' : '↓'}
+                        {Math.abs(worldState.economic.crypto?.BTC?.change || 0)}%
                       </span>
                     </div>
                   </div>
-                </>
-              ) : (
-                <>
-                  {/* 加载中状态 */}
-                  <div className="country-flag-wrapper">
-                    <div className="leader-image-loading"></div>
-                  </div>
-                  <div className="country-stats">
-                    <div className="stats-row stats-row-1">
-                      <span className="loading-text">数据加载中...</span>
+                )}
+              </div>
+
+              {/* 右侧：时间 + 用户信息 + 导航按钮 */}
+              <div className="header-right">
+                <div className="right-column">
+                  {/* 第一行：时间（左）+ 用户信息（右） */}
+                  <div className="top-row">
+                    {/* 时间显示 - 统一格式 */}
+                    <div className="time-display">
+                      <span className="time-icon">🕐</span>
+                      <span className="time-value">
+                        {(() => {
+                          const now = new Date();
+                          const time = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+                          const date = now.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+                          return `${time}, ${date}`;
+                        })()}
+                      </span>
                     </div>
-                    <div className="stats-row stats-row-2">
-                      <span className="country-name">伊朗</span>
-                    </div>
+
+                    {/* 用户信息 + 登出 */}
+                    {player && (
+                      <div className="user-info">
+                        <div className="user-avatar">👤</div>
+                        <div className="user-details">
+                          <div className="user-name">{player.username}</div>
+                          {currentRole && (
+                            <div className="user-role">
+                              {currentRole.flag || '🏛️'} {currentRole.role_name || currentRole.name}
+                            </div>
+                          )}
+                        </div>
+                        <button className="logout-btn" onClick={handleLogout} title="登出">
+                          🚪
+                        </button>
+                      </div>
+                    )}
                   </div>
-                </>
-              )}
+
+                  {/* 第二行：导航按钮 */}
+                  <nav className="header-nav">
+                    <button
+                      className={`nav-item ${currentPage === 'faction' ? 'active' : ''}`}
+                      onClick={() => handleNavigate('faction')}
+                    >
+                      <span className="nav-icon">👥</span>
+                      <span className="nav-label">{lang === 'zh' ? '势力' : 'Faction'}</span>
+                    </button>
+                    <button
+                      className={`nav-item ${currentPage === 'economy' ? 'active' : ''}`}
+                      onClick={() => handleNavigate('economy')}
+                    >
+                      <span className="nav-icon">📊</span>
+                      <span className="nav-label">{lang === 'zh' ? '经济' : 'Economy'}</span>
+                    </button>
+                    <button
+                      className={`nav-item ${currentPage === 'diplomacy' ? 'active' : ''}`}
+                      onClick={() => handleNavigate('diplomacy')}
+                    >
+                      <span className="nav-icon">🤝</span>
+                      <span className="nav-label">{lang === 'zh' ? '外交' : 'Diplomacy'}</span>
+                    </button>
+                    <button
+                      className={`nav-item ${currentPage === 'military' ? 'active' : ''}`}
+                      onClick={() => handleNavigate('military')}
+                    >
+                      <span className="nav-icon">⚔️</span>
+                      <span className="nav-label">{lang === 'zh' ? '军事' : 'Military'}</span>
+                    </button>
+                    <button
+                      className={`nav-item ${currentPage === 'leaderboard' ? 'active' : ''}`}
+                      onClick={() => handleNavigate('leaderboard')}
+                    >
+                      <span className="nav-icon">🏆</span>
+                      <span className="nav-label">{lang === 'zh' ? '排行榜' : 'Rank'}</span>
+                    </button>
+                    <button
+                      className={`nav-item ${currentPage === 'settings' ? 'active' : ''}`}
+                      onClick={() => handleNavigate('settings')}
+                    >
+                      <span className="nav-icon">⚙️</span>
+                      <span className="nav-label">{lang === 'zh' ? '设置' : 'Settings'}</span>
+                    </button>
+                  </nav>
+                </div>
+              </div>
+            </header>
+
+            {/* ========== 时间线 ========== */}
+            <div className="timeline-container">
+              <div className="timeline-header">
+                <span className="timeline-label">⏱️ {t('timeline.label')}</span>
+                <div className="timeline-dates">
+                  <span
+                    className={`timeline-date ${currentTimelineDate === 'today' ? 'active' : ''}`}
+                    onClick={() => setCurrentTimelineDate('today')}
+                  >
+                    {t('timeline.today')}
+                  </span>
+                  <span
+                    className={`timeline-date ${currentTimelineDate === 'yesterday' ? 'active' : ''}`}
+                    onClick={() => setCurrentTimelineDate('yesterday')}
+                  >
+                    {t('timeline.yesterday')}
+                  </span>
+                  <span
+                    className={`timeline-date ${currentTimelineDate === 'thisWeek' ? 'active' : ''}`}
+                    onClick={() => setCurrentTimelineDate('thisWeek')}
+                  >
+                    {t('timeline.thisWeek')}
+                  </span>
+                  <span
+                    className={`timeline-date ${currentTimelineDate === 'all' ? 'active' : ''}`}
+                    onClick={() => setCurrentTimelineDate('all')}
+                  >
+                    {t('timeline.all')}
+                  </span>
+                </div>
+              </div>
             </div>
 
-            {/* 资源条 - 可点击打开经济面板 */}
-            {worldState && worldState.economic && (
-              <div className="resource-bar clickable" onClick={(e) => { 
-                e.stopPropagation(); 
-                // 确保关闭其他面板
-                setShowFactionPanel(false);
-                setShowDiplomacyPanel(false);
-                setShowMilitaryPanel(false);
-                setShowSettingsPanel(false);
-                setShowLeaderboard(false);
-                setShowEconomicPanel(true);
-              }}>
-                <div className="resource-item">
-                  <span className="resource-label">{t('resources.oil')}</span>
-                  <span className="resource-value">
-                    ${worldState.economic.commodities?.Oil?.value?.replace('$', '') || '85.3'}
-                  </span>
-                  <span className={`resource-change ${
-                    (worldState.economic.commodities?.Oil?.change || 0) > 0 ? 'up' : 'down'
-                  }`}>
-                    {(worldState.economic.commodities?.Oil?.change || 0) > 0 ? '↑' : '↓'}
-                    {Math.abs(worldState.economic.commodities?.Oil?.change || 0)}%
-                  </span>
+            {/* ========== 主地图区域 - 沙盘战报布局 ========== */}
+            <main className="main-content">
+              {/* 左侧边栏 - 竹简兵符 */}
+              <aside className="left-panel">
+                <div className="scroll-bamboo">
+                  <div className="panel-title-seal">{lang === 'zh' ? '⚔️ 军令' : '⚔️ Commands'}</div>
+
+                  <button className="action-token military" onMouseDown={(e) => {
+                    e.preventDefault();
+                    const startTime = performance.now();
+                    setShowActionPanel(true);
+                    requestAnimationFrame(() => {
+                      const endTime = performance.now();
+                      console.log(`⏱️ 行动面板响应时间：${(endTime - startTime).toFixed(2)}ms`);
+                    });
+                  }}>
+                    <span className="token-icon">🏮</span>
+                    <span className="token-text">{lang === 'zh' ? '行动' : 'Action'}</span>
+                  </button>
+
+                  <div className="bamboo-slip">
+                    <div className="slip-title">{lang === 'zh' ? '查看领导人' : 'View Leaders'}</div>
+                    <select className="general-select" onChange={(e) => {
+                      if (e.target.value) {
+                        handleTrackLeader(e.target.value);
+                        e.target.value = '';
+                      }
+                    }} defaultValue="">
+                      <option value="" disabled>{lang === 'zh' ? '选择领导人' : 'Select Leader'}</option>
+                      {LEADERS.map(leader => (
+                        <option key={leader.id} value={leader.id}>{lang === 'zh' ? leader.name : leader.nameEn}</option>
+                      ))}
+                    </select>
+                  </div>
+
                 </div>
-                <div className="resource-item">
-                  <span className="resource-label">{t('resources.gold')}</span>
-                  <span className="resource-value">
-                    ${worldState.economic.commodities?.Gold?.value?.replace('$', '') || '2150'}
-                  </span>
-                  <span className={`resource-change ${
-                    (worldState.economic.commodities?.Gold?.change || 0) > 0 ? 'up' : 'down'
-                  }`}>
-                    {(worldState.economic.commodities?.Gold?.change || 0) > 0 ? '↑' : '↓'}
-                    {Math.abs(worldState.economic.commodities?.Gold?.change || 0)}%
-                  </span>
+              </aside>
+
+              {/* 中央地图 - 沙盘 */}
+              <div className="map-frame">
+                <div className="map-container">
+                  {/* 装饰角标 - 图腾 */}
+                  <div className="map-corner top-left">🦅</div>
+                  <div className="map-corner top-right">⚔️</div>
+                  <div className="map-corner bottom-left">🐫</div>
+                  <div className="map-corner bottom-right">📜</div>
+
+                  {/* 世界地图 - 真实国家边界（D3 + GeoJSON） */}
+                  <WorldMapNew
+                    onRegionSelect={handleCountrySelect}
+                    onResetRef={mapResetRef}
+                    onLeaderSelectRef={mapLeaderSelectRef}
+                  />
                 </div>
-                <div className="resource-item">
-                  <span className="resource-label">{t('resources.btc')}</span>
-                  <span className="resource-value">
-                    ${worldState.economic.crypto?.BTC?.value?.replace('$', '') || '68200'}
-                  </span>
-                  <span className={`resource-change ${
-                    (worldState.economic.crypto?.BTC?.change || 0) > 0 ? 'up' : 'down'
-                  }`}>
-                    {(worldState.economic.crypto?.BTC?.change || 0) > 0 ? '↑' : '↓'}
-                    {Math.abs(worldState.economic.crypto?.BTC?.change || 0)}%
-                  </span>
+              </div>
+
+              {/* 右侧边栏 - 卷轴战报 */}
+              <aside className="right-panel">
+                <div className="scroll-report">
+                  <div className="report-seal">📋 {t('events.latest')}</div>
+
+                  <div className="event-list">
+                    {(events || []).slice(0, 5).map((event, index) => (
+                      <div key={index} className={`event-item ${event.type || 'military'}`}>
+                        <span className="event-icon">
+                          {event.type === 'economic' ? '💰' : event.type === 'diplomatic' ? '🤝' : '⚔️'}
+                        </span>
+                        <div className="event-content">
+                          <div className="event-title">{translateEvent(event.title || event.description || 'Event')}</div>
+                          <div className="event-time">{event.time || 'Recent'}</div>
+                        </div>
+                      </div>
+                    ))}
+                    {(!events || events.length === 0) && (
+                      <>
+                        <div className="event-item military">
+                          <span className="event-icon">⚔️</span>
+                          <div className="event-content">
+                            <div className="event-title">{t('events.tehran')}</div>
+                            <div className="event-time">15 {lang === 'zh' ? '分钟前' : 'min ago'}</div>
+                          </div>
+                        </div>
+                        <div className="event-item economic">
+                          <span className="event-icon">💰</span>
+                          <div className="event-content">
+                            <div className="event-title">{t('events.oil')}</div>
+                            <div className="event-time">1 {lang === 'zh' ? '小时前' : 'hour ago'}</div>
+                          </div>
+                        </div>
+                        <div className="event-item diplomatic">
+                          <span className="event-icon">🤝</span>
+                          <div className="event-content">
+                            <div className="event-title">{t('events.saudi')}</div>
+                            <div className="event-time">2 {lang === 'zh' ? '小时前' : 'hours ago'}</div>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="view-more-seal" onClick={() => setShowEventPanel(true)}>
+                    {lang === 'zh' ? '查看更多 →' : 'View More →'}
+                  </div>
+                </div>
+              </aside>
+            </main>
+
+            {/* ========== 二级页面：完整事件流 ========== */}
+            {showEventPanel && (
+              <MemorialModal
+                isOpen={showEventPanel}
+                onClose={() => setShowEventPanel(false)}
+                title="📜 完整事件流"
+                type="外交"
+                width="1000px"
+                disableAnimation={true}
+              >
+                <EventStream
+                  events={events}
+                  availableRoles={[]}
+                  onEventSelect={(event) => {
+                    console.log('📊 选中事件:', event);
+                    // 触发 PM Agent 分析
+                    analyzeEventWithPM(event);
+                  }}
+                />
+              </MemorialModal>
+            )}
+
+            {/* ========== 经济面板 ========== */}
+            {showEconomicPanel && (
+              <MemorialModal
+                isOpen={showEconomicPanel}
+                onClose={() => setShowEconomicPanel(false)}
+                title={t('economy.title')}
+                type="经济"
+                width="min(650px, 90vw)"
+              >
+                <EconomicPanel worldState={worldState} onClose={() => setShowEconomicPanel(false)} />
+              </MemorialModal>
+            )}
+
+            {/* ========== 外交面板 ========== */}
+            {showDiplomacyPanel && (
+              <MemorialModal
+                isOpen={showDiplomacyPanel}
+                onClose={() => setShowDiplomacyPanel(false)}
+                title={t('diplomacy.title')}
+                type="外交"
+                width="min(700px, 90vw)"
+              >
+                <DiplomacyPanel onClose={() => setShowDiplomacyPanel(false)} />
+              </MemorialModal>
+            )}
+
+            {/* ========== 二级页面：势力详情 ========== */}
+            {showFactionPanel && (
+              <MemorialModal
+                isOpen={showFactionPanel}
+                onClose={() => setShowFactionPanel(false)}
+                title={lang === 'zh' ? '⚔️ 势力对比' : '⚔️ Faction Comparison'}
+                type={lang === 'zh' ? '策略' : 'Strategy'}
+              >
+                <div className="factions-grid">
+                  {FACTIONS.map(faction => {
+                    const factionNameEn = {
+                      '抵抗轴心': 'Resistance Axis',
+                      '美以联盟': 'US-Israel Alliance',
+                      '温和联盟': 'Moderate Alliance',
+                      '亲穆兄会': 'Muslim Brotherhood',
+                    }[faction.name];
+                    const descEn = {
+                      '抵抗轴心': 'Regional resistance alliance led by Iran',
+                      '美以联盟': 'Strategic alliance between US and Israel',
+                      '温和联盟': 'Moderate Arab states alliance in Gulf region',
+                      '亲穆兄会': 'Political forces supporting Muslim Brotherhood',
+                    }[faction.name];
+                    const countriesEn = {
+                      '抵抗轴心': ['Iran', 'Iraq', 'Syria', 'Lebanon', 'Palestine'],
+                      '美以联盟': ['USA', 'Israel', 'Jordan'],
+                      '温和联盟': ['Saudi Arabia', 'Egypt', 'UAE', 'Kuwait', 'Qatar', 'Bahrain', 'Oman', 'Yemen'],
+                      '亲穆兄会': ['Turkey', 'Qatar'],
+                    }[faction.name];
+
+                    return (
+                      <div
+                        key={faction.id}
+                        className="faction-card"
+                        style={{ borderLeftColor: faction.color }}
+                        onClick={() => setSelectedFaction(faction)}
+                      >
+                        <div className="faction-card-header">
+                          <h3 style={{ color: faction.color }}>{lang === 'zh' ? faction.name : factionNameEn}</h3>
+                          <div className="faction-strength">
+                            <div className="strength-bar">
+                              <div
+                                className="strength-fill"
+                                style={{ width: `${faction.strength}%`, background: faction.color }}
+                              ></div>
+                            </div>
+                            <span className="strength-value">{faction.strength}</span>
+                          </div>
+                        </div>
+                        <p className="faction-description">{lang === 'zh' ? faction.description : descEn}</p>
+                        <div className="faction-countries">
+                          <span className="countries-label">{lang === 'zh' ? '控制国家:' : 'Countries:'}</span>
+                          <div className="countries-list">{(lang === 'zh' ? faction.countries : countriesEn).join(' · ')}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </MemorialModal>
+            )}
+
+            {/* ========== 二级页面：领导人图鉴 ========== */}
+            {showLeaderPanel && (
+              <MemorialModal
+                isOpen={showLeaderPanel}
+                onClose={() => setShowLeaderPanel(false)}
+                title={lang === 'zh' ? '👤 领导人图鉴' : '👤 Leaders'}
+                type={lang === 'zh' ? '地图' : 'Map'}
+              >
+                <div className="leaders-grid">
+                  {LEADERS.map(leader => {
+                    const locationEn = {
+                      '美国': 'USA',
+                      '以色列': 'Israel',
+                      '伊拉克': 'Iraq',
+                      '叙利亚': 'Syria',
+                      '伊朗': 'Iran',
+                      '沙特': 'Saudi Arabia',
+                      '埃及': 'Egypt',
+                      '土耳其': 'Turkey',
+                    }[leader.location];
+
+                    return (
+                      <div
+                        key={leader.id}
+                        className="leader-card"
+                        onClick={() => handleTrackLeader(leader.id)}
+                      >
+                        <div className="leader-avatar">
+                          <img src={leader.image} alt={leader.name} className="leader-image" />
+                        </div>
+                        <div className="leader-info">
+                          <div className="leader-name">{leader.name}</div>
+                          <div className="leader-location">{lang === 'zh' ? leader.location : locationEn}</div>
+                          <div className={`leader-status ${leader.status === 'Active' ? 'active' : 'inactive'}`}>
+                            {leader.status === 'Active' ? (lang === 'zh' ? '● 活跃' : '● Active') : (lang === 'zh' ? '○ 离线' : '○ Offline')}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </MemorialModal>
+            )}
+
+            {/* ========== 外交面板 ========== */}
+            {showDiplomacyPanel && (
+              <MemorialModal
+                isOpen={showDiplomacyPanel}
+                onClose={() => setShowDiplomacyPanel(false)}
+                title={t('diplomacy.title')}
+                type="外交"
+                width="min(700px, 90vw)"
+              >
+                <DiplomacyPanel onClose={() => setShowDiplomacyPanel(false)} />
+              </MemorialModal>
+            )}
+
+            {/* ========== 军事面板 ========== */}
+            {showMilitaryPanel && (
+              <MemorialModal
+                onClose={() => setShowMilitaryPanel(false)}
+                title={t('military.title')}
+                type="军事"
+                width="min(650px, 90vw)"
+              >
+                <MilitaryPanel onClose={() => setShowMilitaryPanel(false)} />
+              </MemorialModal>
+            )}
+
+            {/* ========== 设置面板 ========== */}
+            {showSettingsPanel && (
+              <MemorialModal
+                isOpen={showSettingsPanel}
+                onClose={() => setShowSettingsPanel(false)}
+                title={`⚙️ ${t('settings.title')}`}
+                type="设置"
+              >
+                <SettingsPanel onClose={() => setShowSettingsPanel(false)} />
+              </MemorialModal>
+            )}
+
+            {/* ========== 排行榜 ========== */}
+            {showLeaderboard && (
+              <MemorialModal
+                isOpen={showLeaderboard}
+                onClose={() => setShowLeaderboard(false)}
+                title={lang === 'zh' ? '🏆 排行榜' : '🏆 Leaderboard'}
+                type={lang === 'zh' ? '排行榜' : 'Rank'}
+                width="1200px"
+                disableAnimation={true}
+              >
+                <Leaderboard
+                  onClose={() => setShowLeaderboard(false)}
+                  onCountrySelect={(role) => {
+                    setSelectedCountry(role);
+                    setShowLeaderboard(false);
+                  }}
+                  onLeaderSelect={(role) => {
+                    setSelectedLeader(role);
+                    setShowLeaderboard(false);
+                  }}
+                />
+              </MemorialModal>
+            )}
+
+            {/* ========== 行动面板 ========== */}
+            {showActionPanel && (
+              <MemorialModal
+                isOpen={showActionPanel}
+                onClose={() => setShowActionPanel(false)}
+                title={lang === 'zh' ? '🏮 行动' : '🏮 Actions'}
+                type={lang === 'zh' ? '行动' : 'Action'}
+              >
+                <ActionPanel
+                  currentNation={currentNation}
+                  wars={wars}
+                  onClose={() => setShowActionPanel(false)}
+                  onShowDecision={handleShowDecision}
+                  onActionComplete={async (result) => {
+                    console.log('行动完成:', result);
+                    // 刷新事件列表
+                    try {
+                      const eventsData = await world.events(20);
+                      setEvents(eventsData.events || []);
+                    } catch (error) {
+                      console.error('刷新事件失败:', error);
+                    }
+                    setShowActionPanel(false);
+                  }}
+                />
+              </MemorialModal>
+            )}
+
+            {/* ========== 全局决策弹窗 ========== */}
+            {decisionModal.show && (
+              <div className="global-decision-overlay" onClick={handleCloseDecision}>
+                <div className="global-decision-modal" onClick={(e) => e.stopPropagation()}>
+                  <div className="global-decision-header">
+                    <h3>
+                      {decisionModal.rejected ? '❌ 行动被拒绝' : '✅ 行动建议'}
+                    </h3>
+                    <button className="global-modal-close" onClick={handleCloseDecision}>×</button>
+                  </div>
+
+                  <div className="global-decision-content">
+                    {/* 决策理由 */}
+                    <div className="global-decision-reason">
+                      <strong>{decisionModal.rejected ? '❌ 拒绝理由' : '✅ 执行理由'}:</strong>
+                      <p>{decisionModal.decision.reason}</p>
+                    </div>
+
+                    {/* 详细分析 */}
+                    <div className="global-decision-analysis">
+                      <strong>📊 详细分析:</strong>
+                      <pre>{decisionModal.decision.analysis}</pre>
+                    </div>
+
+                    {/* 执行条件/建议 */}
+                    {decisionModal.decision.conditions && (
+                      <div className="global-decision-conditions">
+                        <strong>💡 建议:</strong>
+                        <p>{decisionModal.decision.conditions}</p>
+                      </div>
+                    )}
+
+                    {/* 置信度 */}
+                    <div className="global-decision-confidence">
+                      <strong>🎯 置信度:</strong>
+                      <span className={`global-confidence-${decisionModal.decision.confidence}`}>
+                        {decisionModal.decision.confidence === 'high' ? '高' :
+                          decisionModal.decision.confidence === 'medium' ? '中' : '低'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 操作按钮 */}
+                  <div className="global-decision-buttons">
+                    {!decisionModal.rejected && (
+                      <>
+                        <button className="global-btn-cancel" onClick={handleCloseDecision}>
+                          取消
+                        </button>
+                        <button
+                          className="global-btn-confirm"
+                          onClick={handleConfirmDecision}
+                          disabled={decisionModal.loading}
+                          style={{ '--action-color': decisionModal.action?.color || '#4299E1' }}
+                        >
+                          {decisionModal.loading ? '执行中...' : '确认执行'}
+                        </button>
+                      </>
+                    )}
+                    {decisionModal.rejected && (
+                      <button className="global-btn-confirm" onClick={handleCloseDecision}>
+                        知道了
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
-          </div>
 
-          {/* 右侧：时间 + 用户信息 + 导航按钮 */}
-          <div className="header-right">
-            <div className="right-column">
-              {/* 第一行：时间（左）+ 用户信息（右） */}
-              <div className="top-row">
-                {/* 时间显示 - 统一格式 */}
-                <div className="time-display">
-                  <span className="time-icon">🕐</span>
-                  <span className="time-value">
-                    {(() => {
-                      const now = new Date();
-                      const time = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
-                      const date = now.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
-                      return `${time}, ${date}`;
-                    })()}
-                  </span>
-                </div>
-                
-                {/* 用户信息 + 登出 */}
-                {player && (
-                  <div className="user-info">
-                    <div className="user-avatar">👤</div>
-                    <div className="user-details">
-                      <div className="user-name">{player.username}</div>
-                      {currentRole && (
-                        <div className="user-role">
-                          {currentRole.flag || '🏛️'} {currentRole.role_name || currentRole.name}
-                        </div>
-                      )}
-                    </div>
-                    <button className="logout-btn" onClick={handleLogout} title="登出">
-                      🚪
-                    </button>
-                  </div>
-                )}
-              </div>
-              
-              {/* 第二行：导航按钮 */}
-              <nav className="header-nav">
-                <button
-                  className={`nav-item ${currentPage === 'faction' ? 'active' : ''}`}
-                  onClick={() => handleNavigate('faction')}
-                >
-                  <span className="nav-icon">👥</span>
-                  <span className="nav-label">{lang === 'zh' ? '势力' : 'Faction'}</span>
-                </button>
-                <button
-                  className={`nav-item ${currentPage === 'economy' ? 'active' : ''}`}
-                  onClick={() => handleNavigate('economy')}
-                >
-                  <span className="nav-icon">📊</span>
-                  <span className="nav-label">{lang === 'zh' ? '经济' : 'Economy'}</span>
-                </button>
-                <button
-                  className={`nav-item ${currentPage === 'diplomacy' ? 'active' : ''}`}
-                  onClick={() => handleNavigate('diplomacy')}
-                >
-                  <span className="nav-icon">🤝</span>
-                  <span className="nav-label">{lang === 'zh' ? '外交' : 'Diplomacy'}</span>
-                </button>
-                <button
-                  className={`nav-item ${currentPage === 'military' ? 'active' : ''}`}
-                  onClick={() => handleNavigate('military')}
-                >
-                  <span className="nav-icon">⚔️</span>
-                  <span className="nav-label">{lang === 'zh' ? '军事' : 'Military'}</span>
-                </button>
-                <button
-                  className={`nav-item ${currentPage === 'leaderboard' ? 'active' : ''}`}
-                  onClick={() => handleNavigate('leaderboard')}
-                >
-                  <span className="nav-icon">🏆</span>
-                  <span className="nav-label">{lang === 'zh' ? '排行榜' : 'Rank'}</span>
-                </button>
-                <button
-                  className={`nav-item ${currentPage === 'settings' ? 'active' : ''}`}
-                  onClick={() => handleNavigate('settings')}
-                >
-                  <span className="nav-icon">⚙️</span>
-                  <span className="nav-label">{lang === 'zh' ? '设置' : 'Settings'}</span>
-                </button>
-              </nav>
-            </div>
-          </div>
-        </header>
-
-      {/* ========== 时间线 ========== */}
-      <div className="timeline-container">
-        <div className="timeline-header">
-          <span className="timeline-label">⏱️ {t('timeline.label')}</span>
-          <div className="timeline-dates">
-            <span 
-              className={`timeline-date ${currentTimelineDate === 'today' ? 'active' : ''}`}
-              onClick={() => setCurrentTimelineDate('today')}
-            >
-              {t('timeline.today')}
-            </span>
-            <span 
-              className={`timeline-date ${currentTimelineDate === 'yesterday' ? 'active' : ''}`}
-              onClick={() => setCurrentTimelineDate('yesterday')}
-            >
-              {t('timeline.yesterday')}
-            </span>
-            <span 
-              className={`timeline-date ${currentTimelineDate === 'thisWeek' ? 'active' : ''}`}
-              onClick={() => setCurrentTimelineDate('thisWeek')}
-            >
-              {t('timeline.thisWeek')}
-            </span>
-            <span 
-              className={`timeline-date ${currentTimelineDate === 'all' ? 'active' : ''}`}
-              onClick={() => setCurrentTimelineDate('all')}
-            >
-              {t('timeline.all')}
-            </span>
-          </div>
-        </div>
+            {/* ========== 世界频道聊天（底部悬浮） ========== */}
+            {isAuthenticated && <WorldChannel lang={lang} />}
+          </>
+        )}
       </div>
-
-      {/* ========== 主地图区域 - 沙盘战报布局 ========== */}
-      <main className="main-content">
-        {/* 左侧边栏 - 竹简兵符 */}
-        <aside className="left-panel">
-          <div className="scroll-bamboo">
-            <div className="panel-title-seal">{lang === 'zh' ? '⚔️ 军令' : '⚔️ Commands'}</div>
-            
-            <button className="action-token military" onMouseDown={(e) => { 
-              e.preventDefault(); 
-              const startTime = performance.now();
-              setShowActionPanel(true);
-              requestAnimationFrame(() => {
-                const endTime = performance.now();
-                console.log(`⏱️ 行动面板响应时间：${(endTime - startTime).toFixed(2)}ms`);
-              });
-            }}>
-              <span className="token-icon">🏮</span>
-              <span className="token-text">{lang === 'zh' ? '行动' : 'Action'}</span>
-            </button>
-            
-            <div className="bamboo-slip">
-              <div className="slip-title">{lang === 'zh' ? '查看领导人' : 'View Leaders'}</div>
-              <select className="general-select" onChange={(e) => {
-                if (e.target.value) {
-                  handleTrackLeader(e.target.value);
-                  e.target.value = '';
-                }
-              }} defaultValue="">
-                <option value="" disabled>{lang === 'zh' ? '选择领导人' : 'Select Leader'}</option>
-                {LEADERS.map(leader => (
-                  <option key={leader.id} value={leader.id}>{lang === 'zh' ? leader.name : leader.nameEn}</option>
-                ))}
-              </select>
-            </div>
-            
-          </div>
-        </aside>
-        
-        {/* 中央地图 - 沙盘 */}
-        <div className="map-frame">
-          <div className="map-container">
-            {/* 装饰角标 - 图腾 */}
-            <div className="map-corner top-left">🦅</div>
-            <div className="map-corner top-right">⚔️</div>
-            <div className="map-corner bottom-left">🐫</div>
-            <div className="map-corner bottom-right">📜</div>
-            
-            {/* 世界地图 - 真实国家边界（D3 + GeoJSON） */}
-            <WorldMapNew 
-              onRegionSelect={handleCountrySelect}
-              onResetRef={mapResetRef}
-              onLeaderSelectRef={mapLeaderSelectRef}
-            />
-          </div>
-        </div>
-        
-        {/* 右侧边栏 - 卷轴战报 */}
-        <aside className="right-panel">
-          <div className="scroll-report">
-            <div className="report-seal">📋 {t('events.latest')}</div>
-            
-            <div className="event-list">
-              {(events || []).slice(0, 5).map((event, index) => (
-                <div key={index} className={`event-item ${event.type || 'military'}`}>
-                  <span className="event-icon">
-                    {event.type === 'economic' ? '💰' : event.type === 'diplomatic' ? '🤝' : '⚔️'}
-                  </span>
-                  <div className="event-content">
-                    <div className="event-title">{translateEvent(event.title || event.description || 'Event')}</div>
-                    <div className="event-time">{event.time || 'Recent'}</div>
-                  </div>
-                </div>
-              ))}
-              {(!events || events.length === 0) && (
-                <>
-                  <div className="event-item military">
-                    <span className="event-icon">⚔️</span>
-                    <div className="event-content">
-                      <div className="event-title">{t('events.tehran')}</div>
-                      <div className="event-time">15 {lang === 'zh' ? '分钟前' : 'min ago'}</div>
-                    </div>
-                  </div>
-                  <div className="event-item economic">
-                    <span className="event-icon">💰</span>
-                    <div className="event-content">
-                      <div className="event-title">{t('events.oil')}</div>
-                      <div className="event-time">1 {lang === 'zh' ? '小时前' : 'hour ago'}</div>
-                    </div>
-                  </div>
-                  <div className="event-item diplomatic">
-                    <span className="event-icon">🤝</span>
-                    <div className="event-content">
-                      <div className="event-title">{t('events.saudi')}</div>
-                      <div className="event-time">2 {lang === 'zh' ? '小时前' : 'hours ago'}</div>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-            
-            <div className="view-more-seal" onClick={() => setShowEventPanel(true)}>
-              {lang === 'zh' ? '查看更多 →' : 'View More →'}
-            </div>
-          </div>
-        </aside>
-      </main>
-
-      {/* ========== 二级页面：完整事件流 ========== */}
-      {showEventPanel && (
-        <MemorialModal
-          isOpen={showEventPanel}
-          onClose={() => setShowEventPanel(false)}
-          title="📜 完整事件流"
-          type="外交"
-          width="1000px"
-          disableAnimation={true}
-        >
-          <EventStream 
-            events={events} 
-            availableRoles={[]}
-            onEventSelect={(event) => {
-              console.log('📊 选中事件:', event);
-              // 触发 PM Agent 分析
-              analyzeEventWithPM(event);
-            }}
-          />
-        </MemorialModal>
-      )}
-
-      {/* ========== 二级页面：经济分析 ========== */}
-      {showEconomicPanel && (
-        <MemorialModal
-          isOpen={showEconomicPanel}
-          onClose={() => setShowEconomicPanel(false)}
-          title="💰 经济仪表盘"
-          type="经济"
-        >
-          {worldState && worldState.economic && (
-            <div className="economic-dashboard">
-              {/* 股票市场 */}
-              <div className="econ-section">
-                <h3>📈 股票市场</h3>
-                <div className="econ-grid">
-                  {Object.entries(worldState.economic.stocks || {}).map(([key, data]) => {
-                    // 统一处理股票数据：添加适当的格式
-                    let displayValue = data.value;
-                    if (typeof data.value === 'string') {
-                      // 字符串直接显示（如 "6672.62"）
-                      displayValue = data.value;
-                    } else if (typeof data.value === 'number') {
-                      displayValue = data.value.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                    }
-                    // 添加股票名称映射
-                    const stockNames = {
-                      'SPX': '标普 500',
-                      'HSI': '恒生指数',
-                      'DJI': '道琼斯',
-                      'IXIC': '纳斯达克'
-                    };
-                    return (
-                      <div key={key} className="econ-card">
-                        <div className="econ-card-name">{stockNames[key] || key}</div>
-                        <div className="econ-card-value">{displayValue}</div>
-                        <div className={`econ-card-change ${data.change > 0 ? 'positive' : 'negative'}`}>
-                          {data.change > 0 ? '↑' : '↓'} {Math.abs(data.change)}%
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              
-              {/* 大宗商品 */}
-              <div className="econ-section">
-                <h3>🏆 大宗商品</h3>
-                <div className="econ-grid">
-                  {Object.entries(worldState.economic.commodities || {}).map(([key, data]) => {
-                    let displayValue = data.value;
-                    if (typeof data.value === 'string') {
-                      displayValue = data.value;
-                    } else if (typeof data.value === 'number') {
-                      displayValue = `$${data.value.toFixed(2)}`;
-                    }
-                    return (
-                      <div key={key} className="econ-card">
-                        <div className="econ-card-name">{key}</div>
-                        <div className="econ-card-value">{displayValue}</div>
-                        <div className={`econ-card-change ${data.change > 0 ? 'positive' : 'negative'}`}>
-                          {data.change > 0 ? '↑' : '↓'} {Math.abs(data.change)}%
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              
-              {/* 加密货币 */}
-              <div className="econ-section">
-                <h3>₿ 加密货币</h3>
-                <div className="econ-grid">
-                  {Object.entries(worldState.economic.crypto || {}).map(([key, data]) => {
-                    let displayValue = data.value;
-                    if (typeof data.value === 'string') {
-                      displayValue = data.value;
-                    } else if (typeof data.value === 'number') {
-                      displayValue = `$${data.value.toLocaleString()}`;
-                    }
-                    return (
-                      <div key={key} className="econ-card">
-                        <div className="econ-card-name">{key}</div>
-                        <div className="econ-card-value">{displayValue}</div>
-                        <div className={`econ-card-change ${data.change > 0 ? 'positive' : 'negative'}`}>
-                          {data.change > 0 ? '↑' : '↓'} {Math.abs(data.change)}%
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
-        </MemorialModal>
-      )}
-
-      {/* ========== 二级页面：势力详情 ========== */}
-      {showFactionPanel && (
-        <MemorialModal
-          isOpen={showFactionPanel}
-          onClose={() => setShowFactionPanel(false)}
-          title={lang === 'zh' ? '⚔️ 势力对比' : '⚔️ Faction Comparison'}
-          type={lang === 'zh' ? '策略' : 'Strategy'}
-        >
-          <div className="factions-grid">
-            {FACTIONS.map(faction => {
-              const factionNameEn = {
-                '抵抗轴心': 'Resistance Axis',
-                '美以联盟': 'US-Israel Alliance',
-                '温和联盟': 'Moderate Alliance',
-                '亲穆兄会': 'Muslim Brotherhood',
-              }[faction.name];
-              const descEn = {
-                '抵抗轴心': 'Regional resistance alliance led by Iran',
-                '美以联盟': 'Strategic alliance between US and Israel',
-                '温和联盟': 'Moderate Arab states alliance in Gulf region',
-                '亲穆兄会': 'Political forces supporting Muslim Brotherhood',
-              }[faction.name];
-              const countriesEn = {
-                '抵抗轴心': ['Iran', 'Iraq', 'Syria', 'Lebanon', 'Palestine'],
-                '美以联盟': ['USA', 'Israel', 'Jordan'],
-                '温和联盟': ['Saudi Arabia', 'Egypt', 'UAE', 'Kuwait', 'Qatar', 'Bahrain', 'Oman', 'Yemen'],
-                '亲穆兄会': ['Turkey', 'Qatar'],
-              }[faction.name];
-              
-              return (
-                <div 
-                  key={faction.id} 
-                  className="faction-card"
-                  style={{ borderLeftColor: faction.color }}
-                  onClick={() => setSelectedFaction(faction)}
-                >
-                  <div className="faction-card-header">
-                    <h3 style={{ color: faction.color }}>{lang === 'zh' ? faction.name : factionNameEn}</h3>
-                    <div className="faction-strength">
-                      <div className="strength-bar">
-                        <div 
-                          className="strength-fill" 
-                          style={{ width: `${faction.strength}%`, background: faction.color }}
-                        ></div>
-                      </div>
-                      <span className="strength-value">{faction.strength}</span>
-                    </div>
-                  </div>
-                  <p className="faction-description">{lang === 'zh' ? faction.description : descEn}</p>
-                  <div className="faction-countries">
-                    <span className="countries-label">{lang === 'zh' ? '控制国家:' : 'Countries:'}</span>
-                    <div className="countries-list">{(lang === 'zh' ? faction.countries : countriesEn).join(' · ')}</div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </MemorialModal>
-      )}
-
-      {/* ========== 二级页面：领导人图鉴 ========== */}
-      {showLeaderPanel && (
-        <MemorialModal
-          isOpen={showLeaderPanel}
-          onClose={() => setShowLeaderPanel(false)}
-          title={lang === 'zh' ? '👤 领导人图鉴' : '👤 Leaders'}
-          type={lang === 'zh' ? '地图' : 'Map'}
-        >
-          <div className="leaders-grid">
-            {LEADERS.map(leader => {
-              const locationEn = {
-                '美国': 'USA',
-                '以色列': 'Israel',
-                '伊拉克': 'Iraq',
-                '叙利亚': 'Syria',
-                '伊朗': 'Iran',
-                '沙特': 'Saudi Arabia',
-                '埃及': 'Egypt',
-                '土耳其': 'Turkey',
-              }[leader.location];
-              
-              return (
-                <div 
-                  key={leader.id} 
-                  className="leader-card"
-                  onClick={() => handleTrackLeader(leader.id)}
-                >
-                  <div className="leader-avatar">
-                    <img src={leader.image} alt={leader.name} className="leader-image" />
-                  </div>
-                  <div className="leader-info">
-                    <div className="leader-name">{leader.name}</div>
-                    <div className="leader-location">{lang === 'zh' ? leader.location : locationEn}</div>
-                    <div className={`leader-status ${leader.status === 'Active' ? 'active' : 'inactive'}`}>
-                      {leader.status === 'Active' ? (lang === 'zh' ? '● 活跃' : '● Active') : (lang === 'zh' ? '○ 离线' : '○ Offline')}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </MemorialModal>
-      )}
-
-      {/* ========== 经济面板 ========== */}
-      {showEconomicPanel && (
-        <MemorialModal
-          isOpen={showEconomicPanel}
-          onClose={() => setShowEconomicPanel(false)}
-          title={t('economy.title')}
-          type="经济"
-          width="min(650px, 90vw)"
-        >
-          <EconomicPanel worldState={worldState} onClose={() => setShowEconomicPanel(false)} />
-        </MemorialModal>
-      )}
-
-      {/* ========== 外交面板 ========== */}
-      {showDiplomacyPanel && (
-        <MemorialModal
-          isOpen={showDiplomacyPanel}
-          onClose={() => setShowDiplomacyPanel(false)}
-          title={t('diplomacy.title')}
-          type="外交"
-          width="min(700px, 90vw)"
-        >
-          <DiplomacyPanel onClose={() => setShowDiplomacyPanel(false)} />
-        </MemorialModal>
-      )}
-
-      {/* ========== 军事面板 ========== */}
-      {showMilitaryPanel && (
-        <MemorialModal
-          isOpen={showMilitaryPanel}
-          onClose={() => setShowMilitaryPanel(false)}
-          title={t('military.title')}
-          type="军事"
-          width="min(650px, 90vw)"
-        >
-          <MilitaryPanel onClose={() => setShowMilitaryPanel(false)} />
-        </MemorialModal>
-      )}
-
-      {/* ========== 设置面板 ========== */}
-      {showSettingsPanel && (
-        <MemorialModal
-          isOpen={showSettingsPanel}
-          onClose={() => setShowSettingsPanel(false)}
-          title={`⚙️ ${t('settings.title')}`}
-          type="设置"
-        >
-          <SettingsPanel onClose={() => setShowSettingsPanel(false)} />
-        </MemorialModal>
-      )}
-
-      {/* ========== 排行榜 ========== */}
-      {showLeaderboard && (
-        <MemorialModal
-          isOpen={showLeaderboard}
-          onClose={() => setShowLeaderboard(false)}
-          title={lang === 'zh' ? '🏆 排行榜' : '🏆 Leaderboard'}
-          type={lang === 'zh' ? '排行榜' : 'Rank'}
-          width="1200px"
-          disableAnimation={true}
-        >
-          <Leaderboard 
-            onClose={() => setShowLeaderboard(false)} 
-            onCountrySelect={(role) => {
-              setSelectedCountry(role);
-              setShowLeaderboard(false);
-            }}
-            onLeaderSelect={(role) => {
-              setSelectedLeader(role);
-              setShowLeaderboard(false);
-            }}
-          />
-        </MemorialModal>
-      )}
-
-      {/* ========== 行动面板 ========== */}
-      {showActionPanel && (
-        <MemorialModal
-          isOpen={showActionPanel}
-          onClose={() => setShowActionPanel(false)}
-          title={lang === 'zh' ? '🏮 行动' : '🏮 Actions'}
-          type={lang === 'zh' ? '行动' : 'Action'}
-        >
-          <ActionPanel 
-            currentNation={currentNation}
-            wars={wars}
-            onClose={() => setShowActionPanel(false)}
-            onShowDecision={handleShowDecision}
-            onActionComplete={async (result) => {
-              console.log('行动完成:', result);
-              // 刷新事件列表
-              try {
-                const eventsData = await world.events(20);
-                setEvents(eventsData.events || []);
-              } catch (error) {
-                console.error('刷新事件失败:', error);
-              }
-              setShowActionPanel(false);
-            }}
-          />
-        </MemorialModal>
-      )}
-
-      {/* ========== 全局决策弹窗 ========== */}
-      {decisionModal.show && (
-        <div className="global-decision-overlay" onClick={handleCloseDecision}>
-          <div className="global-decision-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="global-decision-header">
-              <h3>
-                {decisionModal.rejected ? '❌ 行动被拒绝' : '✅ 行动建议'}
-              </h3>
-              <button className="global-modal-close" onClick={handleCloseDecision}>×</button>
-            </div>
-            
-            <div className="global-decision-content">
-              {/* 决策理由 */}
-              <div className="global-decision-reason">
-                <strong>{decisionModal.rejected ? '❌ 拒绝理由' : '✅ 执行理由'}:</strong>
-                <p>{decisionModal.decision.reason}</p>
-              </div>
-              
-              {/* 详细分析 */}
-              <div className="global-decision-analysis">
-                <strong>📊 详细分析:</strong>
-                <pre>{decisionModal.decision.analysis}</pre>
-              </div>
-              
-              {/* 执行条件/建议 */}
-              {decisionModal.decision.conditions && (
-                <div className="global-decision-conditions">
-                  <strong>💡 建议:</strong>
-                  <p>{decisionModal.decision.conditions}</p>
-                </div>
-              )}
-              
-              {/* 置信度 */}
-              <div className="global-decision-confidence">
-                <strong>🎯 置信度:</strong>
-                <span className={`global-confidence-${decisionModal.decision.confidence}`}>
-                  {decisionModal.decision.confidence === 'high' ? '高' : 
-                   decisionModal.decision.confidence === 'medium' ? '中' : '低'}
-                </span>
-              </div>
-            </div>
-            
-            {/* 操作按钮 */}
-            <div className="global-decision-buttons">
-              {!decisionModal.rejected && (
-                <>
-                  <button className="global-btn-cancel" onClick={handleCloseDecision}>
-                    取消
-                  </button>
-                  <button 
-                    className="global-btn-confirm" 
-                    onClick={handleConfirmDecision}
-                    disabled={decisionModal.loading}
-                    style={{ '--action-color': decisionModal.action?.color || '#4299E1' }}
-                  >
-                    {decisionModal.loading ? '执行中...' : '确认执行'}
-                  </button>
-                </>
-              )}
-              {decisionModal.rejected && (
-                <button className="global-btn-confirm" onClick={handleCloseDecision}>
-                  知道了
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ========== 世界频道聊天（底部悬浮） ========== */}
-      {isAuthenticated && <WorldChannel lang={lang} />}
-      </>
-    )}
     </div>
-  </div>
   );
 }
 
