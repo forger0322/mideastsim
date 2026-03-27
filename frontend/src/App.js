@@ -17,6 +17,18 @@ import { world } from './services/api';
 import { t, useTranslation, setLang, translateEvent } from './i18n';
 import './App.css';
 
+// 领导人数据
+const LEADERS = [
+  { id: 'trump', name: '唐纳德·特朗普', nameEn: 'Donald Trump', location: '美国', locationEn: 'United States', status: 'Active', avatar: '🇺🇸', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Donald_Trump_official_portrait.jpg/220px-Donald_Trump_official_portrait.jpg', lat: 37.0902, lng: -95.7129 },
+  { id: 'netanyahu', name: '本雅明·内塔尼亚胡', nameEn: 'Benjamin Netanyahu', location: '以色列', locationEn: 'Israel', status: 'Active', avatar: '🇮🇱', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Netanyahu_2017_%28cropped%29.jpg/220px-Netanyahu_2017_%28cropped%29.jpg', lat: 31.0461, lng: 34.8516 },
+  { id: 'mujtaba', name: '穆杰塔巴·萨德尔', nameEn: 'Mujtaba Sadr', location: '伊拉克', locationEn: 'Iraq', status: 'Active', avatar: '🇮🇶', image: 'https://ui-avatars.com/api/?name=Mujtaba+Sadr&size=220&background=8B1A1A&color=fff', lat: 33.2232, lng: 43.6793 },
+  { id: 'assad', name: '巴沙尔·阿萨德', nameEn: 'Bashar al-Assad', location: '叙利亚', locationEn: 'Syria', status: 'Active', avatar: '🇸🇾', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Bashar_al-Assad_in_Moscow%2C_18_May_2023_%28cropped%29.jpg/220px-Bashar_al-Assad_in_Moscow%2C_18_May_2023_%28cropped%29.jpg', lat: 34.8021, lng: 38.9968 },
+  { id: 'khamenei', name: '阿里·哈梅内伊', nameEn: 'Ali Khamenei', location: '伊朗', locationEn: 'Iran', status: 'Active', avatar: '🇮🇷', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Ali_Khamenei_in_Mashhad_%282016%29_02_%28cropped%29.jpg/220px-Ali_Khamenei_in_Mashhad_%282016%29_02_%28cropped%29.jpg', lat: 32.4279, lng: 53.6880 },
+  { id: 'salman', name: '萨勒曼国王', nameEn: 'King Salman', location: '沙特', locationEn: 'Saudi Arabia', status: 'Active', avatar: '🇸🇦', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Salman_bin_Abdulaziz_Al_Saud_2019.jpg/220px-Salman_bin_Abdulaziz_Al_Saud_2019.jpg', lat: 23.8859, lng: 45.0792 },
+  { id: 'sisi', name: '阿卜杜勒 - 法塔赫·塞西', nameEn: 'Abdel Fattah el-Sisi', location: '埃及', locationEn: 'Egypt', status: 'Active', avatar: '🇪🇬', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Abdel_Fattah_el-Sisi_2015.jpg/220px-Abdel_Fattah_el-Sisi_2015.jpg', lat: 26.8206, lng: 30.8025 },
+  { id: 'erdogan', name: '雷杰普·塔伊普·埃尔多安', nameEn: 'Recep Tayyip Erdogan', location: '土耳其', locationEn: 'Turkey', status: 'Active', avatar: '🇹🇷', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Recep_Tayyip_Erdogan_%282023%29_%28cropped%29.jpg/220px-Recep_Tayyip_Erdogan_%282023%29_%28cropped%29.jpg', lat: 38.9637, lng: 35.2433 },
+];
+
 // 国家到领导人的映射（根据国家 ID）
 const COUNTRY_LEADER_MAP = {
   'IRN': { name: '阿里·哈梅内伊', nameEn: 'Ali Khamenei', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Ali_Khamenei_in_Mashhad_%282016%29_02_%28cropped%29.jpg/220px-Ali_Khamenei_in_Mashhad_%282016%29_02_%28cropped%29.jpg' },
