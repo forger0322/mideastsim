@@ -586,11 +586,34 @@ function App() {
         }
         const worldData = await worldResponse.json();
         
-        // 合并默认经济数据 (真实市场数据 2026-03-12)
+        // 使用后端返回的真实经济数据
         const mergedData = {
           ...worldData,
           hotspots: worldData.hotspots || [],
-          economic: {
+          // 使用后端返回的 economy 数据（包含实时价格）
+          economy: worldData.economy || {
+            stocks: { spx: 6672.62, hsi: 25716.76, ftse: 8342.15 },
+            crypto: { btc: 70523, eth: 2064 },
+            commodities: { oil: 96.35, gold: 5153, silver: 86.84 }
+          },
+          // 保留旧的 economic 字段用于兼容（使用 economy 数据转换）
+          economic: worldData.economy ? {
+            commodities: {
+              Oil: { value: `$${worldData.economy.commodities?.oil?.toFixed(2) || '96.35'}`, change: 3.2 },
+              Gold: { value: `$${worldData.economy.commodities?.gold?.toFixed(2) || '5153'}`, change: 1.8 },
+              Silver: { value: `$${worldData.economy.commodities?.silver?.toFixed(2) || '86.84'}`, change: 1.28 }
+            },
+            crypto: {
+              BTC: { value: `$${worldData.economy.crypto?.btc?.toFixed(0) || '70523'}`, change: 0.58 },
+              ETH: { value: `$${worldData.economy.crypto?.eth?.toFixed(0) || '2064'}`, change: 1.81 }
+            },
+            stocks: {
+              SPX: { value: (worldData.economy.stocks?.spx || 6672.62).toFixed(2), change: -1.5 },
+              HSI: { value: (worldData.economy.stocks?.hsi || 25716.76).toFixed(2), change: -0.70 },
+              FTSE: { value: (worldData.economy.stocks?.ftse || 8342.15).toFixed(2), change: 0.45 }
+            },
+            domestic: worldData.economic?.domestic || {}
+          } : {
             commodities: {
               Oil: { value: '$96.35', change: 3.2 },
               Gold: { value: '$5153', change: 1.8 },
@@ -604,7 +627,7 @@ function App() {
               SPX: { value: '6672.62', change: -1.5 },
               HSI: { value: '25716.76', change: -0.70 }
             },
-            domestic: worldData.economic?.domestic || {}
+            domestic: {}
           }
         };
         
