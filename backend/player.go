@@ -84,19 +84,8 @@ func (s *PlayerService) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 自动分配一个未绑定的角色
-	var roleID string
-	err = s.db.db.QueryRow(`
-		SELECT id FROM roles 
-		WHERE player_id IS NULL AND is_active = 1 
-		ORDER BY RANDOM() LIMIT 1
-	`).Scan(&roleID)
-	
-	if err == nil && roleID != "" {
-		// 绑定角色到玩家
-		s.db.db.Exec(`UPDATE roles SET player_id = ? WHERE id = ?`, playerID, roleID)
-		logger.Printf("[INFO] 新玩家 %s 自动绑定角色 %s", req.Username, roleID)
-	}
+	// 新玩家不自动绑定角色，由玩家在前端自主选择
+	roleID := ""
 
 	// 生成 token
 	token, err := s.auth.GenerateToken(playerID, req.Username, roleID)
