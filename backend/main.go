@@ -241,8 +241,8 @@ func simulationLoop(db *Database) {
 	defer ticker.Stop()
 
 	for range ticker.C {
-		// 生成随机事件
-		generateRandomEvent(db)
+		// ⚠️ 随机事件生成已禁用 - 事件由 AI Agent 行动生成
+		// generateRandomEvent(db)
 
 		// 更新关系
 		updateRelations(db)

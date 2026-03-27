@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"math/rand"
 	"time"
@@ -296,9 +297,125 @@ func (m *OfflineAIManager) ExecuteAIActions(ruleEngine *RuleEngine) {
 		if command := m.MakeAIDecision(roleID); command != nil {
 			// 执行 AI 决策
 			go func(roleID string, cmd *AgentCommand) {
-				// 调用规则引擎执行行动
-				// 注意：这里需要访问 ruleEngine 的相关方法
-				log.Printf("🤖 执行 AI 行动：%s - %s", roleID, cmd.Action)
+				log.Printf("🤖 AI 决策：%s → %s (%s)", roleID, cmd.Action, cmd.TargetID)
+				
+				var result *ActionResult
+				var err error
+				
+				// 根据行动类型调用规则引擎
+				switch cmd.Action {
+				case "declare_war":
+					if cmd.TargetID != "" {
+						result, err = ruleEngine.DeclareWar(roleID, cmd.TargetID)
+					}
+				case "sanction":
+					if cmd.TargetID != "" {
+						result, err = ruleEngine.Sanction(roleID, cmd.TargetID)
+					}
+				case "alliance":
+					if cmd.TargetID != "" {
+						result, err = ruleEngine.FormAlliance(roleID, cmd.TargetID)
+					}
+				case "statement":
+					// 外交声明
+					statementType := "neutral"
+					if cmd.Data != nil {
+						if t, ok := cmd.Data["statement_type"].(string); ok {
+							statementType = t
+						}
+					}
+					content := cmd.ReasonZh
+					if content == "" {
+						content = "我们致力于维护地区和平与稳定。"
+					}
+					result, err = ruleEngine.DiplomaticStatement(roleID, cmd.TargetID, statementType, content)
+				case "military_exercise":
+					// 军事演习 - 创建事件
+					result = &ActionResult{
+						Success: true,
+						Message: fmt.Sprintf("%s 在边境地区举行军事演习", roleID),
+						NewEvent: &Event{
+							ID:          fmt.Sprintf("evt_mil_%s_%d", roleID, time.Now().Unix()),
+							Timestamp:   time.Now(),
+							Location:    roleID,
+							Type:        "military",
+							Title:       "Military Exercise",
+							TitleZh:     "军事演习",
+							Description: fmt.Sprintf("%s conducted a military exercise near border regions.", roleID),
+							DescriptionZh: fmt.Sprintf("%s 在边境地区举行军事演习。", roleID),
+							ActorID:     roleID,
+						},
+					}
+				case "improve_relations":
+					// 改善关系 - 增加关系值
+					if cmd.TargetID != "" {
+						currentRel, _ := m.db.GetRelation(roleID, cmd.TargetID)
+						newValue := currentRel.Value + 5
+						if newValue > 100 {
+							newValue = 100
+						}
+						m.db.UpdateRelation(roleID, cmd.TargetID, newValue, 5)
+						result = &ActionResult{
+							Success: true,
+							Message: fmt.Sprintf("%s 改善了与 %s 的关系", roleID, cmd.TargetID),
+							NewEvent: &Event{
+								ID:          fmt.Sprintf("evt_rel_%s_%s_%d", roleID, cmd.TargetID, time.Now().Unix()),
+								Timestamp:   time.Now(),
+								Location:    roleID,
+								Type:        "diplomacy",
+								Title:       "Relations Improved",
+								TitleZh:     "改善关系",
+								Description: fmt.Sprintf("%s took steps to improve relations with %s.", roleID, cmd.TargetID),
+								DescriptionZh: fmt.Sprintf("%s 采取措施改善与 %s 的关系。", roleID, cmd.TargetID),
+								ActorID:     roleID,
+								TargetID:    cmd.TargetID,
+							},
+						}
+					}
+				case "build_military":
+					// 发展军备 - 增加军力
+					role, err := m.db.GetRoleByID(roleID)
+					if err == nil {
+						newAttrs := role.Attributes
+						newAttrs.Army += 2
+						m.db.UpdateRoleAttributes(roleID, newAttrs)
+						result = &ActionResult{
+							Success: true,
+							Message: fmt.Sprintf("%s 加强了军事建设", roleID),
+							NewEvent: &Event{
+								ID:          fmt.Sprintf("evt_build_%s_%d", roleID, time.Now().Unix()),
+								Timestamp:   time.Now(),
+								Location:    roleID,
+								Type:        "military",
+								Title:       "Military Buildup",
+								TitleZh:     "军事建设",
+								Description: fmt.Sprintf("%s invested in military development.", roleID),
+								DescriptionZh: fmt.Sprintf("%s 投资发展军事力量。", roleID),
+								ActorID:     roleID,
+							},
+						}
+					}
+				default:
+					log.Printf("⚠️ 未知行动类型：%s", cmd.Action)
+				}
+				
+				// 处理结果
+				if err != nil {
+					log.Printf("❌ AI 行动失败：%s - %v", cmd.Action, err)
+					return
+				}
+				
+				if result != nil && result.NewEvent != nil {
+					// 保存事件到数据库
+					if err := m.db.CreateEvent(result.NewEvent); err != nil {
+						log.Printf("❌ 创建事件失败：%v", err)
+					} else {
+						log.Printf("✅ AI 事件已创建：%s - %s", result.NewEvent.ID, result.NewEvent.TitleZh)
+					}
+					
+					// 广播事件
+					broadcastWorldState()
+				}
 			}(roleID, command)
 		}
 	}
