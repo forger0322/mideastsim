@@ -95,9 +95,6 @@ func main() {
 		}
 	}
 
-	// 🆕 初始化经济数据定时更新
-	initEconomicData()
-
 	// 🆕 初始化 Agent 记忆系统
 	if err := db.CreateAgentMemoryTable(); err != nil {
 		logger.Printf("⚠️ Agent 记忆表初始化警告：%v", err)
@@ -266,21 +263,21 @@ func generateRandomEvent(db *Database) {
 
 	// 中英文地点名称
 	locationNames := map[string]map[string]string{
-		"Tehran":       {"zh": "德黑兰", "en": "Tehran"},
-		"Jerusalem":    {"zh": "耶路撒冷", "en": "Jerusalem"},
-		"Riyadh":       {"zh": "利雅得", "en": "Riyadh"},
-		"Damascus":     {"zh": "大马士革", "en": "Damascus"},
-		"Baghdad":      {"zh": "巴格达", "en": "Baghdad"},
-		"Abu Dhabi":    {"zh": "阿布扎比", "en": "Abu Dhabi"},
-		"Cairo":        {"zh": "开罗", "en": "Cairo"},
-		"Ankara":       {"zh": "安卡拉", "en": "Ankara"},
-		"Amman":        {"zh": "安曼", "en": "Amman"},
-		"Beirut":       {"zh": "贝鲁特", "en": "Beirut"},
-		"Doha":         {"zh": "多哈", "en": "Doha"},
-		"Kuwait City":  {"zh": "科威特城", "en": "Kuwait City"},
-		"Muscat":       {"zh": "马斯喀特", "en": "Muscat"},
-		"Sanaa":        {"zh": "萨那", "en": "Sanaa"},
-		"Ramallah":     {"zh": "拉马拉", "en": "Ramallah"},
+		"Tehran":      {"zh": "德黑兰", "en": "Tehran"},
+		"Jerusalem":   {"zh": "耶路撒冷", "en": "Jerusalem"},
+		"Riyadh":      {"zh": "利雅得", "en": "Riyadh"},
+		"Damascus":    {"zh": "大马士革", "en": "Damascus"},
+		"Baghdad":     {"zh": "巴格达", "en": "Baghdad"},
+		"Abu Dhabi":   {"zh": "阿布扎比", "en": "Abu Dhabi"},
+		"Cairo":       {"zh": "开罗", "en": "Cairo"},
+		"Ankara":      {"zh": "安卡拉", "en": "Ankara"},
+		"Amman":       {"zh": "安曼", "en": "Amman"},
+		"Beirut":      {"zh": "贝鲁特", "en": "Beirut"},
+		"Doha":        {"zh": "多哈", "en": "Doha"},
+		"Kuwait City": {"zh": "科威特城", "en": "Kuwait City"},
+		"Muscat":      {"zh": "马斯喀特", "en": "Muscat"},
+		"Sanaa":       {"zh": "萨那", "en": "Sanaa"},
+		"Ramallah":    {"zh": "拉马拉", "en": "Ramallah"},
 	}
 
 	// 事件类型
@@ -1298,65 +1295,18 @@ var economicBaseline = map[string]float64{
 
 // 经济数据变化百分比
 var economicChanges = map[string]float64{
-	"spx":  0,
-	"hsi":  0,
-	"ftse": 0,
-	"btc":  0,
-	"eth":  0,
-	"oil":  0,
-	"gold": 0,
+	"spx":    0,
+	"hsi":    0,
+	"ftse":   0,
+	"btc":    0,
+	"eth":    0,
+	"oil":    0,
+	"gold":   0,
 	"silver": 0,
 }
 
 // 经济数据锁（并发安全）
 var economicMutex sync.RWMutex
-
-// initEconomicData 初始化经济数据并启动定时更新
-func initEconomicData() {
-	// 每 60 秒随机波动经济数据
-	go func() {
-		ticker := time.NewTicker(60 * time.Second)
-		defer ticker.Stop()
-		for range ticker.C {
-			updateEconomicDataRandomly()
-		}
-	}()
-}
-
-// updateEconomicDataRandomly 随机更新经济数据（模拟市场波动）
-func updateEconomicDataRandomly() {
-	economicMutex.Lock()
-	defer economicMutex.Unlock()
-
-	// 随机波动范围：±2%
-	rand.Seed(time.Now().UnixNano())
-
-	// 股市波动
-	for _, key := range []string{"spx", "hsi", "ftse"} {
-		change := (rand.Float64() - 0.5) * 4 // -2% to +2%
-		economicBaseline[key] = economicBaseline[key] * (1 + change/100)
-		economicChanges[key] = change
-	}
-
-	// 加密货币波动（更大波动：±5%）
-	for _, key := range []string{"btc", "eth"} {
-		change := (rand.Float64() - 0.5) * 10 // -5% to +5%
-		economicBaseline[key] = economicBaseline[key] * (1 + change/100)
-		economicChanges[key] = change
-	}
-
-	// 大宗商品波动：±3%
-	for _, key := range []string{"oil", "gold", "silver"} {
-		change := (rand.Float64() - 0.5) * 6 // -3% to +3%
-		economicBaseline[key] = economicBaseline[key] * (1 + change/100)
-		economicChanges[key] = change
-	}
-
-	log.Printf("[经济更新] 市场波动：油价$%.2f (%.2f%%), 黄金$%.2f (%.2f%%), BTC$%.2f (%.2f%%)",
-		economicBaseline["oil"], economicChanges["oil"],
-		economicBaseline["gold"], economicChanges["gold"],
-		economicBaseline["btc"], economicChanges["btc"])
-}
 
 // 更新经济数据（使用 PM Agent 分析的具体值）
 func updateEconomicData(analysis *PMAnalyzeResponse) {

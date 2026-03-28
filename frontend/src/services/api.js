@@ -1,6 +1,6 @@
 // frontend/src/services/api.js
-// 使用相对路径，通过 setupProxy.js 代理到后端
-const API_BASE = '';
+// 使用域名调用后端 8081 端口
+const API_BASE = 'http://www.clawdbotgame.com:8081';
 
 // 获取存储的 token
 const getToken = () => localStorage.getItem('auth_token');

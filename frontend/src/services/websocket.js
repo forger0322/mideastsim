@@ -14,9 +14,9 @@ class WorldWebSocket {
 
     let wsUrl;
     if (isDevelopment) {
-      // 开发环境：通过 setupProxy 代理（localhost:9090/ws）
-      wsUrl = `${protocol}//localhost${window.location.port ? ':' + window.location.port : ''}/ws`;
-      console.log(`[WebSocket] DEV 模式，使用本地代理: ${wsUrl}`);
+      // 开发环境：直接连接后端 8081 端口
+      wsUrl = `${protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}/ws`;
+      console.log(`[WebSocket] DEV 模式，同源连接: ${wsUrl}`);
     } else {
       // 生产环境：优先用环境变量，次选同源
       const customWsHost = process.env.REACT_APP_WS_HOST;

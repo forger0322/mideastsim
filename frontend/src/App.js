@@ -635,20 +635,21 @@ function App() {
             commodities: { oil: 96.35, gold: 5153, silver: 86.84 }
           },
           // 保留旧的 economic 字段用于兼容（使用 economy 数据转换）
+          // 后端格式：economy.stocks.spx = {value: 6672.62, change: -1.5}
           economic: worldData.economy ? {
             commodities: {
-              Oil: { value: `$${worldData.economy.commodities?.oil?.toFixed(2) || '96.35'}`, change: 3.2 },
-              Gold: { value: `$${worldData.economy.commodities?.gold?.toFixed(2) || '5153'}`, change: 1.8 },
-              Silver: { value: `$${worldData.economy.commodities?.silver?.toFixed(2) || '86.84'}`, change: 1.28 }
+              Oil: { value: worldData.economy.commodities?.oil?.value?.toFixed(2) || '96.35', change: worldData.economy.commodities?.oil?.change || 3.2 },
+              Gold: { value: worldData.economy.commodities?.gold?.value?.toFixed(0) || '5153', change: worldData.economy.commodities?.gold?.change || 1.8 },
+              Silver: { value: worldData.economy.commodities?.silver?.value?.toFixed(2) || '86.84', change: worldData.economy.commodities?.silver?.change || 1.28 }
             },
             crypto: {
-              BTC: { value: `$${worldData.economy.crypto?.btc?.toFixed(0) || '70523'}`, change: 0.58 },
-              ETH: { value: `$${worldData.economy.crypto?.eth?.toFixed(0) || '2064'}`, change: 1.81 }
+              BTC: { value: worldData.economy.crypto?.btc?.value?.toFixed(0) || '70523', change: worldData.economy.crypto?.btc?.change || 0.58 },
+              ETH: { value: worldData.economy.crypto?.eth?.value?.toFixed(0) || '2064', change: worldData.economy.crypto?.eth?.change || 1.81 }
             },
             stocks: {
-              SPX: { value: (worldData.economy.stocks?.spx || 6672.62).toFixed(2), change: -1.5 },
-              HSI: { value: (worldData.economy.stocks?.hsi || 25716.76).toFixed(2), change: -0.70 },
-              FTSE: { value: (worldData.economy.stocks?.ftse || 8342.15).toFixed(2), change: 0.45 }
+              SPX: { value: (worldData.economy.stocks?.spx?.value || 6672.62).toFixed(2), change: worldData.economy.stocks?.spx?.change || -1.5 },
+              HSI: { value: (worldData.economy.stocks?.hsi?.value || 25716.76).toFixed(2), change: worldData.economy.stocks?.hsi?.change || -0.70 },
+              FTSE: { value: (worldData.economy.stocks?.ftse?.value || 8342.15).toFixed(2), change: worldData.economy.stocks?.ftse?.change || 0.45 }
             },
             domestic: worldData.economic?.domestic || {}
           } : {
@@ -663,7 +664,8 @@ function App() {
             },
             stocks: {
               SPX: { value: '6672.62', change: -1.5 },
-              HSI: { value: '25716.76', change: -0.70 }
+              HSI: { value: '25716.76', change: -0.70 },
+              FTSE: { value: '8342.15', change: 0.45 }
             },
             domestic: {}
           }

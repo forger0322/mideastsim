@@ -5,9 +5,9 @@ module.exports = function (app) {
   console.log('🔧 [Proxy] 配置 WebSocket 代理...');
 
   // WebSocket 代理 - 使用 http-proxy-middleware v3 API
-  // 在开发环境中，localhost:9090/ws 代理到 http://127.0.0.1:8080
+  // 在开发环境中，localhost:9090/ws 代理到 http://127.0.0.1:8081
   app.use('/ws', createProxyMiddleware({
-    target: 'http://127.0.0.1:8080',
+    target: 'http://127.0.0.1:8081',
     ws: true,
     changeOrigin: true,
     logLevel: 'info',
@@ -33,11 +33,11 @@ module.exports = function (app) {
     timeout: 60000, // 60 秒超时
   }));
 
-  console.log('✅ [Proxy] WebSocket 代理已配置：/ws → http://127.0.0.1:8080');
+  console.log('✅ [Proxy] WebSocket 代理已配置：/ws → http://127.0.0.1:8081');
 
   // API 代理
   app.use('/api', createProxyMiddleware({
-    target: 'http://127.0.0.1:8080',
+    target: 'http://127.0.0.1:8081',
     changeOrigin: true,
     logLevel: 'info',
     pathRewrite: {
@@ -45,5 +45,5 @@ module.exports = function (app) {
     },
   }));
 
-  console.log('✅ [Proxy] API 代理已配置：/api → http://127.0.0.1:8080');
+  console.log('✅ [Proxy] API 代理已配置：/api → http://127.0.0.1:8081');
 };
