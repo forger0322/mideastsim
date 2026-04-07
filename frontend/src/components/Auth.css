@@ -1,0 +1,1144 @@
+/* ============================================
+   MideastSim - 羊皮纸军令状登录界面
+   Parchment Scroll Auth Interface
+   ============================================ */
+
+/* 语言切换按钮 - 右上角 */
+.lang-switch-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 8px 16px;
+  background: rgba(139, 90, 43, 0.2);
+  border: 2px solid #8b5a2b;
+  border-radius: 8px;
+  color: #5a3a1a;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 100;
+}
+
+.lang-switch-btn:hover {
+  background: rgba(139, 90, 43, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 90, 43, 0.3);
+}
+
+.lang-switch-btn:active {
+  transform: translateY(0);
+}
+
+/* 密码输入框容器 */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper .form-input {
+  flex: 1;
+  padding-right: 50px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 5px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+
+.password-toggle-btn:hover {
+  opacity: 1;
+}
+
+/* 输入框错误状态 */
+.form-input.input-error {
+  border-color: #dc2626;
+  background-color: rgba(220, 38, 38, 0.05);
+}
+
+/* 字段错误提示 */
+.field-error {
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: rgba(220, 38, 38, 0.1);
+  border-left: 3px solid #dc2626;
+  border-radius: 4px;
+  color: #7f1d1d;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.field-error .error-char {
+  font-size: 14px;
+}
+
+/* Auth Container - 羊皮纸背景 */
+.auth-container {
+  --faction-red-opacity: 0.1;
+  --faction-blue-opacity: 0.1;
+  --faction-gold-opacity: 0.1;
+  --faction-green-opacity: 0.1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* 羊皮纸基色 #d9c8a9 */
+  background-color: #d9c8a9;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 简洁羊皮纸背景 - 移除过度滤镜 */
+.auth-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(139, 90, 43, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 90, 43, 0.08) 1px, transparent 1px);
+  background-size: 40px 40px, 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 移除褶皱效果 */
+.auth-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 移除势力色块淡影 - 保持页面清晰 */
+/* 移除模糊色块 */
+
+/* ============================================
+   横向卷轴容器 - 使用 transform 实现流畅展开
+   ============================================ */
+.scroll-wrapper {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 700px;
+  opacity: 0;
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease;
+}
+
+.scroll-wrapper.unrolled {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* ============================================
+   左右卷轴杆 - 做旧青铜/实木
+   ============================================ */
+.scroll-rod-left,
+.scroll-rod-right {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 12;
+  flex-shrink: 0;
+}
+
+.scroll-rod-left {
+  margin-right: -8px;
+}
+
+.scroll-rod-right {
+  margin-left: -8px;
+}
+
+/* 卷轴杆身 - 做旧青铜/木质 */
+.rod-axis {
+  width: 55px;
+  height: 300px;
+  background: linear-gradient(145deg, #5d4a2e, #3a2c1a);
+  border-radius: 30px;
+  border: 3px solid rgba(101, 67, 33, 0.6);
+  box-shadow: 
+    0 6px 25px rgba(0, 0, 0, 0.5),
+    inset 0 -5px 10px rgba(0, 0, 0, 0.3),
+    inset 0 5px 10px rgba(255, 215, 140, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 铜绿效果 */
+.rod-axis::before {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 10%;
+  width: 30%;
+  height: 40%;
+  background: rgba(0, 150, 150, 0.15);
+  filter: blur(8px);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* 划痕效果 */
+.rod-axis::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.03) 10px,
+    rgba(0, 0, 0, 0.03) 12px
+  );
+  pointer-events: none;
+}
+
+/* 卷轴杆帽 - 火漆印风格 */
+.rod-cap {
+  width: 75px;
+  height: 75px;
+  background: linear-gradient(
+    135deg,
+    #5c3317 0%,
+    #3d1f12 50%,
+    #2d1a0f 100%
+  );
+  border-radius: 50%;
+  border: 4px solid rgba(139, 69, 19, 0.5);
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.6),
+    inset 0 2px 15px rgba(0, 0, 0, 0.5);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.rod-cap.top {
+  top: -32px;
+}
+
+.rod-cap.bottom {
+  bottom: -32px;
+}
+
+.rod-cap::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(
+    circle,
+    rgba(180, 50, 50, 0.7) 0%,
+    rgba(139, 26, 26, 0.9) 70%
+  );
+  border-radius: 50%;
+  border: 2px solid rgba(212, 175, 55, 0.4);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* 卷轴装饰 - 游戏纹章 */
+.rod-decoration {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 45px;
+  height: 45px;
+  background: radial-gradient(
+    circle,
+    rgba(212, 175, 55, 0.25) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 13;
+}
+
+.deco-char {
+  font-size: 24px;
+  color: rgba(212, 175, 55, 0.75);
+  font-weight: bold;
+  text-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+  font-family: 'KaiTi', 'STKaiti', serif;
+}
+
+.scroll-rod-left .deco-char {
+  color: rgba(255, 215, 100, 0.85);
+}
+
+.scroll-rod-right .deco-char {
+  color: rgba(200, 100, 100, 0.85);
+}
+
+/* ============================================
+   卷轴主体 - 羊皮纸军令状
+   ============================================ */
+.scroll-body {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.scroll-paper {
+  position: relative;
+  width: 100%;
+  min-height: 300px;
+  /* 浅羊皮纸色 #eadab8 */
+  background: #eadab8;
+  box-shadow: 
+    0 10px 20px rgba(0, 0, 0, 0.3),
+    inset 0 0 30px rgba(160, 120, 80, 0.2);
+  /* 上圆角大，下圆角小，像卷轴 */
+  border-radius: 20px 20px 8px 8px;
+  border: 2px solid #8b6b3f;
+}
+
+/* 羊皮纸纹理 - 简化版，移除复杂 SVG 滤镜 */
+.paper-texture {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(rgba(139, 90, 43, 0.06) 1px, transparent 1px),
+    radial-gradient(rgba(139, 90, 43, 0.04) 1px, transparent 1px);
+  background-size: 20px 20px, 35px 35px;
+  background-position: 0 0, 10px 10px;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 毛边效果 - 虚线边框模拟 */
+.scroll-paper::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 1px dashed #8b6b3f;
+  border-radius: 24px 24px 12px 12px;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* 毛边效果 - 简化 */
+.scroll-paper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(139, 90, 43, 0.03);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* 宣纸边框 - 织锦纹样 */
+.paper-border {
+  position: absolute;
+  background: linear-gradient(
+    90deg,
+    rgba(139, 69, 19, 0.18) 0%,
+    rgba(180, 130, 80, 0.22) 50%,
+    rgba(139, 69, 19, 0.18) 100%
+  );
+  z-index: 4;
+}
+
+.paper-border.top,
+.paper-border.bottom {
+  height: 18px;
+  left: 0;
+  right: 0;
+}
+
+.paper-border.top {
+  top: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(139, 69, 19, 0.22) 0%,
+    rgba(180, 130, 80, 0.18) 100%
+  );
+}
+
+.paper-border.bottom {
+  bottom: 0;
+  background: linear-gradient(
+    0deg,
+    rgba(139, 69, 19, 0.22) 0%,
+    rgba(180, 130, 80, 0.18) 100%
+  );
+}
+
+.paper-border.left,
+.paper-border.right {
+  width: 18px;
+  top: 0;
+  bottom: 0;
+}
+
+.paper-border.left {
+  left: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(139, 69, 19, 0.22) 0%,
+    rgba(180, 130, 80, 0.18) 100%
+  );
+}
+
+.paper-border.right {
+  right: 0;
+  background: linear-gradient(
+    270deg,
+    rgba(139, 69, 19, 0.22) 0%,
+    rgba(180, 130, 80, 0.18) 100%
+  );
+}
+
+/* ============================================
+   内容区域
+   ============================================ */
+.auth-card {
+  position: relative;
+  z-index: 5;
+  padding: 35px 50px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* 头部 */
+.auth-header {
+  text-align: center;
+  margin-bottom: 28px;
+  position: relative;
+}
+
+/* 顶部装饰 - 游戏专属纹章 */
+.header-ornament {
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.ornament-symbol {
+  font-size: 2.2rem;
+  color: rgba(139, 69, 19, 0.65);
+  animation: taijiRotate 30s linear infinite;
+  display: inline-block;
+  text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+}
+
+@keyframes taijiRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 可点击的推演印章 */
+.seal-clickable {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.seal-clickable:hover {
+  transform: scale(1.08);
+  text-shadow: 0 0 20px rgba(180, 50, 50, 0.5);
+}
+
+.auth-title {
+  font-size: 2.4rem;
+  font-weight: bold;
+  color: #4a331c;
+  font-family: 'KaiTi', 'STKaiti', '楷体', serif;
+  letter-spacing: 8px;
+  margin: 0 0 8px 0;
+  text-shadow: 
+    2px 2px 0 #d9c8a9,
+    4px 4px 0 rgba(0, 0, 0, 0.1);
+  position: relative;
+  display: inline-block;
+}
+
+/* 移除毛笔飞白效果，简化渲染 */
+
+.auth-subtitle {
+  color: rgba(101, 67, 33, 0.75);
+  font-size: 0.65rem;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  letter-spacing: 3px;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+/* 分隔线 - 回纹 */
+.divider-pattern {
+  width: 180px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(139, 69, 19, 0.5) 15%,
+    rgba(139, 69, 19, 0.75) 50%,
+    rgba(139, 69, 19, 0.5) 85%,
+    transparent 100%
+  );
+  margin: 18px auto 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pattern-symbol {
+  color: rgba(139, 69, 19, 0.65);
+  font-size: 14px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(90deg, #e8d8a8 0%, #e8d8a8 100%);
+  padding: 0 10px;
+}
+
+/* ============================================
+   标签页 - 木质印章样式
+   ============================================ */
+.auth-tabs {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 28px;
+  justify-content: center;
+}
+
+.auth-tab {
+  padding: 12px 35px;
+  background: transparent;
+  border: 2px solid rgba(139, 69, 19, 0.35);
+  border-radius: 8px;
+  color: rgba(101, 67, 33, 0.75);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'KaiTi', 'STKaiti', '楷体', serif;
+  letter-spacing: 3px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  /* 木质纹理 */
+  background-image: linear-gradient(
+    180deg,
+    rgba(180, 130, 80, 0.08) 0%,
+    rgba(139, 69, 19, 0.05) 100%
+  );
+  box-shadow: 
+    0 3px 10px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.tab-char {
+  font-size: 1.4rem;
+  color: rgba(139, 69, 19, 0.55);
+  font-weight: bold;
+  font-family: 'KaiTi', 'STKaiti', serif;
+}
+
+.tab-text {
+  letter-spacing: 3px;
+}
+
+.auth-tab:hover {
+  color: rgba(101, 67, 33, 0.95);
+  border-color: rgba(139, 69, 19, 0.55);
+  background-image: linear-gradient(
+    180deg,
+    rgba(180, 130, 80, 0.15) 0%,
+    rgba(139, 69, 19, 0.1) 100%
+  );
+  transform: translateY(-1px);
+  box-shadow: 
+    0 5px 15px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* 激活状态 - 印章按下效果 */
+.auth-tab.active {
+  color: #2c1810;
+  background: linear-gradient(
+    180deg,
+    rgba(180, 130, 80, 0.25) 0%,
+    rgba(212, 175, 55, 0.18) 100%
+  );
+  border-color: rgba(139, 69, 19, 0.7);
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.2),
+    inset 0 2px 8px rgba(139, 69, 19, 0.25);
+  transform: translateY(1px);
+}
+
+.auth-tab.active .tab-char {
+  color: rgba(139, 69, 19, 0.85);
+}
+
+/* 印章按压动画 */
+@keyframes sealPress {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+
+.auth-tab.active {
+  animation: sealPress 0.3s ease;
+}
+
+/* ============================================
+   表单 - 竖排标签
+   ============================================ */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.form-label {
+  color: rgba(44, 24, 16, 0.9);
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: 'KaiTi', 'STKaiti', '楷体', serif;
+  letter-spacing: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 32px;
+  padding-top: 8px;
+}
+
+.label-char {
+  font-size: 1.3rem;
+  color: rgba(139, 69, 19, 0.65);
+  font-weight: bold;
+  font-family: 'KaiTi', 'STKaiti', serif;
+  text-shadow: 0 0 8px rgba(139, 69, 19, 0.2);
+}
+
+.form-input {
+  flex: 1;
+  padding: 12px 20px;
+  /* 浅米色底 #f0e2c4 + 深棕色描边 */
+  background: #f0e2c4;
+  border: 2px solid #8b6b3f;
+  border-radius: 30px; /* 两端圆，像古代书卷 */
+  color: #2a1e0a;
+  font-size: 0.95rem;
+  font-family: 'KaiTi', 'STKaiti', '楷体', serif;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #b89b6b;
+  box-shadow: 0 0 12px rgba(184, 155, 107, 0.25);
+  background: #f5e9d1;
+}
+
+.form-input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  background: rgba(220, 210, 190, 0.5);
+}
+
+.form-input::placeholder {
+  color: #8b7d6b; /* 墨色 */
+  font-style: italic;
+  font-size: 14px;
+  font-family: 'KaiTi', 'STKaiti', '楷体', serif;
+}
+
+/* ============================================
+   错误消息
+   ============================================ */
+.error-message {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 26, 26, 0.12) 0%,
+    rgba(180, 50, 50, 0.08) 100%
+  );
+  border: 2px solid rgba(180, 50, 50, 0.35);
+  color: #8B1A1A;
+  padding: 11px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-family: 'KaiTi', 'STKaiti', '楷体', serif;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 10px rgba(139, 26, 26, 0.15);
+}
+
+.error-char {
+  font-size: 1.2rem;
+}
+
+/* ============================================
+   提交按钮 - 做旧铜色/赭石色
+   ============================================ */
+.submit-btn {
+  padding: 14px 40px;
+  /* 做旧铜色 #b87c4b */
+  background: #b87c4b;
+  border: 2px solid #6b4f2e;
+  border-radius: 40px;
+  color: #f0e6d2;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  font-family: 'KaiTi', 'STKaiti', '楷体', serif;
+  letter-spacing: 4px;
+  text-shadow: 1px 1px 0 #2a1e0a;
+  /* 底部阴影模拟厚度 */
+  box-shadow: 0 5px 0 #5d3e2a, 0 8px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.submit-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  transition: all 0.3s;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}
+
+.submit-btn:active::after {
+  width: 200px;
+  height: 200px;
+  opacity: 1;
+  transition: 0s;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 3px 0 #5d3e2a, 0 6px 10px rgba(0, 0, 0, 0.2);
+  background: #c68c5a;
+}
+
+.submit-btn:active:not(:disabled) {
+  transform: translateY(5px);
+  box-shadow: 0 0px 0 #5d3e2a, 0 5px 8px rgba(0, 0, 0, 0.2);
+}
+
+.submit-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.loading-text {
+  letter-spacing: 3px;
+}
+
+/* ============================================
+   底部 - 羊皮纸批注样式
+   ============================================ */
+.auth-footer {
+  margin-top: 22px;
+  text-align: center;
+}
+
+.footer-divider {
+  width: 120px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(139, 69, 19, 0.45) 50%,
+    transparent 100%
+  );
+  margin: 0 auto 14px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.divider-dot {
+  color: rgba(139, 69, 19, 0.55);
+  font-size: 11px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(90deg, #e8d8a8 0%, #e8d8a8 100%);
+  padding: 0 8px;
+}
+
+.auth-footer p {
+  color: rgba(101, 67, 33, 0.75);
+  font-size: 0.75rem;
+  margin: 0 0 14px 0;
+  font-family: 'KaiTi', 'STKaiti', '楷体', serif;
+  letter-spacing: 1.5px;
+  font-style: italic;
+}
+
+.guest-btn {
+  padding: 11px 28px;
+  background: transparent;
+  border: 2px solid rgba(139, 69, 19, 0.45);
+  border-radius: 8px;
+  color: rgba(101, 67, 33, 0.85);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'KaiTi', 'STKaiti', '楷体', serif;
+  letter-spacing: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.guest-btn:hover {
+  background: rgba(180, 130, 80, 0.18);
+  border-color: rgba(139, 69, 19, 0.65);
+  color: rgba(44, 24, 16, 0.95);
+  box-shadow: 0 5px 18px rgba(139, 69, 19, 0.25);
+  transform: translateY(-1px);
+}
+
+/* ============================================
+   火漆印 - 可点击动态元素
+   ============================================ */
+.seal-mark {
+  position: absolute;
+  bottom: 40px;
+  right: 55px;
+  z-index: 5;
+  opacity: 0.85;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.seal-mark:hover {
+  transform: scale(1.08) translateY(-2px);
+  opacity: 1;
+}
+
+.seal-frame {
+  width: 65px;
+  height: 65px;
+  border: 3px solid rgba(180, 50, 50, 0.75);
+  background: radial-gradient(
+    circle,
+    rgba(180, 50, 50, 0.25) 0%,
+    rgba(180, 50, 50, 0.35) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border-radius: 6px;
+  box-shadow: 
+    0 3px 15px rgba(180, 50, 50, 0.35),
+    inset 0 2px 10px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+/* 火漆印按压动画 */
+@keyframes waxSealPress {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.94); }
+  100% { transform: scale(1); }
+}
+
+.seal-mark:active .seal-frame {
+  animation: waxSealPress 0.25s ease;
+}
+
+.seal-char {
+  color: rgba(180, 50, 50, 0.85);
+  font-size: 22px;
+  font-family: 'KaiTi', 'STKaiti', '楷体', serif;
+  font-weight: bold;
+  line-height: 1;
+  text-shadow: 0 0 8px rgba(180, 50, 50, 0.3);
+}
+
+/* 谶语提示框 */
+.seal-tooltip {
+  position: absolute;
+  bottom: 75px;
+  right: 0;
+  background: rgba(44, 24, 16, 0.9);
+  color: #e8d8a8;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-family: 'KaiTi', 'STKaiti', '楷体', serif;
+  letter-spacing: 2px;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.seal-mark:hover .seal-tooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================
+   飘带装饰
+   ============================================ */
+.ribbon-flow {
+  position: absolute;
+  width: 38px;
+  height: 110px;
+  background: linear-gradient(
+    180deg,
+    rgba(180, 50, 50, 0.65) 0%,
+    rgba(139, 26, 26, 0.45) 100%
+  );
+  border: 2px solid rgba(212, 175, 55, 0.35);
+  border-radius: 20px;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.35);
+  z-index: 11;
+}
+
+.ribbon-flow.left {
+  left: 28px;
+  top: -40px;
+  transform: rotate(-18deg);
+}
+
+.ribbon-flow.right {
+  right: 28px;
+  bottom: -40px;
+  transform: rotate(18deg);
+}
+
+/* ============================================
+   底部题字
+   ============================================ */
+.bottom-inscription {
+  margin-top: 22px;
+  text-align: center;
+  color: rgba(101, 67, 33, 0.6);
+  font-size: 0.7rem;
+  font-family: 'KaiTi', 'STKaiti', '楷体', serif;
+  letter-spacing: 3px;
+  z-index: 10;
+}
+
+/* ============================================
+   响应式
+   ============================================ */
+@media (max-width: 750px) {
+  .scroll-wrapper.unrolled {
+    max-width: 100%;
+  }
+
+  .rod-axis {
+    height: 260px;
+    width: 45px;
+  }
+
+  .rod-cap {
+    width: 65px;
+    height: 65px;
+  }
+
+  .scroll-paper {
+    min-height: 280px;
+  }
+
+  .auth-card {
+    padding: 28px 25px;
+  }
+
+  .auth-title {
+    font-size: 2rem;
+    letter-spacing: 5px;
+  }
+
+  .auth-tabs {
+    gap: 18px;
+  }
+
+  .auth-tab {
+    padding: 10px 25px;
+  }
+
+  .form-group {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-label {
+    flex-direction: row;
+    gap: 8px;
+    padding-top: 0;
+  }
+
+  .seal-mark {
+    bottom: 28px;
+    right: 28px;
+  }
+
+  .seal-frame {
+    width: 55px;
+    height: 55px;
+  }
+
+  .seal-char {
+    font-size: 20px;
+  }
+
+  .seal-tooltip {
+    right: auto;
+    left: 0;
+    white-space: normal;
+    max-width: 180px;
+  }
+
+  .ribbon-flow {
+    display: none;
+  }
+
+  .faction-shadow {
+    opacity: 0.1;
+  }
+}
+
+/* 小手机适配 (≤480px) */
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 8px;
+  }
+  
+  .scroll-body {
+    min-width: 0;
+    width: 100%;
+  }
+  
+  .scroll-paper {
+    padding: 20px 15px;
+  }
+  
+  .auth-title {
+    font-size: 22px;
+    margin-bottom: 15px;
+  }
+  
+  .auth-tabs {
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .auth-tab {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-label {
+    font-size: 13px;
+  }
+  
+  .form-input {
+    padding: 10px 12px;
+    font-size: 16px; /* 防止 iOS 缩放 */
+  }
+  
+  .auth-submit {
+    padding: 12px 20px;
+    font-size: 15px;
+    width: 100%;
+  }
+  
+  .seal-mark {
+    bottom: 15px;
+    right: 15px;
+  }
+  
+  .seal-frame {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .seal-char {
+    font-size: 16px;
+  }
+  
+  .faction-shadows {
+    display: none; /* 小屏幕隐藏背景色块提升性能 */
+  }
+}

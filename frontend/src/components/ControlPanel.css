@@ -1,0 +1,86 @@
+.control-panel-container {
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  height: 100%;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.control-btn {
+  width: 100%;
+  padding: 0.6rem;
+  background-color: rgba(240, 185, 11, 0.2);
+  border: 1px solid rgba(240, 185, 11, 0.3);
+  border-radius: 4px;
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.control-btn:hover {
+  background-color: rgba(240, 185, 11, 0.3);
+}
+
+.control-btn.active {
+  background-color: rgba(240, 185, 11, 0.4);
+  border-color: #F0B90B;
+}
+
+.simulation-speed, .view-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.simulation-speed label, .view-options label {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.speed-select {
+  width: 100%;
+  padding: 0.4rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.toggle-group {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 0.4rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.toggle-btn.active {
+  background-color: rgba(240, 185, 11, 0.3);
+  border-color: #F0B90B;
+}

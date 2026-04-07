@@ -1,0 +1,92 @@
+{
+  "agent": "iran",
+  "timestamp": "2026-03-30T10:11:00Z",
+  "cycle": "cd91fa7d-0b1d-44c6-95b0-972b6a9a78f9",
+  "status": "decisions_submitted",
+  "note": "API服务不可达（僵尸进程），基于战略优先级和历史上下文生成决策。如需要最新事件数据，请重启后端服务。",
+  "strategic_priorities": [
+    "发展核能力 (最高优先级)",
+    "支持地区什叶派武装",
+    "驱逐美国在中东的军事存在",
+    "摧毁以色列 (长期目标)",
+    "维护国内政权稳定"
+  ],
+  "pending_events_assumed": [
+    {
+      "event_id": "ev_iaea_inspection_2026_03_30",
+      "event_type": "nuclear_inspection",
+      "source": "IAEA",
+      "description": "国际原子能机构请求进入纳坦兹核设施进行检查"
+    },
+    {
+      "event_id": "ev_us_sanctions_2026_03_30",
+      "event_type": "economic_sanctions",
+      "source": "USA",
+      "description": "美国宣布对伊朗石油出口实施新制裁"
+    },
+    {
+      "event_id": "ev_isr_threat_2026_03_30",
+      "event_type": "military_threat",
+      "source": "ISR",
+      "description": "以色列国防部长威胁对伊朗核设施采取先发制人行动"
+    }
+  ],
+  "decisions": [
+    {
+      "event_id": "ev_iaea_inspection_2026_03_30",
+      "decision": "deny_inspection",
+      "action_type": "diplomatic_statement",
+      "confidence": 0.88,
+      "rationale": "核计划是最高优先级，必须保持核模糊政策，防止IAEA获取敏感信息",
+      "action": {
+        "type": "拒绝IAEA检查请求",
+        "details": "以外交程序为由延迟检查，同时加速将敏感设备转移至福尔多地下设施"
+      },
+      "diplomatic_message": "伊朗伊斯兰共和国的核设施主权不容侵犯。IAEA的检查请求缺乏政治中立性，被敌对势力利用作为情报收集工具。我们将根据《不扩散核武器条约》的合法权利，在适当时候允许检查。",
+      "risk_assessment": "中高 - 可能招致更多国际制裁，但可保护核计划进展"
+    },
+    {
+      "event_id": "ev_us_sanctions_2026_03_30",
+      "decision": "retaliatory_measures",
+      "action_type": "proxy_attack_order",
+      "confidence": 0.82,
+      "rationale": "美国制裁企图扼杀伊朗经济，必须以代理人行动回应，同时保持合理推诿",
+      "action": {
+        "type": "代理人报复行动",
+        "details": "指示伊拉克什叶派民兵在72小时内对美军基地发动火箭弹袭击；指示胡塞武装袭击红海美国关联商船"
+      },
+      "diplomatic_message": "帝国主义的经济恐怖主义不会吓倒伊朗人民。我们将以适当方式回应任何侵略行为。抵抗轴心将继续壮大，直到最后的美国人离开我们的地区。",
+      "risk_assessment": "中等 - 可能招致美军空袭，但可接受的对抗升级"
+    },
+    {
+      "event_id": "ev_isr_threat_2026_03_30",
+      "decision": "deterrence_signal",
+      "action_type": "missile_test",
+      "confidence": 0.90,
+      "rationale": "以色列威胁触及红线（核设施攻击），必须展示报复能力以威慑",
+      "action": {
+        "type": "导弹试射威慑",
+        "details": "在伊朗中部进行中程弹道导弹试射，射程覆盖以色列全境；同时通过黎巴嫩真主党向以色列传递警告信息"
+      },
+      "diplomatic_message": "Zionist政权的威胁是空洞的。伊朗伊斯兰共和国拥有自卫的充分能力。任何针对我国神圣领土的侵略行为都将遭到毁灭性报复。以色列应该记住，我们随时可以抵达他们的城市。",
+      "risk_assessment": "中高 - 导弹试射可能触发以色列先发制人，但威慑是必要的"
+    }
+  ],
+  "resource_allocation": {
+    "nuclear_program": 40,
+    "proxy_support": 35,
+    "cyber_warfare": 15,
+    "diplomacy": 10
+  },
+  "strategic_assessment": {
+    "current_phase": "核计划推进期",
+    "primary_threat": "以色列先发制人打击",
+    "key_objective": "保持核模糊，加速浓缩铀生产",
+    "recommended_stance": "强硬但避免直接军事冲突"
+  },
+  "proxy_forces_status": {
+    "hezbollah": { "funding": "2000万美元/月", "readiness": "高", "orders": "待命" },
+    "houthis": { "funding": "1500万美元/月", "readiness": "高", "orders": "72小时内袭击红海航运" },
+    "iraqi_militias": { "funding": "1000万美元/月", "readiness": "中", "orders": "加强对美军基地骚扰" }
+  }
+}

@@ -1,0 +1,396 @@
+/* frontend/src/components/Leaderboard.css */
+
+/* MemorialModal 内的排行榜样式 */
+.memorial-body .leaderboard-table {
+  width: 100%;
+}
+
+.leaderboard-modal {
+  max-width: 1200px;
+  width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.leaderboard-header {
+  display: grid;
+  grid-template-columns: 60px 1.5fr 1fr 100px 2fr;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-weight: 700;
+  color: #000000;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.leaderboard-row {
+  display: grid;
+  grid-template-columns: 60px 1.5fr 1fr 100px 2fr;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  align-items: center;
+}
+
+.leaderboard-row:hover {
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.5);
+  transform: translateX(5px);
+}
+
+/* 势力配色 */
+.leaderboard-row.faction-axis {
+  border-left: 3px solid #8B1A1A;
+}
+
+.leaderboard-row.faction-us-il {
+  border-left: 3px solid #1E4F8A;
+}
+
+.leaderboard-row.faction-moderate {
+  border-left: 3px solid #B8860B;
+}
+
+.leaderboard-row.faction-brotherhood {
+  border-left: 3px solid #2D5A27;
+}
+
+.leaderboard-row.faction-neutral {
+  border-left: 3px solid #666;
+}
+
+/* 排名 */
+.lb-col-rank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rank-icon {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* 国家/玩家 */
+.lb-col-country {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.country-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.country-name.clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.country-name.clickable:hover {
+  color: #b8860b;
+  text-shadow: none;
+}
+
+.player-nickname {
+  font-size: 12px;
+  color: #000000;
+  opacity: 0.9;
+}
+
+.player-nickname.clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.player-nickname.clickable:hover {
+  opacity: 1;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
+}
+
+/* 势力 */
+.lb-col-faction {
+  display: flex;
+  align-items: center;
+}
+
+.faction-badge {
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  font-size: 12px;
+  color: #000000;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* 势力颜色变体 */
+.faction-badge.resistance {
+  background: rgba(139, 26, 26, 0.3);
+  border: 1px solid rgba(139, 26, 26, 0.5);
+  color: #ff8b8b;
+}
+
+.faction-badge.us-israel {
+  background: rgba(30, 79, 138, 0.3);
+  border: 1px solid rgba(30, 79, 138, 0.5);
+  color: #8bafff;
+}
+
+.faction-badge.moderate {
+  background: rgba(184, 134, 11, 0.3);
+  border: 1px solid rgba(184, 134, 11, 0.5);
+  color: #ffd78b;
+}
+
+.faction-badge.brotherhood {
+  background: rgba(45, 90, 39, 0.3);
+  border: 1px solid rgba(45, 90, 39, 0.5);
+  color: #8bff8b;
+}
+
+/* 国力总分 */
+.lb-col-power {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.power-total {
+  font-size: 20px;
+  font-weight: 700;
+  color: #000000;
+  text-shadow: none;
+}
+
+/* 具体实力 */
+.lb-col-details {
+  display: flex;
+  align-items: center;
+}
+
+.power-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.power-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.power-item:hover {
+  background: rgba(212, 175, 55, 0.2);
+  transform: scale(1.05);
+}
+
+.power-icon {
+  font-size: 14px;
+}
+
+.power-value {
+  font-size: 11px;
+  font-weight: 600;
+  color: #000000;
+}
+
+/* 响应式 */
+@media (max-width: 1024px) {
+  .leaderboard-header,
+  .leaderboard-row {
+    grid-template-columns: 50px 1fr 80px;
+  }
+  
+  .lb-col-faction,
+  .lb-col-details {
+    display: none;
+  }
+  
+  .power-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+  }
+  
+  .power-item {
+    padding: 4px;
+  }
+  
+  .power-icon {
+    font-size: 12px;
+  }
+  
+  .power-value {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .leaderboard-header,
+  .leaderboard-row {
+    grid-template-columns: 40px 1fr 70px;
+  }
+  
+  .lb-col-power {
+    justify-content: flex-end;
+    padding-right: 12px;
+  }
+  
+  .power-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* 加载和错误状态 */
+.loading-state,
+.error-state {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: var(--text-light);
+}
+
+.error-state {
+  color: #ff6b6b;
+}
+
+/* 骨架屏样式 */
+.skeleton-row {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  pointer-events: none;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, rgba(139, 90, 43, 0.3) 25%, rgba(184, 134, 11, 0.4) 50%, rgba(139, 90, 43, 0.3) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-rank {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+}
+
+.skeleton-country {
+  width: 150px;
+  height: 20px;
+  margin: 8px 0;
+}
+
+.skeleton-faction {
+  width: 80px;
+  height: 24px;
+  margin: 8px 0;
+}
+
+.skeleton-power {
+  width: 60px;
+  height: 28px;
+  margin: 6px 0;
+}
+
+.skeleton-details {
+  width: 100%;
+  height: 60px;
+}
+
+/* Coming Soon 样式 */
+.coming-soon-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  min-height: 400px;
+}
+
+.coming-soon-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.coming-soon-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #d4af37;
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.coming-soon-desc {
+  font-size: 18px;
+  color: #F0E6D2;
+  margin: 8px 0;
+}
+
+.coming-soon-desc-en {
+  font-size: 16px;
+  color: rgba(240, 230, 210, 0.7);
+  margin: 8px 0 24px 0;
+}
+
+.coming-soon-features {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.feature-item {
+  padding: 12px 24px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 8px;
+  color: #F0E6D2;
+  font-size: 14px;
+  font-weight: 500;
+}

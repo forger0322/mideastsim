@@ -1,0 +1,124 @@
+{
+  "worldState": {
+    "timestamp": "2026-03-10T04:55:00Z",
+    "events": [
+      {
+        "id": "event-001",
+        "timestamp": "2026-03-10T04:25:00Z",
+        "location": "德黑兰",
+        "type": "military",
+        "text": "伊朗革命卫队宣布接管首都安全，最高领袖办公室宣布全国哀悼"
+      },
+      {
+        "id": "event-002", 
+        "timestamp": "2026-03-10T04:10:00Z",
+        "location": "华盛顿",
+        "type": "diplomacy",
+        "text": "白宫国家安全委员会召开紧急会议，AI特朗普授权第六舰队进入波斯湾"
+      },
+      {
+        "id": "event-003",
+        "timestamp": "2026-03-10T03:55:00Z", 
+        "location": "全球市场",
+        "type": "economic",
+        "text": "布伦特原油期货突破87美元/桶，黄金价格触及2180美元/盎司"
+      },
+      {
+        "id": "event-004",
+        "timestamp": "2026-03-10T03:40:00Z",
+        "location": "利雅得",
+        "type": "diplomacy", 
+        "text": "沙特王储紧急致电以色列总理，提议召开海湾合作委员会特别会议"
+      }
+    ],
+    "leaders": [
+      {
+        "id": "trump-ai",
+        "name": "AI特朗普",
+        "location": "华盛顿",
+        "status": "active"
+      },
+      {
+        "id": "khamenei",
+        "name": "哈梅内伊",
+        "location": "德黑兰", 
+        "status": "deceased"
+      },
+      {
+        "id": "mbin-salman",
+        "name": "穆罕默德·本·萨勒曼",
+        "location": "利雅得",
+        "status": "active"
+      },
+      {
+        "id": "netanyahu",
+        "name": "内塔尼亚胡",
+        "location": "耶路撒冷",
+        "status": "active"
+      }
+    ],
+    "hotspots": [
+      {
+        "location": "德黑兰",
+        "status": "权力真空",
+        "color": "red"
+      },
+      {
+        "location": "霍尔木兹海峡",
+        "status": "军事对峙",
+        "color": "orange" 
+      },
+      {
+        "location": "利雅得",
+        "status": "紧急外交",
+        "color": "yellow"
+      }
+    ],
+    "economic": {
+      "stocks": {
+        "sp500": {"value": 4820.5, "change": -2.1},
+        "hs50": {"value": 16150.2, "change": -1.5},
+        "cn_military": {"value": 3280.8, "change": 4.2}
+      },
+      "commodities": {
+        "oil": {"value": 87.2, "change": 5.1},
+        "gold": {"value": 2180.0, "change": 2.3},
+        "silver": {"value": 26.2, "change": 1.2}
+      },
+      "crypto": {
+        "btc": {"value": 69500.0, "change": 2.8},
+        "eth": {"value": 3520.0, "change": 1.5}
+      },
+      "domestic": {
+        "gas_price": {"value": 8.7, "change": 3.1},
+        "housing": {"value": "平稳", "change": 0.0}
+      }
+    }
+  },
+  "currentBranch": {
+    "has_branch": true,
+    "title": "伊朗革命卫队是否向以色列发射导弹？",
+    "options": [
+      {
+        "id": "missile-strike",
+        "text": "立即导弹打击",
+        "description": "向特拉维夫和海法发射中程弹道导弹"
+      },
+      {
+        "id": "cyber-attack", 
+        "text": "网络攻击",
+        "description": "瘫痪以色列电网和金融系统"
+      },
+      {
+        "id": "diplomatic-pressure",
+        "text": "外交施压",
+        "description": "通过联合国安理会寻求国际支持"
+      },
+      {
+        "id": "wait-and-see",
+        "text": "观望等待",
+        "description": "让AI推演系统自主决策后续行动"
+      }
+    ]
+  }
+}

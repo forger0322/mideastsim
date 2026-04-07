@@ -1,0 +1,175 @@
+/* 🏛️ 创建会议室页面样式 */
+
+.create-meeting-room-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.create-meeting-room-container {
+  width: 100%;
+  max-width: 450px;
+  padding: 20px;
+}
+
+.create-meeting-room-card {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.create-meeting-room-title {
+  margin: 0 0 30px 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.create-meeting-room-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #a0a0a0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.room-name-input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 16px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.room-name-input:focus {
+  border-color: #4a90d9;
+  background-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+}
+
+.room-name-input::placeholder {
+  color: #666;
+}
+
+.error-message {
+  color: #ff6b6b;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.btn-cancel,
+.btn-create {
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  outline: none;
+}
+
+.btn-cancel {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.btn-cancel:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-create {
+  background: linear-gradient(135deg, #4a90d9 0%, #357abd 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(74, 144, 217, 0.3);
+}
+
+.btn-create:hover {
+  box-shadow: 0 6px 20px rgba(74, 144, 217, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-create:active {
+  transform: translateY(0);
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+  .create-meeting-room-container {
+    padding: 15px;
+  }
+
+  .create-meeting-room-card {
+    padding: 30px 20px;
+  }
+
+  .create-meeting-room-title {
+    font-size: 24px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn-cancel,
+  .btn-create {
+    width: 100%;
+  }
+}

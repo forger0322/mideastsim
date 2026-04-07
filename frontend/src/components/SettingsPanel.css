@@ -1,0 +1,293 @@
+/* frontend/src/components/SettingsPanel.css - 卷轴风格 */
+
+.settings-panel {
+  background: linear-gradient(180deg, #f5e6d3 0%, #eadab8 50%, #f5e6d3 100%);
+  border: 3px solid #8b5a2b;
+  border-radius: 15px 15px 8px 8px;
+  overflow: hidden;
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.4),
+    inset 0 0 40px rgba(139, 90, 43, 0.15),
+    0 0 0 2px rgba(212, 175, 55, 0.3);
+}
+
+/* 卷轴顶部装饰 */
+.settings-panel::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(180deg, #8b5a2b 0%, #5d4037 100%);
+  border-radius: 50%;
+  border: 2px solid #4a331c;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1;
+}
+
+/* 卷轴底部装饰 */
+.settings-panel::after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(180deg, #5d4037 0%, #8b5a2b 100%);
+  border-radius: 50%;
+  border: 2px solid #4a331c;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 35px 25px 20px;
+  border-bottom: 2px solid #8b5a2b;
+  position: relative;
+  z-index: 2;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+  color: #4a331c;
+  font-family: 'KaiTi', 'STKaiti', serif;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.close-btn {
+  width: 35px;
+  height: 35px;
+  background: transparent;
+  border: 2px solid #8b5a2b;
+  border-radius: 50%;
+  color: #8b5a2b;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: rgba(139, 90, 43, 0.1);
+  border-color: #c44536;
+  color: #c44536;
+  transform: rotate(90deg);
+}
+
+.panel-content {
+  padding: 20px 25px 35px;
+  position: relative;
+  z-index: 2;
+}
+
+.setting-section {
+  margin-bottom: 28px;
+}
+
+.setting-section:last-child {
+  margin-bottom: 0;
+}
+
+.setting-section h4 {
+  margin: 0 0 14px;
+  font-size: 16px;
+  color: #4a331c;
+  font-family: 'KaiTi', 'STKaiti', serif;
+  font-weight: bold;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #8b5a2b;
+}
+
+/* Language Options */
+.language-options {
+  display: flex;
+  gap: 12px;
+}
+
+.lang-btn {
+  flex: 1;
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.4);
+  border: 2px solid #8b5a2b;
+  border-radius: 10px;
+  color: #2c2416;
+  font-size: 15px;
+  font-family: 'KaiTi', 'STKaiti', serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.lang-btn:hover {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: #d4af37;
+}
+
+.lang-btn.active {
+  background: linear-gradient(180deg, #d4af37 0%, #b87c4b 100%);
+  border-color: #8b5a2b;
+  color: #f5e6d3;
+  font-weight: bold;
+  box-shadow: 0 3px 10px rgba(212, 175, 55, 0.4);
+}
+
+/* Theme Options */
+.theme-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.theme-btn {
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.4);
+  border: 2px solid #8b5a2b;
+  border-radius: 10px;
+  color: #2c2416;
+  font-size: 14px;
+  font-family: 'KaiTi', 'STKaiti', serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.theme-btn:hover {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: #d4af37;
+}
+
+.theme-btn.active {
+  background: linear-gradient(180deg, #d4af37 0%, #b87c4b 100%);
+  border-color: #8b5a2b;
+  color: #f5e6d3;
+  font-weight: bold;
+  box-shadow: 0 3px 10px rgba(212, 175, 55, 0.4);
+}
+
+/* Toggle Switch */
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px dashed rgba(139, 90, 43, 0.3);
+}
+
+.toggle-row:last-child {
+  border-bottom: none;
+}
+
+.toggle-label {
+  font-size: 15px;
+  color: #2c2416;
+  font-family: 'KaiTi', 'STKaiti', serif;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 50px;
+  height: 26px;
+  background: rgba(139, 90, 43, 0.3);
+  border-radius: 13px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.toggle-switch.active {
+  background: linear-gradient(90deg, #d4af37, #b87c4b);
+}
+
+.toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  background: #f5e6d3;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.toggle-switch.active .toggle-knob {
+  transform: translateX(24px);
+}
+
+/* Save Button */
+.save-btn {
+  width: 100%;
+  padding: 14px 30px;
+  background: linear-gradient(180deg, #b87c4b 0%, #8b5a2b 100%);
+  border: 2px solid #5d4037;
+  border-radius: 25px;
+  color: #f5e6d3;
+  font-size: 16px;
+  font-family: 'KaiTi', 'STKaiti', serif;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.save-btn:hover {
+  background: linear-gradient(180deg, #d4af37 0%, #b87c4b 100%);
+  border-color: #8b5a2b;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+}
+
+/* 火漆印装饰 */
+.settings-seal {
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  background: radial-gradient(circle at 30% 30%, #c44536, #8b1a1a);
+  border-radius: 50%;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f5e6d3;
+  font-family: 'KaiTi', serif;
+  font-size: 18px;
+  font-weight: bold;
+  z-index: 3;
+  transform: rotate(-15deg);
+}
+
+.settings-seal.top-right {
+  top: 15px;
+  right: 15px;
+}
+
+.settings-seal.bottom-left {
+  bottom: 15px;
+  left: 15px;
+}
+
+/* 羊皮纸纹理 */
+.settings-panel .panel-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(rgba(160, 120, 80, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(160, 120, 80, 0.06) 1px, transparent 1px);
+  background-size: 30px 30px, 30px 30px;
+  pointer-events: none;
+  opacity: 0.4;
+  z-index: -1;
+}

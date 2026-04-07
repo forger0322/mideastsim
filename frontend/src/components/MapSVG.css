@@ -1,0 +1,126 @@
+/* 古代手绘风格 SVG 地图 */
+
+.map-svg-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.map-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* 国家路径 */
+.country-path {
+  transition: all 0.2s ease;
+}
+
+.country-path:hover {
+  filter: brightness(1.1) url(#aged-edge);
+}
+
+/* 悬停高亮动画 */
+.hover-highlight {
+  animation: dashAnimation 1s linear infinite;
+}
+
+@keyframes dashAnimation {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+
+/* 国家标签 - 仿宋体/楷体 */
+.country-label {
+  font-family: 'KaiTi', 'STKaiti', 'SimSun', serif;
+  fill: #2c2416;
+  text-shadow: 0 0 2px rgba(245, 230, 211, 0.8);
+  pointer-events: none;
+  letter-spacing: 1px;
+}
+
+/* 选中状态 */
+.country-group.selected .country-path {
+  stroke-width: 3;
+  stroke: #d4af37 !important;
+  filter: url(#aged-edge) drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+/* 网格线动画 */
+.grid-lines {
+  opacity: 0.6;
+}
+
+/* 罗盘装饰 */
+.compass {
+  pointer-events: none;
+}
+
+.compass circle {
+  transform-origin: center;
+  animation: compassRotate 20s linear infinite;
+}
+
+@keyframes compassRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 波浪装饰 */
+.wave-decoration {
+  opacity: 0.5;
+}
+
+/* 选中指示器 */
+.selection-indicator {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(139, 90, 43, 0.9);
+  border: 2px solid #d4af37;
+  border-radius: 30px 5px 30px 5px;
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  animation: slideUp 0.3s ease-out;
+  z-index: 100;
+}
+
+.indicator-icon {
+  font-size: 16px;
+}
+
+.indicator-text {
+  font-family: 'KaiTi', 'STKaiti', serif;
+  color: #f5e6d3;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* 响应式 */
+@media (max-width: 1200px) {
+  .country-label {
+    font-size: 10px;
+  }
+}
